@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>WallaTeam — Prototipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  html, body { margin: 0; padding: 0; background: #EEF2F4; font-family: 'Inter', system-ui, sans-serif; }
+  * { box-sizing: border-box; }
+  body { color: #2C3E50; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="lib/design-canvas.jsx"></script>
+<script type="text/babel" src="lib/tweaks-panel.jsx"></script>
+<script type="text/babel" src="lib/wallateam-ui.jsx"></script>
+<script type="text/babel" src="lib/screen-login.jsx"></script>
+<script type="text/babel" src="lib/screen-home.jsx"></script>
+<script type="text/babel" src="lib/screen-create-wallet.jsx"></script>
+<script type="text/babel" src="lib/screen-wallet-detail.jsx"></script>
+<script type="text/babel" src="lib/screen-add-expense.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "themeMode": "light"
+}/*EDITMODE-END*/;
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const theme = WT_THEMES[tweaks.themeMode] || WT_THEMES.light;
+
+  const screens = [
+    { id: 'login', label: '01 · Login / Registro', sub: 'Onboarding inicial', Comp: WTScreenLogin },
+    { id: 'home', label: '02 · Home — Wallets', sub: 'Personal + en equipo', Comp: WTScreenHome },
+    { id: 'create', label: '03 · Crear Wallet', sub: 'Form completo con presupuesto inicial', Comp: WTScreenCreateWallet },
+    { id: 'detail', label: '04 · Detalle de Wallet', sub: 'Viaje en Familia (compartido)', Comp: WTScreenWalletDetail },
+    { id: 'add', label: '05 · Agregar Gasto', sub: 'Split por porcentajes', Comp: WTScreenAddExpense },
+  ];
+
+  return (
+    <React.Fragment>
+      <DesignCanvas
+        title="WallaTeam"
+        subtitle="Prototipo MVP · Android · Guaraníes (PYG) · Mid-fi"
+      >
+        <DCSection id="flow" title="Flujo principal · MVP" subtitle="4 pantallas core para arrancar — login, ver wallets, detalle, registrar gasto">
+          {screens.map(s => (
+            <DCArtboard key={s.id} id={s.id} label={s.label} width={400} height={820}>
+              <div data-screen-label={s.label} style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', padding: 20 }}>
+                <WTPhone theme={theme} label={s.label.split('·')[1]?.trim() || s.label} sublabel={s.sub}>
+                  <s.Comp theme={theme}/>
+                </WTPhone>
+              </div>
+            </DCArtboard>
+          ))}
+        </DCSection>
+
+        <DCSection id="notes" title="Notas para implementación" subtitle="Contexto para handoff a Claude Code (React Native)">
+          <DCArtboard id="notes-stack" label="Stack & arquitectura" width={420} height={520}>
+            <NotesCard theme={theme} title="Stack sugerido" items={[
+              ['React Native', 'Expo + TypeScript'],
+              ['Navigation', 'expo-router (file-based)'],
+              ['Estado', 'Zustand + AsyncStorage'],
+              ['Backend', 'Supabase (auth + DB + RLS)'],
+              ['Estilos', 'NativeWind o StyleSheet'],
+              ['Iconos', 'lucide-react-native'],
+              ['i18n', 'i18n-js (es-PY default)'],
+            ]}/>
+          </DCArtboard>
+          <DCArtboard id="notes-data" label="Modelo de datos" width={420} height={520}>
+            <NotesCard theme={theme} title="Entidades core" items={[
+              ['User', 'id, name, email, avatar'],
+              ['Wallet', 'id, name, type (personal|team), currency, balance, owner_id'],
+              ['WalletMember', 'wallet_id, user_id, role'],
+              ['Expense', 'id, wallet_id, amount, category, paid_by, date, photo_url, note'],
+              ['ExpenseSplit', 'expense_id, user_id, percentage, amount'],
+              ['Currency', 'code (PYG default), symbol (₲), decimals'],
+            ]}/>
+          </DCArtboard>
+          <DCArtboard id="notes-roadmap" label="Roadmap por fases" width={420} height={520}>
+            <NotesCard theme={theme} title="Fases sugeridas" items={[
+              ['Fase 1 · Auth', 'Email/pass + Google OAuth'],
+              ['Fase 2 · Wallets', 'CRUD personal'],
+              ['Fase 3 · Gastos', 'Crear, editar, listar'],
+              ['Fase 4 · Equipo', 'Invitar, miembros, roles'],
+              ['Fase 5 · Split', 'Equitativo + % + montos'],
+              ['Fase 6 · Balance', 'Cálculo deudas + saldar'],
+              ['Fase 7 · Multimoneda', 'USD, ARS además de PYG'],
+            ]}/>
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Tema">
+          <TweakRadio
+            label="Modo"
+            value={tweaks.themeMode}
+            options={[
+              { value: 'light', label: '☀️ Light' },
+              { value: 'dark', label: '🌙 Dark' },
+            ]}
+            onChange={(v) => setTweak('themeMode', v)}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </React.Fragment>
+  );
+}
+
+function NotesCard({ theme, title, items }) {
+  return (
+    <div style={{
+      width: '100%', height: '100%', padding: 22,
+      background: '#fff', borderRadius: 18,
+      border: '1px solid #E5E7EB',
+      fontFamily: WT_FONT, color: '#2C3E50',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <div style={{ width: 30, height: 30, borderRadius: 8, background: 'linear-gradient(135deg, #16A085 0%, #1F3A5F 130%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="sparkle" size={16} color="#fff"/>
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.2 }}>{title}</div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {items.map(([k, v], i) => (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingBottom: 10, borderBottom: i < items.length - 1 ? '1px dashed #E5E7EB' : 'none' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#16A085', letterSpacing: 0.3, textTransform: 'uppercase' }}>{k}</div>
+            <div style={{ fontSize: 13, color: '#2C3E50' }}>{v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
