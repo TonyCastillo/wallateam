@@ -39,3 +39,11 @@
 - 📁 Tocados: `app/theme/tokens.ts`, `app/theme/ThemeProvider.tsx`, `app/app/_layout.tsx`, `app/app/index.tsx`
 - 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca sin errores
 - 🧠 Notas: ver ADR-006 sobre la relajación del type `Colors` para soportar dual palette light/dark
+
+## [01.03] 2026-04-28 — Carga de fuentes Inter
+- ✅ `@expo-google-fonts/inter` integrado en `_layout.tsx` con `useFonts` (4 pesos: 400/500/600/700)
+- ✅ `expo-splash-screen` (preventAutoHideAsync + hideAsync tras carga) — evita flash de fuente system
+- ✅ Helper `theme/typography.ts` con `text.{regular,medium,semibold,bold}` y `fontFamily(weight)` tipado
+- ✅ `index.tsx` muestra los 4 pesos como smoke test visual
+- 📁 Tocados: `app/theme/typography.ts`, `app/app/_layout.tsx`, `app/app/index.tsx`
+- 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca OK

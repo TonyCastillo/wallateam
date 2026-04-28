@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-28 (máquina: laptop-casa)
 **Fase activa:** 01-fase-auth
-**Último módulo completado:** 01.02-theme-tokens
-**Próximo módulo a ejecutar:** [prompts/01-fase-auth/03-fonts-inter.md](../prompts/01-fase-auth/03-fonts-inter.md)
+**Último módulo completado:** 01.03-fonts-inter
+**Próximo módulo a ejecutar:** [prompts/01-fase-auth/04-supabase-client.md](../prompts/01-fase-auth/04-supabase-client.md)
 
 ---
 
@@ -22,7 +22,7 @@
 
 | Fase | Estado | Módulos done |
 |---|---|---|
-| 01 — Auth | 🟡 En curso | 2 / 7 |
+| 01 — Auth | 🟡 En curso | 3 / 7 |
 | 02 — Wallets personales | ⚪ Pendiente | — |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
@@ -40,7 +40,10 @@
 - TypeScript strict habilitado, type-check limpio
 - Theme tokens light/dark + ThemeProvider listos. Persisten preferencia en AsyncStorage.
 - `Colors` type relajado a `string` (en vez de literals) para que `colorsDark` encaje (ver ADR-006)
-- Próxima acción: ejecutar `prompts/01-fase-auth/03-fonts-inter.md` (carga de fuentes Inter)
+- Inter cargado vía `@expo-google-fonts/inter` con splash screen hasta listo
+- Helper `theme/typography.ts` expone `text.{regular,medium,semibold,bold}` y `fontFamily(weight)`
+- **Pendiente del usuario en módulo siguiente:** crear project Supabase y obtener URL + anon key
+- Próxima acción: ejecutar `prompts/01-fase-auth/04-supabase-client.md` (Supabase project + schema + RLS + cliente)
 
 ## Comandos útiles
 
