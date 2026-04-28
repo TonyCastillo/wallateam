@@ -76,3 +76,16 @@
 - 📁 Tocados: `app/schemas/auth.ts`, `app/stores/auth.ts`, `app/components/{Icon,WTLogo,RadialHero,Input,Button}.tsx`, `app/(auth)/_layout.tsx`, `app/(auth)/login.tsx`, `app/(app)/_layout.tsx`, `app/(app)/index.tsx`, `app/_layout.tsx`, `app.json`
 - 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca cargando `.env` correctamente. Validación visual + flow E2E (signup → home → logout → login → reabrir) en módulo 1.06.
 - 🧠 Notas: zodResolver(schema) requiere `as unknown as Resolver<SignupInput>` porque cuando tab='login' el schema no tiene fullName (solo está en signup). Defaults siempre incluyen fullName='' y se ignora en login.
+
+## [01.06] 2026-04-28 — Validación visual + E2E
+- ✅ Usuario probó la app en Expo Go con el flow completo (signup → home → logout → login → reabrir → sigue logueado)
+- ✅ Confirmación visual: pantalla matchea el prototipo HTML (logo 68px, tipografía Inter, tabs, gradient CTA, eye toggle, divider, microcopy es-PY)
+- ✅ Microcopy 100% literal contra el mock
+- ✅ AuthGate redirige correctamente según session
+- ✅ Persistencia de sesión funciona vía AsyncStorage (force-quit + reopen mantiene login)
+- 🧠 Notas: la validación lado a lado contra `WallaTeam Prototype.html` se delega al usuario en futuras revisiones. Sin desviaciones reportadas en esta primera pasada.
+
+## [01.99] 2026-04-28 — Fase 1 (Auth) cerrada ✅
+- Smoke test E2E pasado por el usuario en dispositivo real
+- Commit de cierre `feat(auth)[01.99]: cierre fase 1`
+- Próxima fase: 02-fase-wallets-personales (a planificar/diseñar prompts antes de ejecutar)

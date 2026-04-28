@@ -1,9 +1,9 @@
 # Estado actual del proyecto WallaTeam
 
 **Última actualización:** 2026-04-28 (máquina: laptop-casa)
-**Fase activa:** 01-fase-auth
-**Último módulo completado:** 01.05-screen-login
-**Próximo módulo a ejecutar:** [prompts/01-fase-auth/06-validate-vs-mock.md](../prompts/01-fase-auth/06-validate-vs-mock.md)
+**Fase activa:** 02-fase-wallets-personales (pendiente de diseño de prompts)
+**Último módulo completado:** 01.99-close-phase (Fase 1 cerrada ✅)
+**Próximo módulo a ejecutar:** _diseñar `prompts/02-fase-wallets-personales/` antes de ejecutar — usar plantilla del cierre de Fase 1_
 
 ---
 
@@ -22,8 +22,8 @@
 
 | Fase | Estado | Módulos done |
 |---|---|---|
-| 01 — Auth | 🟡 En curso | 5 / 7 |
-| 02 — Wallets personales | ⚪ Pendiente | — |
+| 01 — Auth | ✅ Cerrada | 7 / 7 |
+| 02 — Wallets personales | ⚪ Pendiente (a planificar) | — |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
@@ -33,29 +33,50 @@
 
 ## Notas del momento
 
-- Expo SDK 54 (más nuevo que SDK 50 mínimo) — React 19.1, RN 0.81.5
-- Todas las dependencias del MVP instaladas en `app/package.json`
-- Para nuevas instalaciones de paquetes, recordar usar `--legacy-peer-deps` (ver ADR-004)
-- `npx expo start` arranca correctamente en `localhost:8081`
-- TypeScript strict habilitado, type-check limpio
-- Theme tokens light/dark + ThemeProvider listos. Persisten preferencia en AsyncStorage.
-- `Colors` type relajado a `string` (en vez de literals) para que `colorsDark` encaje (ver ADR-006)
-- Inter cargado vía `@expo-google-fonts/inter` con splash screen hasta listo
-- Helper `theme/typography.ts` expone `text.{regular,medium,semibold,bold}` y `fontFamily(weight)`
-- Supabase project `azfcmdihftxtiwrvcfsh` activo. Schema (7 tablas + 4 currencies seed + trigger handle_new_user) y RLS aplicados en dashboard. Confirm email desactivado en dev (ADR-007).
-- Cliente Supabase listo en `app/lib/supabase.ts` con AsyncStorage adapter; helpers PYG en `app/lib/format.ts`
-- Smoke test contra REST API: `currencies` devuelve [ARS, EUR, PYG, USD] correctamente
-- Pantalla de Login/Registro implementada en `app/(auth)/login.tsx`. AuthGate en root `_layout.tsx` redirige según sesión. Placeholder home en `(app)/index.tsx` con logout funcional.
-- Componentes nuevos: Icon (lucide), WTLogo (svg), RadialHero (svg), Input (WTField), Button (gradient + outline)
-- `typedRoutes` desactivado por quirk de la versión actual (ver ADR-008)
-- **Próxima acción:** validar visualmente la pantalla en Expo Go vs el prototipo HTML (`prompts/01-fase-auth/06-validate-vs-mock.md`)
+- **Fase 1 (Auth) completa**: setup Expo SDK 54, theme tokens light/dark, fuentes Inter, Supabase project + schema + RLS, Login/Registro funcional con sesión persistente
+- Project Supabase activo: `azfcmdihftxtiwrvcfsh.supabase.co`
+- Confirm email **OFF en dev** (re-activar antes de release a prod)
+- Stack en producción: Expo SDK 54 + React 19.1 + RN 0.81.5
+- 6 commits en main: `3e1ddb0` (bootstrap) → `5cf701f` (01.01) → `9e5d361` (01.02) → `9affe1a` (01.03) → `3dc8436` (01.04) → `d59d220` (01.05) → cierre Fase 1
+- **Próxima acción:** diseñar los prompts de Fase 2 (Wallets personales) antes de ejecutar nada. Ver "Plantilla para arrancar Fase 2" abajo.
+
+## Plantilla para arrancar Fase 2
+
+Pegar este prompt al usuario o al próximo agente cuando se vaya a iniciar Fase 2:
+
+```
+Empezá Fase 2 (Wallets personales) del proyecto WallaTeam.
+
+Lectura obligatoria antes de cualquier acción:
+1. prompts/00-AGENT-HANDOFF.md
+2. prompts/00-MASTER.md
+3. bitacora/STATE.md, CHANGELOG.md, TASKS.md, DECISIONS.md
+
+Después:
+- Crear los archivos de prompts/02-fase-wallets-personales/ siguiendo
+  la estructura de prompts/01-fase-auth/ (00-overview, 01..N módulos, 99-close-phase)
+- Mocks ground truth: design_handoff_wallateam_mvp/lib/screen-home.jsx,
+  screen-create-wallet.jsx, screen-wallet-detail.jsx (este último mostrará data
+  dummy hasta Fase 4)
+- Módulos sugeridos:
+  01 - BottomNav component + (app)/(tabs) layout
+  02 - Wallet store + queries Supabase (CRUD wallets personales)
+  03 - Pantalla Home (balance card gradient, quick actions, lista wallets)
+  04 - Pantalla Crear Wallet (form completo SIN sección team que va Fase 4)
+  05 - Pantalla Detalle Wallet (sin gastos reales, placeholder lista)
+  06 - Validación visual contra prototipo
+  99 - Cerrar fase
+
+Recordá: actualizar bitácora al cerrar cada módulo, commit por módulo,
+no inventar componentes (reusar Icon/Button/Input/Theme), microcopy literal es-PY.
+```
 
 ## Comandos útiles
 
 ```bash
 cd app
-npm install --legacy-peer-deps   # primera vez en cada máquina (o tras cambios en package.json)
-npm start                         # arranca expo dev server
+npm install --legacy-peer-deps   # primera vez en cada máquina o tras package.json change
+npm start                         # Metro dev server
 npm run typecheck                 # tsc --noEmit
 ```
 
