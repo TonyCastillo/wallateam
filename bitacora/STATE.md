@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-28 (máquina: laptop-casa)
 **Fase activa:** 01-fase-auth
-**Último módulo completado:** 01.03-fonts-inter
-**Próximo módulo a ejecutar:** [prompts/01-fase-auth/04-supabase-client.md](../prompts/01-fase-auth/04-supabase-client.md)
+**Último módulo completado:** 01.04-supabase-client
+**Próximo módulo a ejecutar:** [prompts/01-fase-auth/05-screen-login.md](../prompts/01-fase-auth/05-screen-login.md)
 
 ---
 
@@ -22,7 +22,7 @@
 
 | Fase | Estado | Módulos done |
 |---|---|---|
-| 01 — Auth | 🟡 En curso | 3 / 7 |
+| 01 — Auth | 🟡 En curso | 4 / 7 |
 | 02 — Wallets personales | ⚪ Pendiente | — |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
@@ -42,8 +42,10 @@
 - `Colors` type relajado a `string` (en vez de literals) para que `colorsDark` encaje (ver ADR-006)
 - Inter cargado vía `@expo-google-fonts/inter` con splash screen hasta listo
 - Helper `theme/typography.ts` expone `text.{regular,medium,semibold,bold}` y `fontFamily(weight)`
-- **Pendiente del usuario en módulo siguiente:** crear project Supabase y obtener URL + anon key
-- Próxima acción: ejecutar `prompts/01-fase-auth/04-supabase-client.md` (Supabase project + schema + RLS + cliente)
+- Supabase project `azfcmdihftxtiwrvcfsh` activo. Schema (7 tablas + 4 currencies seed + trigger handle_new_user) y RLS aplicados en dashboard. Confirm email desactivado en dev (ADR-007).
+- Cliente Supabase listo en `app/lib/supabase.ts` con AsyncStorage adapter; helpers PYG en `app/lib/format.ts`
+- Smoke test contra REST API: `currencies` devuelve [ARS, EUR, PYG, USD] correctamente
+- Próxima acción: ejecutar `prompts/01-fase-auth/05-screen-login.md` (UI de Login/Registro + auth gate)
 
 ## Comandos útiles
 

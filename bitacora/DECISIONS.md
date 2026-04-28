@@ -38,6 +38,16 @@
 - Cualquier nueva instalación posterior debe usar el flag (anotado en `STATE.md` sección "Comandos útiles")
 - Si en futuro Expo bumpea React a 19.2+, este flag puede dejar de ser necesario
 
+## ADR-007 · Publishable key (`sb_publishable_*`) en lugar de JWT anon key clásica + Confirm email OFF en dev
+
+**Fecha:** 2026-04-28
+**Contexto:** Supabase ofrece dos formatos de key pública: la JWT clásica (`eyJ...`) y la nueva publishable key (`sb_publishable_*`). El usuario tiene la nueva. `@supabase/supabase-js@^2.105` la acepta sin cambios.
+**Decisión:** Usar la publishable key. Va en `EXPO_PUBLIC_SUPABASE_ANON_KEY` (mismo nombre de var, distinto formato). Adicionalmente, "Confirm email" desactivado en Supabase Auth → Sign In/Up para que el flow de signup en dev sea inmediato sin pasar por inbox.
+**Consecuencias:**
+- Las dos keys son intercambiables a nivel del cliente (misma seguridad: ambas son safe-to-publish, todo el control está en RLS)
+- "Confirm email OFF" debe **re-activarse antes de release a producción** (anotado como blocker pre-release)
+- Si el usuario rota la key en el futuro, solo cambia `app/.env` (no requiere cambios de código)
+
 ## ADR-006 · `Colors` type relajado a `string` para soportar dual palette
 
 **Fecha:** 2026-04-28

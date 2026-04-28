@@ -47,3 +47,15 @@
 - ✅ `index.tsx` muestra los 4 pesos como smoke test visual
 - 📁 Tocados: `app/theme/typography.ts`, `app/app/_layout.tsx`, `app/app/index.tsx`
 - 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca OK
+
+## [01.04] 2026-04-28 — Supabase: project, schema, RLS, cliente
+- ✅ Project Supabase `azfcmdihftxtiwrvcfsh.supabase.co` creado por el usuario
+- ✅ `app/.env` con URL + publishable key (gitignored)
+- ✅ `app/supabase/schema.sql`: 7 tablas (profiles, currencies, wallets, wallet_members, expenses, expense_splits, wallet_invites) + seed de 4 currencies (PYG/USD/ARS/EUR) + trigger `handle_new_user` que inserta en `profiles` al signup tomando `full_name` de raw_user_meta_data
+- ✅ `app/supabase/policies.sql`: RLS habilitada en las 7 tablas + helper `is_wallet_member` (security definer) + policies por tabla (profiles=own, currencies=read-all, wallets=owner|member, wallet_members=member, expenses=member, expense_splits=via expense, invites=invitador|destinatario por email)
+- ✅ `app/lib/supabase.ts`: createClient con AsyncStorage adapter (autoRefreshToken, persistSession, detectSessionInUrl=false)
+- ✅ `app/lib/format.ts`: `fmtGs`, `fmtGsSigned` (− para neg, + para pos), `fmtGsCompact` (k/M)
+- ✅ `app/app/index.tsx`: smoke test que consulta currencies y muestra los formatos PYG
+- ✅ Dashboard del usuario: SQLs corridos exitosamente, "Confirm email" desactivado en Auth → Sign In/Up
+- 🧪 Verificación: `tsc --noEmit` limpio; smoke test REST API devuelve [ARS, EUR, PYG, USD] (RLS de `currencies_read_all` funciona sin auth)
+- 🧠 Notas: ver ADR-007 sobre publishable key vs JWT anon key clásica

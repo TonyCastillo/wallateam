@@ -7,12 +7,11 @@
 
 ## En curso
 
-- [ ] [Fase 1] 04 — Supabase: project, schema, RLS, cliente
+- [ ] [Fase 1] 05 — Pantalla Login/Registro + auth gate
 
 ## Pendiente
 
 ### Fase 1 — Auth
-- [ ] [Fase 1] 05 — Pantalla Login/Registro + auth gate
 - [ ] [Fase 1] 06 — Validación visual contra prototipo
 - [ ] [Fase 1] 99 — Cerrar fase: smoke test + commit + plantilla próxima fase
 
@@ -32,3 +31,4 @@
 - ✅ [Fase 1] 01 — Setup Expo + dependencias (2026-04-28)
 - ✅ [Fase 1] 02 — Theme tokens + ThemeProvider (2026-04-28)
 - ✅ [Fase 1] 03 — Carga de fuentes Inter (2026-04-28)
+- ✅ [Fase 1] 04 — Supabase: project, schema, RLS, cliente (2026-04-28)
