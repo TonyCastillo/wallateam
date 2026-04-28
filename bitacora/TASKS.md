@@ -7,13 +7,11 @@
 
 ## En curso
 
-- _(ninguno — esperando ejecutar `prompts/01-fase-auth/01-setup-expo.md`)_
+- [ ] [Fase 1] 02 — Theme tokens + ThemeProvider
 
 ## Pendiente
 
 ### Fase 1 — Auth
-- [ ] [Fase 1] 01 — Setup Expo + dependencias
-- [ ] [Fase 1] 02 — Theme tokens + ThemeProvider
 - [ ] [Fase 1] 03 — Carga de fuentes Inter
 - [ ] [Fase 1] 04 — Supabase: project, schema, RLS, cliente
 - [ ] [Fase 1] 05 — Pantalla Login/Registro + auth gate
@@ -33,3 +31,4 @@
 ## Done
 
 - ✅ [Bootstrap] Crear prompts/ + bitacora/ + Fase 1 completa + git init (2026-04-28)
+- ✅ [Fase 1] 01 — Setup Expo + dependencias (2026-04-28)

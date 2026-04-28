@@ -28,8 +28,26 @@
 
 ---
 
-> Las siguientes ADRs se irán agregando a medida que se tomen decisiones durante la ejecución de las fases. Ejemplos de qué documentar:
-> - Desviaciones visuales del prototipo por limitaciones de RN
-> - Cambios en el modelo SQL respecto al README original
-> - Adopción de librerías no incluidas en el stack inicial
-> - Estrategias de caching, sync offline, etc.
+## ADR-004 · `npm install --legacy-peer-deps` para deps JS sobre Expo SDK 54
+
+**Fecha:** 2026-04-28
+**Contexto:** Expo SDK 54 trae `react@19.1.0`, pero `expo-router@6` arrastra `react-dom@19.2.5` que pide `react@^19.2.5` como peer estricto. npm 11 falla con ERESOLVE al instalar paquetes JS adicionales (supabase-js, zustand, etc.).
+**Decisión:** Usar `npm install --legacy-peer-deps` para los paquetes pure-JS. Los paquetes nativos van con `npx expo install` (que ya resuelve compatibilidad correctamente).
+**Consecuencias:**
+- Workaround estándar y documentado para Expo + React 19 mientras Expo no actualice React 19.2.x
+- Cualquier nueva instalación posterior debe usar el flag (anotado en `STATE.md` sección "Comandos útiles")
+- Si en futuro Expo bumpea React a 19.2+, este flag puede dejar de ser necesario
+
+## ADR-005 · Expo SDK 54 (no SDK 50)
+
+**Fecha:** 2026-04-28
+**Contexto:** El README handoff sugería SDK 50+. `create-expo-app@latest` instaló SDK 54.
+**Decisión:** Aceptar SDK 54 (más reciente, soportado, con New Architecture habilitada por default).
+**Consecuencias:**
+- React 19 + RN 0.81 (mejoras de perf y APIs más modernas)
+- New Architecture activa (`newArchEnabled: true`) — todas las libs nativas instaladas son compatibles
+- El prompt `01-setup-expo.md` original mencionaba SDK 50+, por lo que SDK 54 cumple el contrato
+
+---
+
+> Las siguientes ADRs se irán agregando a medida que se tomen decisiones durante la ejecución de las fases.

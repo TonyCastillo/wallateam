@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-28 (máquina: laptop-casa)
 **Fase activa:** 01-fase-auth
-**Último módulo completado:** _ninguno aún_
-**Próximo módulo a ejecutar:** [prompts/01-fase-auth/01-setup-expo.md](../prompts/01-fase-auth/01-setup-expo.md)
+**Último módulo completado:** 01.01-setup-expo
+**Próximo módulo a ejecutar:** [prompts/01-fase-auth/02-theme-tokens.md](../prompts/01-fase-auth/02-theme-tokens.md)
 
 ---
 
@@ -22,7 +22,7 @@
 
 | Fase | Estado | Módulos done |
 |---|---|---|
-| 01 — Auth | 🟡 En curso | 0 / 7 |
+| 01 — Auth | 🟡 En curso | 1 / 7 |
 | 02 — Wallets personales | ⚪ Pendiente | — |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
@@ -33,10 +33,22 @@
 
 ## Notas del momento
 
-- Stack confirmado en `prompts/00-MASTER.md`
-- Repo recién inicializado, prompt-pack creado, sin código de app aún
-- Próxima acción: usuario o agente ejecuta `prompts/01-fase-auth/01-setup-expo.md`
+- Expo SDK 54 (más nuevo que SDK 50 mínimo) — React 19.1, RN 0.81.5
+- Todas las dependencias del MVP instaladas en `app/package.json`
+- Para nuevas instalaciones de paquetes, recordar usar `--legacy-peer-deps` (ver ADR-004)
+- `npx expo start` arranca correctamente en `localhost:8081`
+- TypeScript strict habilitado, type-check limpio
+- Próxima acción: ejecutar `prompts/01-fase-auth/02-theme-tokens.md` (theme tokens + ThemeProvider)
+
+## Comandos útiles
+
+```bash
+cd app
+npm install --legacy-peer-deps   # primera vez en cada máquina (o tras cambios en package.json)
+npm start                         # arranca expo dev server
+npm run typecheck                 # tsc --noEmit
+```
 
 ## Blocker
 
-_(Si hay un blocker activo, documentarlo acá. Si no, dejar esta sección vacía o eliminar.)_
+_(ninguno activo)_
