@@ -59,3 +59,20 @@
 - ✅ Dashboard del usuario: SQLs corridos exitosamente, "Confirm email" desactivado en Auth → Sign In/Up
 - 🧪 Verificación: `tsc --noEmit` limpio; smoke test REST API devuelve [ARS, EUR, PYG, USD] (RLS de `currencies_read_all` funciona sin auth)
 - 🧠 Notas: ver ADR-007 sobre publishable key vs JWT anon key clásica
+
+## [01.05] 2026-04-28 — Pantalla Login/Registro + auth gate
+- ✅ `schemas/auth.ts`: zod loginSchema (email + password ≥8 + 1 número) y signupSchema (extiende con fullName 2-60)
+- ✅ `stores/auth.ts`: Zustand con session/user/hydrated, `hydrate()` (getSession + onAuthStateChange listener), `signOut()`
+- ✅ `components/Icon.tsx`: wrapper `lucide-react-native` con strokeWidth=1.8 default
+- ✅ `components/WTLogo.tsx`: port SVG de wallateam-ui.jsx con `react-native-svg` (Rect, Path, Circle, LinearGradient con id único por instancia via useId)
+- ✅ `components/RadialHero.tsx`: gradient radial top con `react-native-svg` (`expo-linear-gradient` no soporta radial)
+- ✅ `components/Input.tsx`: WTField port. Label uppercase 11px sb 0.3 letterSpacing, box surface 12px borderRadius gap 10, trailing slot opcional, error message debajo
+- ✅ `components/Button.tsx`: variant primary (LinearGradient 135° primary→secondary, shadow ctaPrimary, icon left/right, loading state) + outline (border + bg)
+- ✅ `(auth)/_layout.tsx` y `(auth)/login.tsx`: pantalla completa con tabs Ingresar/Registrarme, RadialHero fondo, WTLogo 68px, título Walla(secondary)+Team(primary) bold 26 letterSpacing -0.5, tagline, form Controller+zod (3 campos en signup), eye toggle (Eye/EyeOff), forgot password placeholder, CTA gradient con arrow-right, divider "o continuar con", Google placeholder con Alert, switch tab footer
+- ✅ `(app)/_layout.tsx` y `(app)/index.tsx`: placeholder home con saludo `Hola, {fullName}` y botón rojo "Cerrar sesión" → `useAuth().signOut()`
+- ✅ Root `_layout.tsx`: `useFonts` Inter, `useAuth().hydrate()` al mount, `AuthGate` redirige según `session` y `segments[0]==='(auth)'` con `router.replace()`
+- 🗑️ Borrado `app/index.tsx` (conflicto con `(app)/index.tsx`)
+- ⚙️ `app.json`: `experiments.typedRoutes=false` (quirk de versión que no expone bare `/`, ver ADR-008)
+- 📁 Tocados: `app/schemas/auth.ts`, `app/stores/auth.ts`, `app/components/{Icon,WTLogo,RadialHero,Input,Button}.tsx`, `app/(auth)/_layout.tsx`, `app/(auth)/login.tsx`, `app/(app)/_layout.tsx`, `app/(app)/index.tsx`, `app/_layout.tsx`, `app.json`
+- 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca cargando `.env` correctamente. Validación visual + flow E2E (signup → home → logout → login → reabrir) en módulo 1.06.
+- 🧠 Notas: zodResolver(schema) requiere `as unknown as Resolver<SignupInput>` porque cuando tab='login' el schema no tiene fullName (solo está en signup). Defaults siempre incluyen fullName='' y se ignora en login.

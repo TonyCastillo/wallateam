@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-28 (máquina: laptop-casa)
 **Fase activa:** 01-fase-auth
-**Último módulo completado:** 01.04-supabase-client
-**Próximo módulo a ejecutar:** [prompts/01-fase-auth/05-screen-login.md](../prompts/01-fase-auth/05-screen-login.md)
+**Último módulo completado:** 01.05-screen-login
+**Próximo módulo a ejecutar:** [prompts/01-fase-auth/06-validate-vs-mock.md](../prompts/01-fase-auth/06-validate-vs-mock.md)
 
 ---
 
@@ -22,7 +22,7 @@
 
 | Fase | Estado | Módulos done |
 |---|---|---|
-| 01 — Auth | 🟡 En curso | 4 / 7 |
+| 01 — Auth | 🟡 En curso | 5 / 7 |
 | 02 — Wallets personales | ⚪ Pendiente | — |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
@@ -45,7 +45,10 @@
 - Supabase project `azfcmdihftxtiwrvcfsh` activo. Schema (7 tablas + 4 currencies seed + trigger handle_new_user) y RLS aplicados en dashboard. Confirm email desactivado en dev (ADR-007).
 - Cliente Supabase listo en `app/lib/supabase.ts` con AsyncStorage adapter; helpers PYG en `app/lib/format.ts`
 - Smoke test contra REST API: `currencies` devuelve [ARS, EUR, PYG, USD] correctamente
-- Próxima acción: ejecutar `prompts/01-fase-auth/05-screen-login.md` (UI de Login/Registro + auth gate)
+- Pantalla de Login/Registro implementada en `app/(auth)/login.tsx`. AuthGate en root `_layout.tsx` redirige según sesión. Placeholder home en `(app)/index.tsx` con logout funcional.
+- Componentes nuevos: Icon (lucide), WTLogo (svg), RadialHero (svg), Input (WTField), Button (gradient + outline)
+- `typedRoutes` desactivado por quirk de la versión actual (ver ADR-008)
+- **Próxima acción:** validar visualmente la pantalla en Expo Go vs el prototipo HTML (`prompts/01-fase-auth/06-validate-vs-mock.md`)
 
 ## Comandos útiles
 

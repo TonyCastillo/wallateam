@@ -38,6 +38,16 @@
 - Cualquier nueva instalación posterior debe usar el flag (anotado en `STATE.md` sección "Comandos útiles")
 - Si en futuro Expo bumpea React a 19.2+, este flag puede dejar de ser necesario
 
+## ADR-008 · `experiments.typedRoutes` desactivado por quirk del codegen
+
+**Fecha:** 2026-04-28
+**Contexto:** Con `experiments.typedRoutes: true` y los archivos `(app)/index.tsx` + `(auth)/login.tsx`, el `router.d.ts` generado expone `/login` y `/index` (con el sufijo) pero NO la ruta bare `/`. Esto rompe `router.replace('/')` en TS strict aunque a runtime funciona.
+**Decisión:** Desactivar `typedRoutes` en `app.json`. Las rutas se siguen escribiendo igual; solo se pierde autocomplete tipado de rutas en el IDE.
+**Consecuencias:**
+- Las llamadas a `router.replace('/')`, `router.push('/login')` etc. siguen funcionando idénticamente
+- Si en una versión futura de expo-router se arregla el codegen para emitir `/` para index files de grupo root, se puede re-habilitar
+- No afecta el behavior runtime ni la calidad del código
+
 ## ADR-007 · Publishable key (`sb_publishable_*`) en lugar de JWT anon key clásica + Confirm email OFF en dev
 
 **Fecha:** 2026-04-28
