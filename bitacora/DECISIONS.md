@@ -38,6 +38,16 @@
 - Cualquier nueva instalación posterior debe usar el flag (anotado en `STATE.md` sección "Comandos útiles")
 - Si en futuro Expo bumpea React a 19.2+, este flag puede dejar de ser necesario
 
+## ADR-006 · `Colors` type relajado a `string` para soportar dual palette
+
+**Fecha:** 2026-04-28
+**Contexto:** En `theme/tokens.ts`, definir `colors as const` produce literal types (`primary: '#16A085'`). Con `export type Colors = typeof colors`, asignar `colorsDark` (que tiene otros hex literales) al `Theme.colors: Colors` falla en TS strict porque `'#5DA9E9'` no es asignable a `'#1F3A5F'`.
+**Decisión:** Definir `Colors` como `{ readonly [K in keyof typeof colors]: string }` — mantiene la forma estructural y los keys, pero relaja los valores a `string`.
+**Consecuencias:**
+- El `as const` se mantiene en los objetos para preservar forma e intellisense
+- `Theme.colors` puede ser tanto `colors` (light) como `colorsDark` sin coerción
+- Si se quisieran literal types en consumidores específicos, importar `colors`/`colorsDark` directamente, no a través de `Theme.colors`
+
 ## ADR-005 · Expo SDK 54 (no SDK 50)
 
 **Fecha:** 2026-04-28

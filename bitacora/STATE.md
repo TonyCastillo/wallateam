@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-28 (máquina: laptop-casa)
 **Fase activa:** 01-fase-auth
-**Último módulo completado:** 01.01-setup-expo
-**Próximo módulo a ejecutar:** [prompts/01-fase-auth/02-theme-tokens.md](../prompts/01-fase-auth/02-theme-tokens.md)
+**Último módulo completado:** 01.02-theme-tokens
+**Próximo módulo a ejecutar:** [prompts/01-fase-auth/03-fonts-inter.md](../prompts/01-fase-auth/03-fonts-inter.md)
 
 ---
 
@@ -22,7 +22,7 @@
 
 | Fase | Estado | Módulos done |
 |---|---|---|
-| 01 — Auth | 🟡 En curso | 1 / 7 |
+| 01 — Auth | 🟡 En curso | 2 / 7 |
 | 02 — Wallets personales | ⚪ Pendiente | — |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
@@ -38,7 +38,9 @@
 - Para nuevas instalaciones de paquetes, recordar usar `--legacy-peer-deps` (ver ADR-004)
 - `npx expo start` arranca correctamente en `localhost:8081`
 - TypeScript strict habilitado, type-check limpio
-- Próxima acción: ejecutar `prompts/01-fase-auth/02-theme-tokens.md` (theme tokens + ThemeProvider)
+- Theme tokens light/dark + ThemeProvider listos. Persisten preferencia en AsyncStorage.
+- `Colors` type relajado a `string` (en vez de literals) para que `colorsDark` encaje (ver ADR-006)
+- Próxima acción: ejecutar `prompts/01-fase-auth/03-fonts-inter.md` (carga de fuentes Inter)
 
 ## Comandos útiles
 

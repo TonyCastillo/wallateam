@@ -29,3 +29,13 @@
 - 📁 Tocados: `app/package.json`, `app/tsconfig.json`, `app/app.json`, `app/app/_layout.tsx`, `app/app/index.tsx`, `app/.env.example`, eliminados `app/App.tsx` y `app/index.ts`
 - 🧪 Verificación: `npx tsc --noEmit` sin errores; `npx expo start` arranca Metro en localhost:8081 sin warnings; `expo-doctor` 16/17 OK (1 falló por timeout de red al schema check)
 - 🧠 Notas: ver ADR-004 sobre `--legacy-peer-deps`
+
+## [01.02] 2026-04-28 — Theme tokens + ThemeProvider
+- ✅ `app/theme/tokens.ts` con `colors` (light) y `colorsDark` (dark) idénticos al `WT_THEMES` original
+- ✅ `typography` (Inter weights + sizes xs..3xl + line heights), `spacing` (xs..xl), `radius` (sm..full), `shadows` (card/cardHi/ctaPrimary), `gradients.ctaPrimary`
+- ✅ `app/theme/ThemeProvider.tsx` con context, hook `useTheme()`, persistencia en `@wt:theme-mode`, modo system/light/dark, listener `Appearance.addChangeListener` para reactividad
+- ✅ `app/_layout.tsx` envuelve con ThemeProvider + StatusBarWithTheme
+- ✅ `app/index.tsx` valida acceso al tema (muestra primary/secondary/mode)
+- 📁 Tocados: `app/theme/tokens.ts`, `app/theme/ThemeProvider.tsx`, `app/app/_layout.tsx`, `app/app/index.tsx`
+- 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca sin errores
+- 🧠 Notas: ver ADR-006 sobre la relajación del type `Colors` para soportar dual palette light/dark
