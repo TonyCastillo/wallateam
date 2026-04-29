@@ -112,3 +112,12 @@
 - 📁 Tocados: `app/lib/types.ts`, `app/lib/walletIcons.ts`, `app/stores/wallets.ts`, `app/app/_layout.tsx`, `app/app/(app)/(tabs)/home.tsx` (smoke test)
 - 🧪 Verificación: home placeholder muestra wallets en JSON debug
 - 🧠 Notas: ver DECISIONS.md sobre useTotalBalance placeholder y realtime simple
+
+## [02.03] 2026-04-28 — Pantalla Home (wallets personales)
+- ✅ Componentes: IconBox (con helper withAlpha), Chip (primary/secondary tones), BalanceCard (gradient secondary→primary), QuickAction (filled/subtle), WalletRow, SectionHeader
+- ✅ Pantalla `(tabs)/home.tsx` completa: top bar + BalanceCard + 4 quick actions + Mis wallets list + Actividad placeholder
+- ✅ Pull-to-refresh con RefreshControl
+- ✅ Empty state con CTA "Crear mi primera wallet"
+- ✅ Skeleton loading rows
+- 📁 Tocados: `app/components/{IconBox,Chip,BalanceCard,QuickAction,WalletRow,SectionHeader}.tsx`, `app/app/(app)/(tabs)/home.tsx`
+- 🧪 Verificación: lista de wallets dummy se ve correctamente, navegación a Crear/Detalle funciona

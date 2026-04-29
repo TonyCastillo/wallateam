@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-28 (máquina: antigravity)
 **Fase activa:** 02-fase-wallets-personales
-**Último módulo completado:** 02.02-wallet-store
-**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/03-screen-home.md](../prompts/02-fase-wallets-personales/03-screen-home.md)
+**Último módulo completado:** 02.03-screen-home
+**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/04-screen-create-wallet.md](../prompts/02-fase-wallets-personales/04-screen-create-wallet.md)
 
 ---
 
@@ -23,7 +23,7 @@
 | Fase | Estado | Módulos done |
 |---|---|---|
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
-| 02 — Wallets personales | 🟡 En curso | 2 / 7 |
+| 02 — Wallets personales | 🟡 En curso | 3 / 7 |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
@@ -39,7 +39,7 @@
 - Stack en producción: Expo SDK 54 + React 19.1 + RN 0.81.5
 - 9 commits en main: bootstrap → 01.01..01.05 → cierre Fase 1 → prompt-pack Fase 2
 - **Prompt-pack Fase 2 escrito** (`prompts/02-fase-wallets-personales/00..99` listos)
-- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/03-screen-home.md`](../prompts/02-fase-wallets-personales/03-screen-home.md). Decir "ejecutá Fase 2.03" o similar.
+- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/04-screen-create-wallet.md`](../prompts/02-fase-wallets-personales/04-screen-create-wallet.md). Decir "ejecutá Fase 2.04" o similar.
 
 ## Plantilla para arrancar Fase 2
 
