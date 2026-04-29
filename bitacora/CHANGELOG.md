@@ -132,3 +132,21 @@
 - ✅ onSubmit llama `useWallets.getState().create()` y vuelve al Home
 - 📁 Tocados: `app/schemas/wallet.ts`, `app/app/(app)/create-wallet.tsx`, `app/app/(app)/_layout.tsx`, `app/components/{ToggleRow,Input}.tsx`
 - 🧪 Verificación: crear wallet → aparece en Home; cancelar → no se inserta; validaciones funcionan
+
+## [02.05] 2026-04-29 — Pantalla Detalle de Wallet
+- ✅ Componentes nuevos: `Tabs` (underline-style con borderBottom 2px primary en activo), `ProgressBar` (clamping 0..1, tint+bg parametrizables), `Metric` (label uppercase + value, props `labelColor`/`valueColor` para uso sobre gradient header), `EmptyExpenses` (IconBox Receipt + microcopy "Todavía no hay gastos" / "Cuando agregues un gasto aparecerá acá" + Button outline "Agregar gasto" con Alert)
+- ✅ Pantalla `app/(app)/wallet/[id].tsx` completa:
+  - Header gradient `[wallet.color, secondary]` 135° con borderBottomRadius 24, paddingTop con safe area
+  - Top row con ChevronLeft (back) + Settings (Alert "Próximamente")
+  - Title row: ícono 56px sobre bg blanco@20% + nombre 22px bold blanco + chip "Personal"/"Equipo" custom (bg blanco@20%)
+  - Métricas row: Presupuesto / Gastado / Restante (highlight=accent), todas en blanco con label@70%
+  - ProgressBar blanco sobre blanco@20% + texto "0% usado · {N días restantes | sin fecha objetivo}"
+  - Tabs underline: Gastos (activo), Resumen (placeholder Fase 8), Miembros (disabled si type='personal')
+  - Tab Gastos → `<EmptyExpenses />`; Resumen y Miembros → placeholders microcopy
+  - FAB inferior derecho (color de la wallet) con Alert "Próximamente — Fase 3"
+- ✅ Loading state: `<ActivityIndicator />` mientras `byId` es undefined y `fetchById` resuelve
+- ✅ Error state: si `fetchById` retorna null → Alert "Wallet no encontrada" con back automático
+- ✅ Helper `resolveLucideIcon(walletIcon)` con fallback al ícono `Wallet` cuando `wallet.icon='wallet'` (no está en el catálogo de 8)
+- 📁 Tocados: `app/components/{Tabs,ProgressBar,Metric,EmptyExpenses}.tsx`, `app/app/(app)/wallet/[id].tsx`
+- 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca cargando `.env`. Validación visual end-to-end queda para módulo 02.06.
+- 🧠 Notas: gastado=0 / restante=initial_balance hasta Fase 3 (consistente con ADR-009 — `useTotalBalance` ya hacía lo mismo).

@@ -7,7 +7,7 @@
 
 ## En curso
 
-- [ ] [Fase 2] 05 — Pantalla Detalle Wallet
+- [ ] [Fase 2] 06 — Validación visual contra prototipo
 
 ## Pendiente
 
@@ -18,7 +18,6 @@
 
 ### Fase 2 — Wallets personales (prompts listos para ejecutar)
 
-- [ ] [Fase 2] 06 — Validación visual contra prototipo
 - [ ] [Fase 2] 99 — Cerrar fase
 
 ### Fases 3-8 (a planificar al cerrar la previa)
@@ -43,3 +42,4 @@
 - ✅ [Fase 2] 02 — Wallet store + queries Supabase (2026-04-28)
 - ✅ [Fase 2] 03 — Pantalla Home (2026-04-28)
 - ✅ [Fase 2] 04 — Pantalla Crear Wallet (2026-04-29)
+- ✅ [Fase 2] 05 — Pantalla Detalle Wallet (2026-04-29)

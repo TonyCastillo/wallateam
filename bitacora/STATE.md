@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-29 (máquina: antigravity)
 **Fase activa:** 02-fase-wallets-personales
-**Último módulo completado:** 02.04-screen-create-wallet
-**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/05-screen-wallet-detail.md](../prompts/02-fase-wallets-personales/05-screen-wallet-detail.md)
+**Último módulo completado:** 02.05-screen-wallet-detail
+**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/06-validate-vs-mock.md](../prompts/02-fase-wallets-personales/06-validate-vs-mock.md)
 
 ---
 
@@ -23,7 +23,7 @@
 | Fase | Estado | Módulos done |
 |---|---|---|
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
-| 02 — Wallets personales | 🟡 En curso | 4 / 7 |
+| 02 — Wallets personales | 🟡 En curso | 5 / 7 |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
@@ -39,7 +39,9 @@
 - Stack en producción: Expo SDK 54 + React 19.1 + RN 0.81.5
 - 9 commits en main: bootstrap → 01.01..01.05 → cierre Fase 1 → prompt-pack Fase 2
 - **Prompt-pack Fase 2 escrito** (`prompts/02-fase-wallets-personales/00..99` listos)
-- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/05-screen-wallet-detail.md`](../prompts/02-fase-wallets-personales/05-screen-wallet-detail.md). Decir "ejecutá Fase 2.05" o similar.
+- **Pantalla Detalle de Wallet** implementada en `app/(app)/wallet/[id].tsx`: header gradient (color wallet → secondary), métricas (Presupuesto/Gastado/Restante), progress bar, tabs underline (Gastos activo, Resumen y Miembros con placeholders), EmptyExpenses, FAB de "agregar gasto" (Alert por ahora — Fase 3 lo wirea).
+- Métricas usan `gastado=0` y `restante=initial_balance` mientras Fase 3 no calcule sumatoria de expenses (consistente con ADR-009).
+- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/06-validate-vs-mock.md`](../prompts/02-fase-wallets-personales/06-validate-vs-mock.md) — checklist visual de las 3 pantallas (Home / Crear / Detalle) contra el prototipo HTML.
 
 ## Plantilla para arrancar Fase 2
 
