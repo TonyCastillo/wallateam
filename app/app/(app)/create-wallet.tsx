@@ -365,7 +365,7 @@ export default function CreateWallet() {
                         fontSize: 32, color: theme.colors.textPrimary, padding: 0,
                       }}
                       keyboardType="numeric"
-                      value={value === 0 ? '' : String(value)}
+                      value={value === 0 ? '' : value.toLocaleString('es-PY')}
                       onChangeText={(t) => {
                         const n = parseInt(t.replace(/[^0-9]/g, ''), 10);
                         onChange(isNaN(n) ? 0 : n);
