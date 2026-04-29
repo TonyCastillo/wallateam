@@ -89,3 +89,14 @@
 - Smoke test E2E pasado por el usuario en dispositivo real
 - Commit de cierre `feat(auth)[01.99]: cierre fase 1`
 - Próxima fase: 02-fase-wallets-personales (a planificar/diseñar prompts antes de ejecutar)
+
+## [02.01] 2026-04-28 — BottomNav + (tabs) layout
+- ✅ Estructura `app/(app)/(tabs)/` con expo-router Tabs personalizado
+- ✅ Componente `BottomNav` con 5 items + FAB central (gradient 135°, marginTop -22, shadows.ctaPrimary)
+- ✅ Componente `Avatar` con iniciales (placeholder hasta Fase 8)
+- ✅ Tabs registradas: home, activity, stats, profile (+ "add" hidden con href:null)
+- ✅ FAB hace `router.push('/create-wallet')` (no entra a tab)
+- ✅ Stubs creados para activity/stats/profile y placeholder create-wallet
+- ✅ Logout movido a tab Profile
+- 📁 Tocados: `app/app/(app)/(tabs)/_layout.tsx`, `app/app/(app)/(tabs)/{home,activity,stats,profile}.tsx`, `app/app/(app)/create-wallet.tsx`, `app/components/{BottomNav,Avatar}.tsx`
+- 🧪 Verificación: nav funciona en Expo Go, FAB abre placeholder

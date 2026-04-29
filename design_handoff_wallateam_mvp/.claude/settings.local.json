@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(mkdir -p f:/proyectos_2026/WallaTeam/WallaTeam/prompts/01-fase-auth f:/proyectos_2026/WallaTeam/WallaTeam/prompts/02-fase-wallets-personales f:/proyectos_2026/WallaTeam/WallaTeam/prompts/03-fase-gastos f:/proyectos_2026/WallaTeam/WallaTeam/prompts/04-fase-equipo f:/proyectos_2026/WallaTeam/WallaTeam/prompts/05-fase-splits f:/proyectos_2026/WallaTeam/WallaTeam/prompts/06-fase-balance f:/proyectos_2026/WallaTeam/WallaTeam/prompts/07-fase-multimoneda f:/proyectos_2026/WallaTeam/WallaTeam/prompts/08-fase-extras f:/proyectos_2026/WallaTeam/WallaTeam/bitacora)",
-      "Read(//f/proyectos_2026/WallaTeam/WallaTeam/**)"
+      "Read(//f/proyectos_2026/WallaTeam/WallaTeam/**)",
+      "Bash(npm -v)",
+      "Bash(npx --version)",
+      "Bash(npx --yes create-expo-app@latest app --template blank-typescript --no-install)",
+      "Bash(npm install *)"
     ]
   }
 }

@@ -7,7 +7,7 @@
 
 ## En curso
 
-- _(ninguno — Fase 1 cerrada, esperando arrancar Fase 2)_
+- [ ] [Fase 2] 02 — Wallet store + queries Supabase
 
 ## Pendiente
 
@@ -17,8 +17,7 @@
 - [ ] [Fase 1.5] Re-activar Confirm email en Supabase antes de release a producción
 
 ### Fase 2 — Wallets personales (prompts listos para ejecutar)
-- [ ] [Fase 2] 01 — BottomNav + (tabs) layout
-- [ ] [Fase 2] 02 — Wallet store + queries Supabase
+
 - [ ] [Fase 2] 03 — Pantalla Home
 - [ ] [Fase 2] 04 — Pantalla Crear Wallet
 - [ ] [Fase 2] 05 — Pantalla Detalle Wallet
@@ -43,3 +42,4 @@
 - ✅ [Fase 1] 05 — Pantalla Login/Registro + auth gate (2026-04-28)
 - ✅ [Fase 1] 06 — Validación visual contra prototipo (2026-04-28)
 - ✅ [Fase 1] 99 — Cerrar fase (2026-04-28)
+- ✅ [Fase 2] 01 — BottomNav + (tabs) layout (2026-04-28)

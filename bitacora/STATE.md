@@ -1,9 +1,9 @@
 # Estado actual del proyecto WallaTeam
 
-**Última actualización:** 2026-04-28 (máquina: laptop-casa)
-**Fase activa:** 02-fase-wallets-personales (prompts listos, sin ejecutar)
-**Último módulo completado:** 01.99-close-phase (Fase 1 cerrada ✅) + prompt-pack Fase 2 escrito
-**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/01-tabs-layout.md](../prompts/02-fase-wallets-personales/01-tabs-layout.md)
+**Última actualización:** 2026-04-28 (máquina: antigravity)
+**Fase activa:** 02-fase-wallets-personales
+**Último módulo completado:** 02.01-tabs-layout
+**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/02-wallet-store.md](../prompts/02-fase-wallets-personales/02-wallet-store.md)
 
 ---
 
@@ -23,7 +23,7 @@
 | Fase | Estado | Módulos done |
 |---|---|---|
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
-| 02 — Wallets personales | 🟡 Prompts listos, sin ejecutar | 0 / 7 |
+| 02 — Wallets personales | 🟡 En curso | 1 / 7 |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
@@ -39,7 +39,7 @@
 - Stack en producción: Expo SDK 54 + React 19.1 + RN 0.81.5
 - 9 commits en main: bootstrap → 01.01..01.05 → cierre Fase 1 → prompt-pack Fase 2
 - **Prompt-pack Fase 2 escrito** (`prompts/02-fase-wallets-personales/00..99` listos)
-- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/01-tabs-layout.md`](../prompts/02-fase-wallets-personales/01-tabs-layout.md). Decir "ejecutá Fase 2.01" o similar.
+- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/02-wallet-store.md`](../prompts/02-fase-wallets-personales/02-wallet-store.md). Decir "ejecutá Fase 2.02" o similar.
 
 ## Plantilla para arrancar Fase 2
 
