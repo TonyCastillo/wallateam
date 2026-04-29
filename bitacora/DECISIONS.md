@@ -80,4 +80,21 @@
 
 ---
 
+## ADR-009 · useTotalBalance usa initial_balance
+
+**Fecha:** 2026-04-28
+**Contexto:** En Fase 2 (Wallets personales) aún no existen gastos, por lo que el balance real no puede calcularse.
+**Decisión:** El hook `useTotalBalance` en `stores/wallets.ts` utilizará `initial_balance` como el valor total momentáneamente.
+**Consecuencias:**
+- Esto debe reemplazarse en la Fase 3 restando la sumatoria de gastos del wallet al `initial_balance`.
+
+## ADR-010 · Realtime subscription para wallets (simple)
+
+**Fecha:** 2026-04-28
+**Contexto:** Necesitamos reflejar cambios en las wallets automáticamente en otros dispositivos del usuario.
+**Decisión:** Se usa una suscripción simple en `stores/wallets.ts` que refetchea todo `fetchAll()` cuando hay un cambio en la tabla.
+**Consecuencias:**
+- Un poco más de uso de red en lugar de actualizaciones incrementales del store.
+- En la Fase 4 puede requerir una implementación más sofisticada para manejar setups multi-usuarios.
+
 > Las siguientes ADRs se irán agregando a medida que se tomen decisiones durante la ejecución de las fases.

@@ -100,3 +100,15 @@
 - ✅ Logout movido a tab Profile
 - 📁 Tocados: `app/app/(app)/(tabs)/_layout.tsx`, `app/app/(app)/(tabs)/{home,activity,stats,profile}.tsx`, `app/app/(app)/create-wallet.tsx`, `app/components/{BottomNav,Avatar}.tsx`
 - 🧪 Verificación: nav funciona en Expo Go, FAB abre placeholder
+
+## [02.02] 2026-04-28 — Wallet store + queries Supabase
+- ✅ `lib/types.ts` con `Wallet`, `WalletType`, `WalletIcon`, `NewWalletInput`
+- ✅ `lib/walletIcons.ts` con catálogo de 8 íconos (id, lucide, color, label)
+- ✅ `stores/wallets.ts` Zustand: `wallets`, `loading`, `error`, `fetchAll`, `fetchById`, `create`, `archive`, `byId` selector
+- ✅ Hook `useTotalBalance` (placeholder hasta Fase 3 — usa initial_balance, no balance real)
+- ✅ Hidratación al login en root `_layout.tsx`
+- ✅ Realtime subscription al channel `wallets-changes`
+- ✅ Wallets dummy listos para ser insertadas para validación
+- 📁 Tocados: `app/lib/types.ts`, `app/lib/walletIcons.ts`, `app/stores/wallets.ts`, `app/app/_layout.tsx`, `app/app/(app)/(tabs)/home.tsx` (smoke test)
+- 🧪 Verificación: home placeholder muestra wallets en JSON debug
+- 🧠 Notas: ver DECISIONS.md sobre useTotalBalance placeholder y realtime simple

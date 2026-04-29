@@ -2,12 +2,17 @@ import { Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeProvider';
 import { useAuth } from '@/stores/auth';
+import { useWallets } from '@/stores/wallets';
 import { typography } from '@/theme/tokens';
 
 export default function Home() {
   const { theme } = useTheme();
   const { user } = useAuth();
   const fullName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? '';
+
+  const wallets = useWallets((s) => s.wallets);
+  const loading = useWallets((s) => s.loading);
+  const error = useWallets((s) => s.error);
 
   return (
     <SafeAreaView
@@ -38,6 +43,14 @@ export default function Home() {
         }}
       >
         Home — pantalla en módulo 03
+      </Text>
+      <Text
+        style={{
+          color: theme.colors.textSecondary,
+          fontFamily: typography.fontFamily.regular,
+        }}
+      >
+        {error ? `Error: ${error}` : loading ? 'Cargando wallets...' : JSON.stringify(wallets, null, 2)}
       </Text>
     </SafeAreaView>
   );

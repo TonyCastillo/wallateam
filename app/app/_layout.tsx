@@ -12,6 +12,7 @@ import {
 } from '@expo-google-fonts/inter';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 import { useAuth } from '@/stores/auth';
+import { useWallets } from '@/stores/wallets';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -35,6 +36,13 @@ function AuthGate() {
       router.replace('/');
     }
   }, [session, hydrated, segments, router]);
+
+  const fetchAll = useWallets((s) => s.fetchAll);
+  useEffect(() => {
+    if (session) {
+      fetchAll();
+    }
+  }, [session, fetchAll]);
 
   return null;
 }
