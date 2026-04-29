@@ -6,26 +6,31 @@ import { typography } from '@/theme/tokens';
 
 interface Props extends TextInputProps {
   label: string;
-  iconName: IconName;
+  iconName?: IconName;
   trailing?: ReactNode;
+  labelTrailing?: ReactNode;
   error?: string;
 }
 
-export function Input({ label, iconName, trailing, error, style, ...rest }: Props) {
+export function Input({ label, iconName, trailing, labelTrailing, error, style, ...rest }: Props) {
   const { theme } = useTheme();
   return (
     <View>
-      <Text
-        style={[
-          styles.label,
-          {
-            color: theme.colors.textSecondary,
-            fontFamily: typography.fontFamily.semibold,
-          },
-        ]}
-      >
-        {label}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <Text
+          style={[
+            styles.label,
+            {
+              color: theme.colors.textSecondary,
+              fontFamily: typography.fontFamily.semibold,
+              marginBottom: 0,
+            },
+          ]}
+        >
+          {label}
+        </Text>
+        {labelTrailing}
+      </View>
       <View
         style={[
           styles.box,
@@ -35,7 +40,7 @@ export function Input({ label, iconName, trailing, error, style, ...rest }: Prop
           },
         ]}
       >
-        <Icon name={iconName} size={18} color={theme.colors.textSecondary} />
+        {iconName && <Icon name={iconName} size={18} color={theme.colors.textSecondary} />}
         <TextInput
           {...rest}
           placeholderTextColor={theme.colors.textSecondary}

@@ -121,3 +121,14 @@
 - ✅ Skeleton loading rows
 - 📁 Tocados: `app/components/{IconBox,Chip,BalanceCard,QuickAction,WalletRow,SectionHeader}.tsx`, `app/app/(app)/(tabs)/home.tsx`
 - 🧪 Verificación: lista de wallets dummy se ve correctamente, navegación a Crear/Detalle funciona
+
+## [02.04] 2026-04-29 — Pantalla Crear Wallet (personal)
+- ✅ Schema zod `schemas/wallet.ts` con `newWalletSchema`
+- ✅ Pantalla `(app)/create-wallet.tsx` con AppBar, preview header gradient en vivo, type selector (personal activo, team disabled), nombre con counter, grid 8 íconos, color picker 8 swatches, moneda PYG, presupuesto con quick-add chips (+100k +500k +1M +5M), opciones avanzadas collapsible (target_date con DatePicker, budget_alert_pct, is_private)
+- ✅ Componente reutilizable `ToggleRow` para opciones avanzadas
+- ✅ DatePicker integrado vía `@react-native-community/datetimepicker`
+- ✅ `(app)/_layout.tsx`: route `create-wallet` registrada con `presentation: 'modal'` + `wallet/[id]`
+- ✅ `Input.tsx` actualizado: `iconName` opcional + prop `labelTrailing` para counter
+- ✅ onSubmit llama `useWallets.getState().create()` y vuelve al Home
+- 📁 Tocados: `app/schemas/wallet.ts`, `app/app/(app)/create-wallet.tsx`, `app/app/(app)/_layout.tsx`, `app/components/{ToggleRow,Input}.tsx`
+- 🧪 Verificación: crear wallet → aparece en Home; cancelar → no se inserta; validaciones funcionan
