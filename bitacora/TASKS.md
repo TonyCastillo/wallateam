@@ -16,14 +16,14 @@
 - [ ] [Fase 1.5] Forgot password real (`supabase.auth.resetPasswordForEmail` + deep link)
 - [ ] [Fase 1.5] Re-activar Confirm email en Supabase antes de release a producción
 
-### Fase 2 — Wallets personales (próxima a ejecutar)
-- [ ] [Fase 2] 00 — Diseñar prompts del 02-fase-wallets-personales/ (overview + módulos 01..N + close-phase)
-- [ ] [Fase 2] BottomNav + (tabs) layout dentro de (app)
-- [ ] [Fase 2] Wallet store Zustand + queries Supabase (CRUD personales)
-- [ ] [Fase 2] Pantalla Home (balance card gradient, quick actions, lista wallets)
-- [ ] [Fase 2] Pantalla Crear Wallet (form completo, sin sección team)
-- [ ] [Fase 2] Pantalla Detalle Wallet (placeholder lista de gastos)
-- [ ] [Fase 2] Validación visual + cierre
+### Fase 2 — Wallets personales (prompts listos para ejecutar)
+- [ ] [Fase 2] 01 — BottomNav + (tabs) layout
+- [ ] [Fase 2] 02 — Wallet store + queries Supabase
+- [ ] [Fase 2] 03 — Pantalla Home
+- [ ] [Fase 2] 04 — Pantalla Crear Wallet
+- [ ] [Fase 2] 05 — Pantalla Detalle Wallet
+- [ ] [Fase 2] 06 — Validación visual contra prototipo
+- [ ] [Fase 2] 99 — Cerrar fase
 
 ### Fases 3-8 (a planificar al cerrar la previa)
 - [ ] [Fase 3] Gastos (CRUD) en wallet personal

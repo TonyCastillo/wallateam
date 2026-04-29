@@ -1,9 +1,9 @@
 # Estado actual del proyecto WallaTeam
 
 **Última actualización:** 2026-04-28 (máquina: laptop-casa)
-**Fase activa:** 02-fase-wallets-personales (pendiente de diseño de prompts)
-**Último módulo completado:** 01.99-close-phase (Fase 1 cerrada ✅)
-**Próximo módulo a ejecutar:** _diseñar `prompts/02-fase-wallets-personales/` antes de ejecutar — usar plantilla del cierre de Fase 1_
+**Fase activa:** 02-fase-wallets-personales (prompts listos, sin ejecutar)
+**Último módulo completado:** 01.99-close-phase (Fase 1 cerrada ✅) + prompt-pack Fase 2 escrito
+**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/01-tabs-layout.md](../prompts/02-fase-wallets-personales/01-tabs-layout.md)
 
 ---
 
@@ -23,7 +23,7 @@
 | Fase | Estado | Módulos done |
 |---|---|---|
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
-| 02 — Wallets personales | ⚪ Pendiente (a planificar) | — |
+| 02 — Wallets personales | 🟡 Prompts listos, sin ejecutar | 0 / 7 |
 | 03 — Gastos | ⚪ Pendiente | — |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
@@ -37,8 +37,9 @@
 - Project Supabase activo: `azfcmdihftxtiwrvcfsh.supabase.co`
 - Confirm email **OFF en dev** (re-activar antes de release a prod)
 - Stack en producción: Expo SDK 54 + React 19.1 + RN 0.81.5
-- 6 commits en main: `3e1ddb0` (bootstrap) → `5cf701f` (01.01) → `9e5d361` (01.02) → `9affe1a` (01.03) → `3dc8436` (01.04) → `d59d220` (01.05) → cierre Fase 1
-- **Próxima acción:** diseñar los prompts de Fase 2 (Wallets personales) antes de ejecutar nada. Ver "Plantilla para arrancar Fase 2" abajo.
+- 9 commits en main: bootstrap → 01.01..01.05 → cierre Fase 1 → prompt-pack Fase 2
+- **Prompt-pack Fase 2 escrito** (`prompts/02-fase-wallets-personales/00..99` listos)
+- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/01-tabs-layout.md`](../prompts/02-fase-wallets-personales/01-tabs-layout.md). Decir "ejecutá Fase 2.01" o similar.
 
 ## Plantilla para arrancar Fase 2
 
