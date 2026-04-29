@@ -20,8 +20,16 @@
 
 - [ ] [Fase 2] 99 — Cerrar fase
 
-### Fases 3-8 (a planificar al cerrar la previa)
-- [ ] [Fase 3] Gastos (CRUD) en wallet personal
+### Fase 3 — Gastos (prompts listos para ejecutar)
+- [ ] [Fase 3] 01 — Expense store + queries Supabase
+- [ ] [Fase 3] 02 — ExpenseRow + lista en Detalle
+- [ ] [Fase 3] 03 — Pantalla Agregar Gasto
+- [ ] [Fase 3] 04 — Editar y eliminar gastos
+- [ ] [Fase 3] 05 — Recálculo de métricas (cierra ADR-009)
+- [ ] [Fase 3] 06 — Validación visual contra prototipo
+- [ ] [Fase 3] 99 — Cerrar fase
+
+### Fases 4-8 (a planificar al cerrar la previa)
 - [ ] [Fase 4] Equipo (wallets type='team', invitaciones, miembros)
 - [ ] [Fase 5] Splits (=, %, ₲) con validaciones
 - [ ] [Fase 6] Balance del grupo (cálculo deudas, saldar)
