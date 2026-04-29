@@ -97,6 +97,7 @@ export function Button({
 const styles = StyleSheet.create({
   btn: {
     paddingVertical: 14,
+    paddingHorizontal: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
