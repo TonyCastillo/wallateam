@@ -13,6 +13,7 @@ import {
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 import { useAuth } from '@/stores/auth';
 import { useWallets } from '@/stores/wallets';
+import { useExpenses } from '@/stores/expenses';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -37,12 +38,14 @@ function AuthGate() {
     }
   }, [session, hydrated, segments, router]);
 
-  const fetchAll = useWallets((s) => s.fetchAll);
+  const fetchAllWallets = useWallets((s) => s.fetchAll);
+  const fetchAllExpenses = useExpenses((s) => s.fetchAll);
   useEffect(() => {
     if (session) {
-      fetchAll();
+      fetchAllWallets();
+      fetchAllExpenses();
     }
-  }, [session, fetchAll]);
+  }, [session, fetchAllWallets, fetchAllExpenses]);
 
   return null;
 }

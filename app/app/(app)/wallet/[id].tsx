@@ -14,6 +14,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
 import { useWallets } from '@/stores/wallets';
+import { useExpenses } from '@/stores/expenses';
 import { fmtGsCompact } from '@/lib/format';
 import { WALLET_ICONS } from '@/lib/walletIcons';
 import { Icon, IconName } from '@/components/Icon';
@@ -37,6 +38,15 @@ export default function WalletDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const wallet = useWallets((s) => (id ? s.byId(id) : undefined));
   const fetchById = useWallets((s) => s.fetchById);
+  // Smoke test Fase 3.01 — se reemplaza por UI real en módulo 3.02
+  const expensesCount = useExpenses((s) => (id ? s.list(id).length : 0));
+  const expensesSpent = useExpenses((s) => (id ? s.totals(id).spent : 0));
+  useEffect(() => {
+    if (id) {
+      // eslint-disable-next-line no-console
+      console.log('[expenses smoke]', id, 'count:', expensesCount, 'spent:', expensesSpent);
+    }
+  }, [id, expensesCount, expensesSpent]);
   const [tab, setTab] = useState<DetailTab>('gastos');
   const [resolving, setResolving] = useState(false);
   const [notFound, setNotFound] = useState(false);

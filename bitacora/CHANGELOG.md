@@ -150,3 +150,16 @@
 - 📁 Tocados: `app/components/{Tabs,ProgressBar,Metric,EmptyExpenses}.tsx`, `app/app/(app)/wallet/[id].tsx`
 - 🧪 Verificación: `tsc --noEmit` limpio; Metro arranca cargando `.env`. Validación visual end-to-end queda para módulo 02.06.
 - 🧠 Notas: gastado=0 / restante=initial_balance hasta Fase 3 (consistente con ADR-009 — `useTotalBalance` ya hacía lo mismo).
+
+## [03.01] 2026-04-29 — Expense store + queries Supabase
+- ✅ `lib/categories.ts`: catálogo cerrado de 8 categorías con `id`, `label`, `icon` (lucide), `color`. Helper `categoryById` con fallback a 'other'
+- ✅ `lib/types.ts` extendido: `Expense`, `ExpenseSplit`, `SplitMode`, `NewExpenseInput`. Import de `CategoryId` para tipado de `expense.category`
+- ✅ `supabase/expenses_rpc.sql`: función `create_expense_with_split` (security invoker, atomic insert expense + split) — el usuario la corrió en el dashboard
+- ✅ `stores/expenses.ts` Zustand: cache `byWallet: Record<string, Expense[]>`, `loading`, `error`. Acciones `fetchAll` (agrupa por wallet_id) / `fetchByWallet` / `create` (vía `supabase.rpc('create_expense_with_split', ...)`) / `update` (sincroniza split.amount si cambia el monto) / `remove` (cascade FK borra split). Selectores `list(walletId)` y `totals(walletId)`. Helper `normalizeExpense` que castea `amount` a Number (Postgres numeric viene como string en JSON).
+- ✅ Realtime subscription al canal `expenses-changes` con setup-once pattern (igual que wallets)
+- ✅ `_layout.tsx` hidrata `useExpenses.fetchAll()` al login junto con wallets
+- ✅ Smoke debug temporal en `wallet/[id].tsx`: `console.log('[expenses smoke]', id, count, spent)` se elimina en 3.02
+- ✅ Usuario insertó gasto manual de prueba (₲ 150.000 categoría food). Smoke test confirma: la consola imprime el count y spent correctos.
+- 📁 Tocados: `app/lib/categories.ts`, `app/lib/types.ts`, `app/stores/expenses.ts`, `app/supabase/expenses_rpc.sql`, `app/app/_layout.tsx`, `app/app/(app)/wallet/[id].tsx`
+- 🧪 Verificación: `tsc --noEmit` limpio, Metro arranca, smoke test imprime data correcta. UI sin cambios visibles (eso llega en 3.02).
+- 🧠 Notas: ver ADR-011 sobre RPC atómico vs queries separadas

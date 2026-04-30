@@ -88,6 +88,17 @@
 **Consecuencias:**
 - Esto debe reemplazarse en la Fase 3 restando la sumatoria de gastos del wallet al `initial_balance`.
 
+## ADR-011 · RPC `create_expense_with_split` para insert atómico expense + split
+
+**Fecha:** 2026-04-29
+**Contexto:** Crear un gasto requiere insertar primero en `expenses` y después en `expense_splits` (FK al expense). Si el segundo insert falla (timeout, RLS bloquea, lo que sea), queda un expense huérfano sin split — y los selectores que asumen `expense_splits` consistente fallan.
+**Decisión:** Crear función Postgres `public.create_expense_with_split(...)` `security invoker` que envuelve los dos inserts en una transacción implícita (PL/pgSQL). El cliente la invoca con `supabase.rpc('create_expense_with_split', { p_wallet_id, p_amount, ... })`.
+**Consecuencias:**
+- Atomicidad garantizada: si falla el split, todo se revierte automáticamente (rollback de transacción PL/pgSQL)
+- `security invoker` mantiene RLS aplicada a nivel de las INSERT statements (chequea membership del wallet, paid_by=user, etc.)
+- El SQL vive en `app/supabase/expenses_rpc.sql` y se aplica manualmente en el dashboard (igual que `schema.sql` y `policies.sql`)
+- Si se agregan columnas nuevas al schema, hay que actualizar la firma del RPC
+
 ## ADR-010 · Realtime subscription para wallets (simple)
 
 **Fecha:** 2026-04-28

@@ -1,9 +1,9 @@
 # Estado actual del proyecto WallaTeam
 
 **Última actualización:** 2026-04-29 (máquina: antigravity)
-**Fase activa:** 02-fase-wallets-personales
-**Último módulo completado:** 02.05-screen-wallet-detail
-**Próximo módulo a ejecutar:** [prompts/02-fase-wallets-personales/06-validate-vs-mock.md](../prompts/02-fase-wallets-personales/06-validate-vs-mock.md)
+**Fase activa:** 03-fase-gastos
+**Último módulo completado:** 03.01-expense-store
+**Próximo módulo a ejecutar:** [prompts/03-fase-gastos/02-expense-row-list.md](../prompts/03-fase-gastos/02-expense-row-list.md)
 
 ---
 
@@ -23,8 +23,8 @@
 | Fase | Estado | Módulos done |
 |---|---|---|
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
-| 02 — Wallets personales | 🟡 En curso | 5 / 7 |
-| 03 — Gastos | ⚪ Pendiente | — |
+| 02 — Wallets personales | ✅ Cerrada (validación visual diferida) | 7 / 7 |
+| 03 — Gastos | 🟡 En curso | 1 / 7 |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
 | 06 — Balance | ⚪ Pendiente | — |
