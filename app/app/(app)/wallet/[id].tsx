@@ -6,10 +6,12 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  FlatList,
+  RefreshControl,
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
@@ -22,6 +24,7 @@ import { Tabs } from '@/components/Tabs';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Metric } from '@/components/Metric';
 import { EmptyExpenses } from '@/components/EmptyExpenses';
+import { ExpenseRow } from '@/components/ExpenseRow';
 import { withAlpha } from '@/components/IconBox';
 
 type DetailTab = 'gastos' | 'resumen' | 'miembros';
@@ -31,6 +34,85 @@ function resolveLucideIcon(walletIcon: string): IconName {
   return (def?.lucide ?? 'Wallet') as IconName;
 }
 
+// ----------------------------------------------------------------------------
+// ExpensesList: tab Gastos del Detalle. Maneja loading, empty y refresh.
+// ----------------------------------------------------------------------------
+function ExpensesList({ walletId }: { walletId: string }) {
+  const { theme } = useTheme();
+  const router = useRouter();
+  const list = useExpenses((s) => s.list(walletId));
+  const loading = useExpenses((s) => s.loading);
+  const fetchByWallet = useExpenses((s) => s.fetchByWallet);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchByWallet(walletId);
+    setRefreshing(false);
+  };
+
+  if (loading && list.length === 0) {
+    return (
+      <View style={{ padding: 16, gap: 8 }}>
+        {[0, 1, 2].map((i) => (
+          <View
+            key={i}
+            style={{
+              height: 68,
+              borderRadius: 14,
+              backgroundColor: theme.colors.surfaceAlt,
+              opacity: 0.5,
+            }}
+          />
+        ))}
+      </View>
+    );
+  }
+
+  if (list.length === 0) {
+    return (
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.colors.primary}
+          />
+        }
+      >
+        <EmptyExpenses walletId={walletId} />
+      </ScrollView>
+    );
+  }
+
+  return (
+    <FlatList
+      data={list}
+      keyExtractor={(e) => e.id}
+      contentContainerStyle={{ padding: 16, paddingBottom: 96 }}
+      ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          tintColor={theme.colors.primary}
+        />
+      }
+      renderItem={({ item }) => (
+        <ExpenseRow
+          expense={item}
+          onPress={() => router.push(`/expense/new?expenseId=${item.id}`)}
+          // onLongPress se conecta en módulo 3.04 (edit/delete con ActionSheet)
+        />
+      )}
+    />
+  );
+}
+
+// ----------------------------------------------------------------------------
+// WalletDetailScreen
+// ----------------------------------------------------------------------------
 export default function WalletDetailScreen() {
   const { theme } = useTheme();
   const router = useRouter();
@@ -38,15 +120,6 @@ export default function WalletDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const wallet = useWallets((s) => (id ? s.byId(id) : undefined));
   const fetchById = useWallets((s) => s.fetchById);
-  // Smoke test Fase 3.01 — se reemplaza por UI real en módulo 3.02
-  const expensesCount = useExpenses((s) => (id ? s.list(id).length : 0));
-  const expensesSpent = useExpenses((s) => (id ? s.totals(id).spent : 0));
-  useEffect(() => {
-    if (id) {
-      // eslint-disable-next-line no-console
-      console.log('[expenses smoke]', id, 'count:', expensesCount, 'spent:', expensesSpent);
-    }
-  }, [id, expensesCount, expensesSpent]);
   const [tab, setTab] = useState<DetailTab>('gastos');
   const [resolving, setResolving] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -96,7 +169,8 @@ export default function WalletDetailScreen() {
     );
   }
 
-  // Fase 2: gastado siempre 0; Fase 3 lo recalcula desde expenses
+  // Fase 2: gastado y restante son placeholder (initial_balance). El recálculo
+  // real con sum(expenses.amount) llega en módulo 3.05 (cierra ADR-009).
   const presupuesto = wallet.initial_balance;
   const gastado = 0;
   const restante = presupuesto - gastado;
@@ -243,14 +317,11 @@ export default function WalletDetailScreen() {
       {/* Tabs */}
       <Tabs items={tabItems} active={tab} onChange={setTab} />
 
-      {/* Contenido por tab */}
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 96 }}
-      >
-        {tab === 'gastos' && <EmptyExpenses />}
+      {/* Contenido por tab — cada uno maneja su propio scroll */}
+      <View style={{ flex: 1 }}>
+        {tab === 'gastos' && <ExpensesList walletId={wallet.id} />}
         {tab === 'resumen' && (
-          <View style={{ padding: 24, alignItems: 'center', gap: 12 }}>
+          <ScrollView contentContainerStyle={{ padding: 24, alignItems: 'center', gap: 12 }}>
             <Text
               style={{
                 color: theme.colors.textPrimary,
@@ -270,10 +341,10 @@ export default function WalletDetailScreen() {
             >
               Vas a poder ver gráficos y resumen mensual de tus gastos.
             </Text>
-          </View>
+          </ScrollView>
         )}
         {tab === 'miembros' && (
-          <View style={{ padding: 24, alignItems: 'center', gap: 12 }}>
+          <ScrollView contentContainerStyle={{ padding: 24, alignItems: 'center', gap: 12 }}>
             <Text
               style={{
                 color: theme.colors.textPrimary,
@@ -293,13 +364,13 @@ export default function WalletDetailScreen() {
             >
               Wallets de equipo con invitaciones y miembros.
             </Text>
-          </View>
+          </ScrollView>
         )}
-      </ScrollView>
+      </View>
 
-      {/* FAB Agregar gasto */}
+      {/* FAB Agregar gasto → /expense/new?walletId=... */}
       <Pressable
-        onPress={() => Alert.alert('Agregar gasto', 'Próximamente — Fase 3')}
+        onPress={() => router.push(`/expense/new?walletId=${wallet.id}`)}
         style={[
           styles.fab,
           {

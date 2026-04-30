@@ -163,3 +163,17 @@
 - 📁 Tocados: `app/lib/categories.ts`, `app/lib/types.ts`, `app/stores/expenses.ts`, `app/supabase/expenses_rpc.sql`, `app/app/_layout.tsx`, `app/app/(app)/wallet/[id].tsx`
 - 🧪 Verificación: `tsc --noEmit` limpio, Metro arranca, smoke test imprime data correcta. UI sin cambios visibles (eso llega en 3.02).
 - 🧠 Notas: ver ADR-011 sobre RPC atómico vs queries separadas
+
+## [03.02] 2026-04-29 — ExpenseRow + lista en Detalle Wallet
+- ✅ `lib/format.ts`: helper `formatExpenseDate(iso)` con relativos "Hoy · HH:mm" / "Ayer · HH:mm" / "DD MMM YYYY"
+- ✅ `components/ExpenseRow.tsx`: row con `IconBox` de la categoría (size 40, bgOpacity 0.15) + descripción 15 sb + "Pagó {Vos|Otro|nombre} · {fecha}" + monto con `−` Unicode (no guion ASCII). Sombra `card` y soporte `onPress` + `onLongPress` (long-press se conecta en 3.04). Comentario inline aclara que el chip de split queda para Fase 5.
+- ✅ `components/EmptyExpenses.tsx` actualizado: ahora recibe prop opcional `walletId`. El botón "Agregar gasto" navega con `router.push('/expense/new?walletId=...')` o `/expense/new` si no viene walletId.
+- ✅ `wallet/[id].tsx` reorganizado:
+  - Subcomponente `ExpensesList` que decide entre 3 vistas: skeleton (3 cards surfaceAlt opacity 0.5 mientras `loading && list.length === 0`) → `EmptyExpenses` (envuelto en ScrollView para soportar pull-to-refresh) → `FlatList` real con gap 8 entre rows y `paddingBottom: 96` para no chocar con el FAB
+  - Tap en `ExpenseRow` navega a `/expense/new?expenseId=...` (modo edit, ruta se crea en 3.03/3.04)
+  - Removido el `<ScrollView>` que envolvía a TODOS los tabs — ahora cada tab maneja su propio scroll. Esto evita el warning de "VirtualizedList nested inside ScrollView" cuando el tab Gastos usa FlatList.
+  - FAB ahora wirea `router.push('/expense/new?walletId=...')` (antes mostraba Alert "Próximamente")
+  - Quitado el smoke debug `console.log` del módulo 3.01
+- 📁 Tocados: `app/lib/format.ts`, `app/components/ExpenseRow.tsx`, `app/components/EmptyExpenses.tsx`, `app/app/(app)/wallet/[id].tsx`
+- 🧪 Verificación: `tsc --noEmit` limpio. Smoke real: tap a una wallet con gastos muestra los `ExpenseRow` ordenados (sort por `occurred_at desc` viene del store), el empty state navega a una ruta que aún no existe (404 hasta 3.03 — esperado).
+- 🧠 Notas: las métricas del header siguen siendo placeholder (gastado=0). El recálculo real es módulo 3.05.

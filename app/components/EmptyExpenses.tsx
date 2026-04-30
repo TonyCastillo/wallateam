@@ -1,11 +1,19 @@
-import { View, Text, Alert } from 'react-native';
+import { View, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
 import { IconBox } from './IconBox';
 import { Button } from './Button';
 
-export function EmptyExpenses() {
+interface Props {
+  /** Si se provee, el botón "Agregar gasto" navega con walletId precargado */
+  walletId?: string;
+}
+
+export function EmptyExpenses({ walletId }: Props) {
   const { theme } = useTheme();
+  const router = useRouter();
+  const target = walletId ? `/expense/new?walletId=${walletId}` : '/expense/new';
   return (
     <View
       style={{
@@ -40,7 +48,7 @@ export function EmptyExpenses() {
         variant="outline"
         label="Agregar gasto"
         iconLeft="Plus"
-        onPress={() => Alert.alert('Agregar gasto', 'Próximamente — Fase 3')}
+        onPress={() => router.push(target)}
         style={{ marginTop: 8 }}
       />
     </View>
