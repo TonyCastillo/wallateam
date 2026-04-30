@@ -5,6 +5,7 @@ export default function AppLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="create-wallet" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="expense/new" options={{ presentation: 'modal' }} />
       <Stack.Screen name="wallet/[id]" />
     </Stack>
   );

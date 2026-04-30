@@ -29,6 +29,15 @@ export default function Home() {
 
   const handleCreateWallet = () => router.push('/create-wallet');
 
+  const handleAddExpense = () => {
+    const personalWallets = wallets.filter(w => w.type === 'personal' && !w.archived_at);
+    if (personalWallets.length === 0) {
+      Alert.alert('Sin wallets', 'Primero creá una wallet personal para poder registrar un gasto.');
+    } else {
+      router.push('/expense/new');
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={['top']}>
       <ScrollView
@@ -59,7 +68,7 @@ export default function Home() {
 
         {/* 3. Quick actions row */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, marginTop: 18 }}>
-          <QuickAction iconName="Receipt" label="Gasto" variant="filled" onPress={() => Alert.alert('Próximamente', 'Fase 3')} />
+          <QuickAction iconName="Receipt" label="Gasto" variant="filled" onPress={handleAddExpense} />
           <QuickAction iconName="Wallet" label="Wallet" variant="subtle" onPress={handleCreateWallet} />
           <QuickAction iconName="UserPlus" label="Invitar" variant="subtle" onPress={() => Alert.alert('Próximamente', 'Fase 4')} />
           <QuickAction iconName="ArrowRightLeft" label="Saldar" variant="subtle" onPress={() => Alert.alert('Próximamente', 'Fase 6')} />

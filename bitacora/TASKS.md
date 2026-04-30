@@ -7,7 +7,7 @@
 
 ## En curso
 
-- [ ] [Fase 3] 03 — Pantalla Agregar Gasto
+- [ ] [Fase 3] 04 — Editar y eliminar gastos
 
 ## Pendiente
 
@@ -21,7 +21,7 @@
 - [ ] [Fase 2] 99 — Cerrar fase
 
 ### Fase 3 — Gastos (prompts listos para ejecutar)
-- [ ] [Fase 3] 04 — Editar y eliminar gastos
+
 - [ ] [Fase 3] 05 — Recálculo de métricas (cierra ADR-009)
 - [ ] [Fase 3] 06 — Validación visual contra prototipo
 - [ ] [Fase 3] 99 — Cerrar fase
@@ -52,3 +52,4 @@
 - ✅ [Fase 2] 99 — Cerrar fase (consolidada, 2026-04-29)
 - ✅ [Fase 3] 01 — Expense store + queries Supabase (2026-04-29)
 - ✅ [Fase 3] 02 — ExpenseRow + lista en Detalle (2026-04-29)
+- ✅ [Fase 3] 03 — Pantalla Agregar Gasto (2026-04-29)

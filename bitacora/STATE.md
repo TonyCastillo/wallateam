@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-04-29 (máquina: antigravity)
 **Fase activa:** 03-fase-gastos
-**Último módulo completado:** 03.02-expense-row-list
-**Próximo módulo a ejecutar:** [prompts/03-fase-gastos/03-screen-add-expense.md](../prompts/03-fase-gastos/03-screen-add-expense.md)
+**Último módulo completado:** 03.03-screen-add-expense
+**Próximo módulo a ejecutar:** [prompts/03-fase-gastos/04-edit-delete-expense.md](../prompts/03-fase-gastos/04-edit-delete-expense.md)
 
 ---
 
@@ -24,7 +24,7 @@
 |---|---|---|
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
 | 02 — Wallets personales | ✅ Cerrada (validación visual diferida) | 7 / 7 |
-| 03 — Gastos | 🟡 En curso | 2 / 7 |
+| 03 — Gastos | 🟡 En curso | 3 / 7 |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
 | 06 — Balance | ⚪ Pendiente | — |

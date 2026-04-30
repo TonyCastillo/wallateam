@@ -19,6 +19,8 @@ interface ExpensesState {
   totals: (walletId: string) => { spent: number; count: number };
 }
 
+const EMPTY_LIST: Expense[] = [];
+
 let isSubscribed = false;
 
 function setupRealtimeOnce() {
@@ -185,10 +187,10 @@ export const useExpenses = create<ExpensesState>((set, get) => ({
     }
   },
 
-  list: (walletId) => get().byWallet[walletId] ?? [],
+  list: (walletId) => get().byWallet[walletId] ?? EMPTY_LIST,
 
   totals: (walletId) => {
-    const list = get().byWallet[walletId] ?? [];
+    const list = get().byWallet[walletId] ?? EMPTY_LIST;
     return {
       spent: list.reduce((acc, e) => acc + Number(e.amount), 0),
       count: list.length,
