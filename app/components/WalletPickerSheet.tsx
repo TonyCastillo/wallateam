@@ -14,9 +14,9 @@ interface Props {
 export function WalletPickerSheet({ visible, selected, onSelect, onClose }: Props) {
   const { theme } = useTheme();
   
-  // Solo wallets personales no archivadas
+  // Wallets activas (personales y de equipo)
   const allWallets = useWallets((s) => s.wallets);
-  const wallets = allWallets.filter((w) => w.type === 'personal' && !w.archived_at);
+  const wallets = allWallets.filter((w) => !w.archived_at);
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -47,7 +47,7 @@ export function WalletPickerSheet({ visible, selected, onSelect, onClose }: Prop
         <ScrollView contentContainerStyle={{ gap: 8 }}>
           {wallets.length === 0 ? (
             <Text style={{ fontFamily: typography.fontFamily.regular, color: theme.colors.textSecondary, textAlign: 'center', padding: 20 }}>
-              No tenés wallets personales disponibles
+              No tenés wallets disponibles
             </Text>
           ) : (
             wallets.map((wallet) => {

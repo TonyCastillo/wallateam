@@ -34,6 +34,33 @@ export interface NewWalletInput {
   is_private?: boolean;
 }
 
+// ---------- Members & Invites (Fase 4) ----------
+
+export type MemberRole = 'admin' | 'member';
+
+export interface WalletMember {
+  wallet_id: string;
+  user_id: string;
+  role: MemberRole;
+  joined_at: string;
+  profile?: {
+    id: string;
+    full_name: string;
+    avatar_url: string | null;
+  };
+}
+
+export interface WalletInvite {
+  id: string;
+  wallet_id: string;
+  invite_code: string;
+  invited_by: string;
+  email: string | null;
+  expires_at: string | null;
+  accepted_at: string | null;
+  created_at: string;
+}
+
 // ---------- Expenses (Fase 3) ----------
 
 export type SplitMode = 'equal' | 'percent' | 'amount';
@@ -66,5 +93,6 @@ export interface NewExpenseInput {
   category: CategoryId;
   occurred_at?: string;
   note?: string | null;
-  // En Fase 3: paid_by se infiere del user actual; split_mode='equal' fijo
+  paid_by?: string;  // Fase 4: opcional para wallets team — default al user actual
+  // split_mode='equal' fijo hasta Fase 5
 }

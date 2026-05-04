@@ -108,7 +108,7 @@ export const useExpenses = create<ExpensesState>((set, get) => ({
         p_description: input.description,
         p_amount: input.amount,
         p_category: input.category,
-        p_paid_by: userId,
+        p_paid_by: input.paid_by ?? userId,
         p_occurred_at: input.occurred_at ?? new Date().toISOString(),
         p_note: input.note ?? null,
       });

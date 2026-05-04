@@ -17,9 +17,10 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
 import { useWallets } from '@/stores/wallets';
 import { useExpenses } from '@/stores/expenses';
+import { useAuth } from '@/stores/auth';
 import { useWalletMetrics } from '@/lib/walletMetrics';
 import { fmtGs, fmtGsCompact } from '@/lib/format';
-import { Expense } from '@/lib/types';
+import { Expense, WalletMember } from '@/lib/types';
 import { WALLET_ICONS } from '@/lib/walletIcons';
 import { Icon, IconName } from '@/components/Icon';
 import { Tabs } from '@/components/Tabs';
@@ -28,6 +29,9 @@ import { Metric } from '@/components/Metric';
 import { EmptyExpenses } from '@/components/EmptyExpenses';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ConfirmDeleteSheet } from '@/components/ConfirmDeleteSheet';
+import { Avatar } from '@/components/Avatar';
+import { AvatarStack } from '@/components/AvatarStack';
+import { InviteSheet } from '@/components/InviteSheet';
 import { withAlpha } from '@/components/IconBox';
 
 type DetailTab = 'gastos' | 'resumen' | 'miembros';
@@ -142,6 +146,149 @@ function ExpensesList({ walletId }: { walletId: string }) {
 }
 
 // ----------------------------------------------------------------------------
+// MembersTab: lista de miembros + botón Invitar (solo wallets team)
+// ----------------------------------------------------------------------------
+function MembersTab({ walletId, walletName }: { walletId: string; walletName: string }) {
+  const { theme } = useTheme();
+  const userId = useAuth((s) => s.user?.id);
+  const members = useWallets((s) => s.membersByWallet[walletId] ?? []);
+  const fetchMembers = useWallets((s) => s.fetchMembers);
+  const [refreshing, setRefreshing] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchMembers(walletId);
+    setRefreshing(false);
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <FlatList
+        data={members}
+        keyExtractor={(m) => m.user_id}
+        contentContainerStyle={{ padding: 16, paddingBottom: 96, gap: 8 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={theme.colors.primary} />
+        }
+        ListHeaderComponent={
+          <Pressable
+            onPress={() => setShowInvite(true)}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 12,
+              paddingVertical: 12,
+              paddingHorizontal: 14,
+              borderRadius: 14,
+              borderWidth: 1,
+              borderColor: theme.colors.primary,
+              borderStyle: 'dashed',
+              marginBottom: 8,
+            }}
+          >
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: withAlpha(theme.colors.primary, 0.12),
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon name="UserPlus" size={20} color={theme.colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text
+                style={{
+                  fontFamily: typography.fontFamily.semibold,
+                  fontSize: 14,
+                  color: theme.colors.primary,
+                }}
+              >
+                Invitar
+              </Text>
+              <Text
+                style={{
+                  fontFamily: typography.fontFamily.regular,
+                  fontSize: 11,
+                  color: theme.colors.textSecondary,
+                }}
+              >
+                Compartí un link para sumar a otros
+              </Text>
+            </View>
+            <Icon name="ChevronRight" size={18} color={theme.colors.textSecondary} />
+          </Pressable>
+        }
+        renderItem={({ item }: { item: WalletMember }) => {
+          const isYou = item.user_id === userId;
+          const name = item.profile?.full_name ?? '?';
+          return (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 12,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
+                borderRadius: 14,
+                backgroundColor: theme.colors.surface,
+                borderWidth: 1,
+                borderColor: theme.colors.border,
+              }}
+            >
+              <Avatar name={name} size={40} />
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontFamily: typography.fontFamily.semibold,
+                    fontSize: 14,
+                    color: theme.colors.textPrimary,
+                  }}
+                >
+                  {isYou ? `${name} (Vos)` : name}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: typography.fontFamily.regular,
+                    fontSize: 11,
+                    color: theme.colors.textSecondary,
+                  }}
+                >
+                  {item.role === 'admin' ? 'Admin' : 'Miembro'}
+                </Text>
+              </View>
+            </View>
+          );
+        }}
+        ListEmptyComponent={
+          <View style={{ alignItems: 'center', paddingVertical: 24 }}>
+            <Text
+              style={{
+                fontFamily: typography.fontFamily.regular,
+                fontSize: 13,
+                color: theme.colors.textSecondary,
+              }}
+            >
+              Cargando miembros…
+            </Text>
+          </View>
+        }
+      />
+
+      <InviteSheet
+        visible={showInvite}
+        walletId={walletId}
+        walletName={walletName}
+        onClose={() => setShowInvite(false)}
+      />
+    </View>
+  );
+}
+
+// ----------------------------------------------------------------------------
 // WalletDetailScreen
 // ----------------------------------------------------------------------------
 export default function WalletDetailScreen() {
@@ -151,6 +298,8 @@ export default function WalletDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const wallet = useWallets((s) => (id ? s.byId(id) : undefined));
   const fetchById = useWallets((s) => s.fetchById);
+  const fetchMembers = useWallets((s) => s.fetchMembers);
+  const members = useWallets((s) => (wallet?.id ? s.membersByWallet[wallet.id] ?? [] : []));
   const [tab, setTab] = useState<DetailTab>('gastos');
   const [resolving, setResolving] = useState(false);
   const [notFound, setNotFound] = useState(false);
@@ -172,6 +321,13 @@ export default function WalletDetailScreen() {
       }
     });
   }, [id, wallet, fetchById, router]);
+
+  // Cargar miembros al entrar a una wallet team
+  useEffect(() => {
+    if (wallet?.type === 'team') {
+      fetchMembers(wallet.id);
+    }
+  }, [wallet?.id, wallet?.type, fetchMembers]);
 
   if (notFound) {
     return <View style={{ flex: 1, backgroundColor: theme.colors.background }} />;
@@ -221,7 +377,7 @@ export default function WalletDetailScreen() {
   const tabItems: { key: DetailTab; label: string; disabled?: boolean }[] = [
     { key: 'gastos', label: 'Gastos' },
     { key: 'resumen', label: 'Resumen' },
-    { key: 'miembros', label: 'Miembros', disabled: !wallet.type || wallet.type === 'personal' },
+    { key: 'miembros', label: 'Miembros', disabled: wallet.type === 'personal' },
   ];
 
   return (
@@ -274,26 +430,30 @@ export default function WalletDetailScreen() {
             >
               {wallet.name}
             </Text>
-            <View
-              style={{
-                alignSelf: 'flex-start',
-                paddingVertical: 4,
-                paddingHorizontal: 10,
-                borderRadius: 999,
-                backgroundColor: 'rgba(255,255,255,0.2)',
-              }}
-            >
-              <Text
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View
                 style={{
-                  color: '#fff',
-                  fontSize: 10,
-                  fontFamily: typography.fontFamily.semibold,
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
+                  paddingVertical: 4,
+                  paddingHorizontal: 10,
+                  borderRadius: 999,
+                  backgroundColor: 'rgba(255,255,255,0.2)',
                 }}
               >
-                {isPersonal ? 'Personal' : 'Equipo'}
-              </Text>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 10,
+                    fontFamily: typography.fontFamily.semibold,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {isPersonal ? 'Personal' : 'Equipo'}
+                </Text>
+              </View>
+              {!isPersonal && members.length > 0 && (
+                <AvatarStack members={members} max={4} size={24} />
+              )}
             </View>
           </View>
         </View>
@@ -372,29 +532,7 @@ export default function WalletDetailScreen() {
             </Text>
           </ScrollView>
         )}
-        {tab === 'miembros' && (
-          <ScrollView contentContainerStyle={{ padding: 24, alignItems: 'center', gap: 12 }}>
-            <Text
-              style={{
-                color: theme.colors.textPrimary,
-                fontSize: 16,
-                fontFamily: typography.fontFamily.semibold,
-              }}
-            >
-              Próximamente — Fase 4
-            </Text>
-            <Text
-              style={{
-                color: theme.colors.textSecondary,
-                fontSize: 13,
-                fontFamily: typography.fontFamily.regular,
-                textAlign: 'center',
-              }}
-            >
-              Wallets de equipo con invitaciones y miembros.
-            </Text>
-          </ScrollView>
-        )}
+        {tab === 'miembros' && <MembersTab walletId={wallet.id} walletName={wallet.name} />}
       </View>
 
       {/* FAB Agregar gasto → /expense/new?walletId=... */}

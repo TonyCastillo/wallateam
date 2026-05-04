@@ -7,7 +7,7 @@
 
 ## En curso
 
-_(ninguno — Fase 3 cerrada, Fase 4 pendiente de inicio)_
+- [ ] [Fase 4] 06 — Validación visual contra prototipo (requiere Expo Go + 2 cuentas)
 
 ## Pendiente
 
@@ -16,14 +16,12 @@ _(ninguno — Fase 3 cerrada, Fase 4 pendiente de inicio)_
 - [ ] [Fase 1.5] Forgot password real (`supabase.auth.resetPasswordForEmail` + deep link)
 - [ ] [Fase 1.5] Re-activar Confirm email en Supabase antes de release a producción
 
-### Fase 4 — Equipo
-- [ ] [Fase 4] 01 — Habilitar type='team' en CreateWallet (sección Miembros + invite link UX)
-- [ ] [Fase 4] 02 — wallet_invites: store + queries (crear invite, generar invite_code, accept)
-- [ ] [Fase 4] 03 — Pantalla "Aceptar invitación" via deep link (wallateam://invite/CODE)
-- [ ] [Fase 4] 04 — Mostrar miembros en Detalle Wallet (avatares overlap + lista en tab Miembros)
-- [ ] [Fase 4] 05 — paid_by selector en Agregar Gasto (entre miembros del wallet)
-- [ ] [Fase 4] 06 — Validación visual + cierre
+### Fase 4 — Equipo (queda pendiente solo cierre)
 - [ ] [Fase 4] 99 — Cerrar fase
+
+### SQL pendiente de aplicar en Supabase Dashboard
+- [ ] Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
+- [ ] Re-correr `app/supabase/policies.sql` (policy `exp_insert` actualizada para soportar paid_by != auth.uid)
 
 ### Fases 5-8 (a planificar al cerrar la previa)
 - [ ] [Fase 5] Splits (=, %, ₲) con validaciones
@@ -55,3 +53,8 @@ _(ninguno — Fase 3 cerrada, Fase 4 pendiente de inicio)_
 - ✅ [Fase 3] 05 — Recálculo de métricas (2026-05-04)
 - ✅ [Fase 3] 06 — Validación visual contra prototipo (2026-05-04)
 - ✅ [Fase 3] 99 — Cerrar fase (2026-05-04)
+- ✅ [Fase 4] 01 — CreateWallet: type='team' habilitado (2026-05-04)
+- ✅ [Fase 4] 02 — wallet_invites store + RPCs (2026-05-04)
+- ✅ [Fase 4] 03 — Pantalla aceptar invitación deep link (2026-05-04)
+- ✅ [Fase 4] 04 — Miembros en Detalle Wallet + InviteSheet (2026-05-04)
+- ✅ [Fase 4] 05 — paid_by selector en Agregar Gasto (2026-05-04)

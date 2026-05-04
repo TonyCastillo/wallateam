@@ -7,6 +7,7 @@ export const newExpenseSchema = z.object({
   category: z.enum(['food', 'transport', 'home', 'shopping', 'entertainment', 'health', 'work', 'other']),
   occurred_at: z.string(), // ISO
   note: z.string().max(280, 'Máximo 280 caracteres').nullable().optional(),
+  paid_by: z.string().uuid().optional(),
 });
 
 export type NewExpenseForm = z.infer<typeof newExpenseSchema>;

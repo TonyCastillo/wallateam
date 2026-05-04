@@ -214,3 +214,43 @@
 - ADR-009 marcado como Resuelto (useTotalBalance y useWalletMetrics con datos reales)
 - `tsc --noEmit` limpio, working tree limpio tras commit
 - Próxima fase: 04-fase-equipo (wallets type='team', invitaciones, miembros, RLS team)
+
+## [04.01] 2026-05-04 — CreateWallet: type='team' habilitado
+- ✅ `lib/types.ts`: nuevos types `WalletMember`, `WalletInvite`, `MemberRole`
+- ✅ `stores/wallets.ts.create`: si `type==='team'`, inserta al creador en `wallet_members` con role='admin'
+- ✅ `create-wallet.tsx`: selector "En equipo" activo, info card "Vas a poder invitar miembros una vez creada la wallet" cuando team seleccionado
+- ✅ Preview header: "1 miembro" (singular) para team
+- 📁 Tocados: lib/types.ts, stores/wallets.ts, app/(app)/create-wallet.tsx
+
+## [04.02] 2026-05-04 — wallet_invites store + RPCs
+- ✅ `supabase/invites_rpc.sql`: RPC `get_invite_preview(p_code)` (security definer, lookup por código sin RLS) y `accept_wallet_invite(p_code)` (security definer, inserta wallet_member idempotente + marca accepted_at). Policy `inv_update` agregada.
+- ✅ `stores/invites.ts`: nuevo store con `byWallet` cache, `fetchByWallet`, `create` (genera invite_code 8 chars alfa-num sin ambiguos, retry 3x si choca unique), `preview` (RPC), `accept` (RPC), `revoke` (set expires_at al pasado)
+- 📁 Tocados: app/supabase/invites_rpc.sql, app/stores/invites.ts
+- ⚠️ Pendiente: usuario debe correr `invites_rpc.sql` en Supabase Dashboard
+
+## [04.03] 2026-05-04 — Pantalla aceptar invitación (deep link)
+- ✅ Ruta `app/(app)/invite/[code].tsx` registrada como modal
+- ✅ Flujo: lookup vía `useInvites.preview()` → muestra card con gradient + nombre + ícono + chip Equipo → tap "Unirme al equipo" → `accept()` → fetchAll wallets+expenses → `router.replace('/wallet/{id}')`
+- ✅ Estados: loading (spinner), error (vencida/no encontrada con botón Volver), preview válido
+- ✅ Microcopy: "Fuiste invitado a unirte a esta wallet", "Unirme al equipo", "Pedile a quien te invitó que te genere un nuevo link"
+- 📁 Tocados: app/(app)/invite/[code].tsx, app/(app)/_layout.tsx
+
+## [04.04] 2026-05-04 — Miembros en Detalle Wallet
+- ✅ `stores/wallets.ts`: cache `membersByWallet`, action `fetchMembers(walletId)` con join a profiles, selector `membersOf(id)`
+- ✅ `components/AvatarStack.tsx`: stack con overlap de hasta N avatares + "+N" overflow
+- ✅ `components/InviteSheet.tsx`: bottom sheet que crea invite (expira en 7 días), muestra link `wallateam://invite/CODE`, botones "Copiar link" (`expo-clipboard`) + "Compartir" (Share API nativa)
+- ✅ `wallet/[id].tsx`: AvatarStack en titleRow para wallets team, tab Miembros activo con FlatList real (Avatar + nombre + rol Admin/Miembro), header "Invitar" como Pressable dashed
+- ✅ Auto-fetch de miembros al entrar al detalle si type='team'
+- 📦 Instalado: `expo-clipboard`
+- 📁 Tocados: app/stores/wallets.ts, app/components/{AvatarStack,InviteSheet}.tsx, app/(app)/wallet/[id].tsx, app/package.json
+
+## [04.05] 2026-05-04 — paid_by selector en Agregar Gasto
+- ✅ `supabase/policies.sql`: relajado `exp_insert` para permitir `paid_by` distinto de `auth.uid()` siempre que sea miembro del wallet
+- ✅ `schemas/expense.ts`: campo `paid_by` opcional (uuid)
+- ✅ `lib/types.ts`: `NewExpenseInput.paid_by` opcional
+- ✅ `stores/expenses.ts.create`: usa `input.paid_by ?? userId`
+- ✅ `components/MemberPickerSheet.tsx`: nuevo sheet con lista ordenada (vos primero), avatar, rol, check
+- ✅ `expense/new.tsx`: incluye wallets team (`WalletPickerSheet` ya no filtra solo personal), FormRow "Pagado por" tappable cuando `team && >1 miembro`, auto-fetchMembers al cambiar wallet, reset paid_by al user actual cuando wallet es personal
+- ✅ Chip "EQUIPO" (secondary) en FormRow Wallet
+- 📁 Tocados: app/supabase/policies.sql, app/schemas/expense.ts, app/lib/types.ts, app/stores/expenses.ts, app/(app)/expense/new.tsx, app/components/{MemberPickerSheet,WalletPickerSheet}.tsx
+- ⚠️ Pendiente: usuario debe re-correr `policies.sql` en Supabase Dashboard

@@ -150,7 +150,7 @@ export default function CreateWallet() {
               fontFamily: typography.fontFamily.medium, fontSize: 12,
               color: 'rgba(255,255,255,0.85)',
             }}>
-              {watched.type === 'personal' ? 'Solo vos' : '1 miembros'}
+              {watched.type === 'personal' ? 'Solo vos' : '1 miembro'}
             </Text>
           </LinearGradient>
 
@@ -184,22 +184,57 @@ export default function CreateWallet() {
                 )}
               />
 
-              {/* En equipo (disabled) */}
+              {/* En equipo */}
+              <Controller
+                control={control}
+                name="type"
+                render={({ field: { value } }) => (
+                  <Pressable
+                    onPress={() => setValue('type', 'team')}
+                    style={{
+                      flex: 1, padding: 18, borderRadius: 14, gap: 8,
+                      backgroundColor: theme.colors.surface,
+                      borderWidth: 2,
+                      borderColor: value === 'team' ? theme.colors.primary : theme.colors.border,
+                    }}
+                  >
+                    <Icon name="Users" size={22} color={value === 'team' ? theme.colors.primary : theme.colors.textSecondary} />
+                    <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 15, color: theme.colors.textPrimary }}>
+                      En equipo
+                    </Text>
+                    <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 12, color: theme.colors.textSecondary }}>
+                      Compartida con otros
+                    </Text>
+                  </Pressable>
+                )}
+              />
+            </View>
+
+            {/* Sección Miembros (solo team) */}
+            {watched.type === 'team' && (
               <View style={{
-                flex: 1, padding: 18, borderRadius: 14, gap: 8,
-                backgroundColor: theme.colors.surface,
-                borderWidth: 1, borderColor: theme.colors.border,
-                opacity: 0.5,
+                marginTop: 12,
+                padding: 14,
+                borderRadius: 12,
+                backgroundColor: withAlpha(theme.colors.primary, 0.08),
+                borderWidth: 1,
+                borderColor: withAlpha(theme.colors.primary, 0.2),
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
               }}>
-                <Icon name="Users" size={22} color={theme.colors.textSecondary} />
-                <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 15, color: theme.colors.textPrimary }}>
-                  En equipo
-                </Text>
-                <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 12, color: theme.colors.textSecondary }}>
-                  Próximamente Fase 4
+                <Icon name="Users" size={18} color={theme.colors.primary} />
+                <Text style={{
+                  flex: 1,
+                  fontFamily: typography.fontFamily.regular,
+                  fontSize: 12,
+                  color: theme.colors.textPrimary,
+                  lineHeight: 16,
+                }}>
+                  Vas a poder invitar miembros una vez creada la wallet.
                 </Text>
               </View>
-            </View>
+            )}
 
             {/* Nombre */}
             <SectionLabel text="Nombre" />

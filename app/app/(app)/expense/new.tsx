@@ -20,6 +20,7 @@ import { FormRow } from '@/components/FormRow';
 import { CategoryPicker } from '@/components/CategoryPicker';
 import { WalletPickerSheet } from '@/components/WalletPickerSheet';
 import { ConfirmDeleteSheet } from '@/components/ConfirmDeleteSheet';
+import { MemberPickerSheet } from '@/components/MemberPickerSheet';
 import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 
@@ -37,7 +38,9 @@ export default function AddExpenseScreen() {
   const fullName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? 'Usuario';
 
   const allWallets = useWallets((s) => s.wallets);
-  const wallets = allWallets.filter((w) => w.type === 'personal' && !w.archived_at);
+  const wallets = allWallets.filter((w) => !w.archived_at);
+  const fetchMembers = useWallets((s) => s.fetchMembers);
+  const membersByWallet = useWallets((s) => s.membersByWallet);
 
   const existing = useExpenses((s) =>
     params.expenseId
@@ -53,6 +56,7 @@ export default function AddExpenseScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showMemberPicker, setShowMemberPicker] = useState(false);
 
   const { control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<NewExpenseForm>({
     resolver: zodResolver(newExpenseSchema),
@@ -64,6 +68,7 @@ export default function AddExpenseScreen() {
           category: (existing.category ?? 'other') as CategoryId,
           occurred_at: existing.occurred_at,
           note: existing.note,
+          paid_by: existing.paid_by,
         }
       : {
           wallet_id: initialWalletId,
@@ -72,6 +77,7 @@ export default function AddExpenseScreen() {
           category: 'food',
           occurred_at: new Date().toISOString(),
           note: null,
+          paid_by: user?.id,
         },
   });
 
@@ -84,6 +90,7 @@ export default function AddExpenseScreen() {
         category: (existing.category ?? 'other') as CategoryId,
         occurred_at: existing.occurred_at,
         note: existing.note,
+        paid_by: existing.paid_by,
       });
     }
   }, [existing?.id]);
@@ -92,11 +99,35 @@ export default function AddExpenseScreen() {
   const watchedCategory = watch('category');
   const watchedOccurredAt = watch('occurred_at');
   const watchedAmount = watch('amount');
+  const watchedPaidBy = watch('paid_by');
 
   const selectedWallet = wallets.find((w) => w.id === watchedWalletId)
     ?? allWallets.find((w) => w.id === watchedWalletId);
   const selectedCategoryDef = categoryById(watchedCategory);
   const expenseDate = new Date(watchedOccurredAt);
+  const isTeamWallet = selectedWallet?.type === 'team';
+  const walletMembers = isTeamWallet && selectedWallet ? membersByWallet[selectedWallet.id] ?? [] : [];
+  const canPickPayer = isTeamWallet && walletMembers.length > 1;
+  const selectedPayer = walletMembers.find((m) => m.user_id === watchedPaidBy);
+  const payerName = selectedPayer
+    ? selectedPayer.user_id === user?.id
+      ? fullName
+      : selectedPayer.profile?.full_name ?? '?'
+    : fullName;
+
+  // Cargar miembros cuando la wallet seleccionada es team
+  useEffect(() => {
+    if (isTeamWallet && selectedWallet) {
+      fetchMembers(selectedWallet.id);
+    }
+  }, [isTeamWallet, selectedWallet?.id, fetchMembers]);
+
+  // Si la wallet cambia y no es team, resetear paid_by al user actual
+  useEffect(() => {
+    if (!isTeamWallet && user?.id && watchedPaidBy !== user.id) {
+      setValue('paid_by', user.id);
+    }
+  }, [isTeamWallet, user?.id, watchedPaidBy, setValue]);
 
   const formatDateForDisplay = (d: Date) => {
     const isToday = new Date().toDateString() === d.toDateString();
@@ -120,6 +151,7 @@ export default function AddExpenseScreen() {
           category: values.category,
           occurred_at: values.occurred_at,
           note: values.note ?? null,
+          paid_by: values.paid_by,
         });
       } else {
         await useExpenses.getState().create({
@@ -129,6 +161,7 @@ export default function AddExpenseScreen() {
           category: values.category,
           occurred_at: values.occurred_at,
           note: values.note ?? null,
+          paid_by: values.paid_by,
         });
       }
       router.back();
@@ -253,7 +286,13 @@ export default function AddExpenseScreen() {
             iconName="Wallet"
             label="Wallet"
             value={selectedWallet ? selectedWallet.name : 'Seleccionar wallet...'}
-            chip={selectedWallet?.type === 'personal' ? { text: 'PERSONAL', tone: 'primary' } : undefined}
+            chip={
+              selectedWallet
+                ? selectedWallet.type === 'personal'
+                  ? { text: 'PERSONAL', tone: 'primary' }
+                  : { text: 'EQUIPO', tone: 'secondary' }
+                : undefined
+            }
             onPress={isEdit ? undefined : (!params.walletId ? () => setShowWalletPicker(true) : undefined)}
             error={errors.wallet_id?.message}
           />
@@ -276,8 +315,9 @@ export default function AddExpenseScreen() {
           <FormRow
             iconName="User"
             label="Pagado por"
-            value={fullName}
-            trailing={<Avatar name={fullName} size={26} />}
+            value={payerName}
+            trailing={<Avatar name={payerName} size={26} />}
+            onPress={canPickPayer ? () => setShowMemberPicker(true) : undefined}
           />
 
           {/* Sección Cómo dividir (Fase 5) */}
@@ -453,6 +493,15 @@ export default function AddExpenseScreen() {
         message={`¿Seguro que querés eliminar "${existing?.description}"? Esta acción no se puede deshacer.`}
         onConfirm={confirmDelete}
         onClose={() => setShowDeleteConfirm(false)}
+      />
+
+      <MemberPickerSheet
+        visible={showMemberPicker}
+        members={walletMembers}
+        selected={watchedPaidBy ?? user?.id ?? ''}
+        currentUserId={user?.id}
+        onSelect={(uid) => setValue('paid_by', uid)}
+        onClose={() => setShowMemberPicker(false)}
       />
     </SafeAreaView>
   );

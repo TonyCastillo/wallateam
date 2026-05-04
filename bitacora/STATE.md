@@ -1,9 +1,15 @@
 # Estado actual del proyecto WallaTeam
 
 **Última actualización:** 2026-05-04 (máquina: notebook)
-**Fase activa:** 04-fase-equipo (pendiente de diseño de prompts)
-**Último módulo completado:** 03.99-close-phase (Fase 3 cerrada ✅)
-**Próximo módulo a ejecutar:** _diseñar prompts/04-fase-equipo/_ (ver plantilla al fondo)
+**Fase activa:** 04-fase-equipo (módulos 01-05 implementados, falta validación + cierre)
+**Último módulo completado:** 04.05-paid-by-selector
+**Próximo módulo a ejecutar:** [prompts/04-fase-equipo/06-validate-vs-mock.md](../prompts/04-fase-equipo/06-validate-vs-mock.md) (requiere Expo Go + 2 cuentas)
+
+## ⚠️ SQL pendiente de aplicar en Supabase Dashboard
+
+Antes de probar en Expo Go:
+1. Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
+2. Re-correr `app/supabase/policies.sql` (policy `exp_insert` actualizada)
 
 ---
 
@@ -25,7 +31,7 @@
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
 | 02 — Wallets personales | ✅ Cerrada | 7 / 7 |
 | 03 — Gastos | ✅ Cerrada | 7 / 7 |
-| 04 — Equipo | ⚪ Pendiente | — |
+| 04 — Equipo | 🟡 En curso | 5 / 7 |
 | 05 — Splits | ⚪ Pendiente | — |
 | 06 — Balance | ⚪ Pendiente | — |
 | 07 — Multimoneda | ⚪ Pendiente | — |

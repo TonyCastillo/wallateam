@@ -2,23 +2,27 @@ import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './auth';
 import { useExpenses } from './expenses';
-import { Wallet, NewWalletInput } from '@/lib/types';
+import { Wallet, NewWalletInput, WalletMember } from '@/lib/types';
 
 interface WalletsState {
   wallets: Wallet[];
+  membersByWallet: Record<string, WalletMember[]>;
   loading: boolean;
   error: string | null;
   fetchAll: () => Promise<void>;
   fetchById: (id: string) => Promise<Wallet | null>;
+  fetchMembers: (walletId: string) => Promise<WalletMember[]>;
   create: (input: NewWalletInput) => Promise<Wallet>;
   archive: (id: string) => Promise<void>;
   byId: (id: string) => Wallet | undefined;
+  membersOf: (id: string) => WalletMember[];
 }
 
 let isSubscribed = false;
 
 export const useWallets = create<WalletsState>((set, get) => ({
   wallets: [],
+  membersByWallet: {},
   loading: false,
   error: null,
 
@@ -88,7 +92,17 @@ export const useWallets = create<WalletsState>((set, get) => ({
         .single();
 
       if (error) throw error;
-      
+
+      // Si es wallet de equipo, registrar al creador como admin en wallet_members
+      if (data.type === 'team') {
+        const { error: memberError } = await supabase
+          .from('wallet_members')
+          .insert({ wallet_id: data.id, user_id: owner_id, role: 'admin' });
+        if (memberError) {
+          console.warn('[wallets.create] no se pudo insertar wallet_member del owner:', memberError.message);
+        }
+      }
+
       set((state) => ({
         wallets: [data as Wallet, ...state.wallets],
         loading: false
@@ -124,6 +138,38 @@ export const useWallets = create<WalletsState>((set, get) => ({
 
   byId: (id: string) => {
     return get().wallets.find((w) => w.id === id);
+  },
+
+  fetchMembers: async (walletId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('wallet_members')
+        .select('wallet_id, user_id, role, joined_at, profile:profiles(id, full_name, avatar_url)')
+        .eq('wallet_id', walletId);
+
+      if (error) throw error;
+
+      const members = ((data ?? []) as any[]).map((row) => ({
+        wallet_id: row.wallet_id,
+        user_id: row.user_id,
+        role: row.role,
+        joined_at: row.joined_at,
+        profile: Array.isArray(row.profile) ? row.profile[0] : row.profile,
+      })) as WalletMember[];
+
+      set((state) => ({
+        membersByWallet: { ...state.membersByWallet, [walletId]: members },
+      }));
+
+      return members;
+    } catch (err: any) {
+      set({ error: err.message });
+      return [];
+    }
+  },
+
+  membersOf: (id: string) => {
+    return get().membersByWallet[id] ?? [];
   },
 }));
 

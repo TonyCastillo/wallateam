@@ -96,9 +96,15 @@ drop policy if exists "exp_select" on expenses;
 create policy "exp_select" on expenses
   for select using (public.is_wallet_member(wallet_id, auth.uid()));
 
+-- exp_insert: el invocador debe ser miembro del wallet.
+-- paid_by debe ser un miembro del wallet también (no necesariamente el invocador,
+-- así otros miembros pueden registrar un gasto pagado por otro miembro del equipo).
 drop policy if exists "exp_insert" on expenses;
 create policy "exp_insert" on expenses
-  for insert with check (public.is_wallet_member(wallet_id, auth.uid()) and paid_by = auth.uid());
+  for insert with check (
+    public.is_wallet_member(wallet_id, auth.uid())
+    and public.is_wallet_member(wallet_id, paid_by)
+  );
 
 drop policy if exists "exp_update" on expenses;
 create policy "exp_update" on expenses
