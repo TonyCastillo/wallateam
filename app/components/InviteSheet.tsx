@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { View, Text, Modal, Pressable, Alert, Share, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, Pressable, Alert, Share, ActivityIndicator, ScrollView } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
 import { Icon } from './Icon';
@@ -53,19 +54,23 @@ export function InviteSheet({ visible, walletId, walletName, onClose }: InviteSh
   }, [visible, walletId]);
 
   const url = invite ? buildInviteUrl(invite.invite_code) : '';
+  const code = invite?.invite_code ?? '';
 
-  const handleCopy = async () => {
-    if (!url) return;
-    await Clipboard.setStringAsync(url);
+  const handleCopyCode = async () => {
+    if (!code) return;
+    await Clipboard.setStringAsync(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
 
   const handleShare = async () => {
-    if (!url) return;
+    if (!code) return;
     try {
       await Share.share({
-        message: `Te invito a unirte a la wallet "${walletName}" en WallaTeam: ${url}`,
+        message:
+          `Te invito a unirte a la wallet "${walletName}" en WallaTeam.\n\n` +
+          `Tu código de invitación es: ${code}\n\n` +
+          `Abrí WallaTeam → Perfil → "Tengo un código" y pegalo.`,
       });
     } catch {
       /* cancelado por el user */
@@ -81,138 +86,190 @@ export function InviteSheet({ visible, walletId, walletName, onClose }: InviteSh
           left: 0,
           right: 0,
           bottom: 0,
+          maxHeight: '90%',
           backgroundColor: theme.colors.background,
           borderTopLeftRadius: 22,
           borderTopRightRadius: 22,
-          padding: 20,
-          paddingBottom: 32,
-          gap: 14,
         }}
       >
-        {/* Pill handle */}
-        <View
-          style={{
-            alignSelf: 'center',
-            width: 40,
-            height: 4,
-            borderRadius: 2,
-            backgroundColor: theme.colors.border,
-            marginBottom: 4,
-          }}
-        />
-
-        <Text
-          style={{
-            fontFamily: typography.fontFamily.bold,
-            fontSize: 18,
-            color: theme.colors.textPrimary,
-          }}
+        <ScrollView
+          contentContainerStyle={{ padding: 20, paddingBottom: 32, gap: 14 }}
+          showsVerticalScrollIndicator={false}
         >
-          Invitar a la wallet
-        </Text>
-        <Text
-          style={{
-            fontFamily: typography.fontFamily.regular,
-            fontSize: 13,
-            color: theme.colors.textSecondary,
-            marginTop: -8,
-          }}
-        >
-          Compartí este link para invitar
-        </Text>
+          {/* Pill handle */}
+          <View
+            style={{
+              alignSelf: 'center',
+              width: 40,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: theme.colors.border,
+              marginBottom: 4,
+            }}
+          />
 
-        {loading || !invite ? (
-          <View style={{ paddingVertical: 32, alignItems: 'center' }}>
-            <ActivityIndicator color={theme.colors.primary} />
-          </View>
-        ) : (
-          <>
-            <View
-              style={{
-                padding: 14,
-                borderRadius: 12,
-                backgroundColor: theme.colors.surface,
-                borderWidth: 1,
-                borderColor: theme.colors.border,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: typography.fontFamily.semibold,
-                  fontSize: 13,
-                  color: theme.colors.textPrimary,
-                }}
-                selectable
-                numberOfLines={1}
-              >
-                {url}
-              </Text>
-              <Text
-                style={{
-                  fontFamily: typography.fontFamily.regular,
-                  fontSize: 11,
-                  color: theme.colors.textSecondary,
-                  marginTop: 4,
-                }}
-              >
-                Vence en 7 días
-              </Text>
+          <Text
+            style={{
+              fontFamily: typography.fontFamily.bold,
+              fontSize: 18,
+              color: theme.colors.textPrimary,
+            }}
+          >
+            Invitar a la wallet
+          </Text>
+          <Text
+            style={{
+              fontFamily: typography.fontFamily.regular,
+              fontSize: 13,
+              color: theme.colors.textSecondary,
+              marginTop: -8,
+            }}
+          >
+            Compartí el código o el QR para sumar a otros
+          </Text>
+
+          {loading || !invite ? (
+            <View style={{ paddingVertical: 48, alignItems: 'center' }}>
+              <ActivityIndicator color={theme.colors.primary} />
             </View>
-
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Pressable
-                onPress={handleCopy}
+          ) : (
+            <>
+              {/* QR */}
+              <View
                 style={{
-                  flex: 1,
-                  paddingVertical: 12,
-                  borderRadius: 12,
+                  alignItems: 'center',
+                  paddingVertical: 18,
+                  borderRadius: 14,
+                  backgroundColor: '#fff',
                   borderWidth: 1,
                   borderColor: theme.colors.border,
-                  backgroundColor: theme.colors.surface,
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  gap: 6,
                 }}
               >
-                <Icon name={copied ? 'Check' : 'Copy'} size={16} color={theme.colors.textPrimary} />
+                <QRCode value={url} size={180} backgroundColor="#fff" color="#000" />
                 <Text
                   style={{
-                    fontFamily: typography.fontFamily.semibold,
-                    fontSize: 14,
-                    color: theme.colors.textPrimary,
+                    marginTop: 10,
+                    fontFamily: typography.fontFamily.regular,
+                    fontSize: 11,
+                    color: '#555',
                   }}
                 >
-                  {copied ? 'Copiado' : 'Copiar link'}
+                  Escaneá con la cámara desde otra cuenta
                 </Text>
-              </Pressable>
-              <Pressable
-                onPress={handleShare}
+              </View>
+
+              {/* Código grande */}
+              <View
                 style={{
-                  flex: 1,
-                  paddingVertical: 12,
+                  padding: 14,
                   borderRadius: 12,
-                  backgroundColor: theme.colors.primary,
+                  backgroundColor: theme.colors.surface,
+                  borderWidth: 1,
+                  borderColor: theme.colors.border,
                   alignItems: 'center',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  gap: 6,
                 }}
               >
-                <Icon name="Share2" size={16} color="#fff" />
                 <Text
                   style={{
                     fontFamily: typography.fontFamily.semibold,
-                    fontSize: 14,
-                    color: '#fff',
+                    fontSize: 11,
+                    color: theme.colors.textSecondary,
+                    letterSpacing: 0.4,
+                    textTransform: 'uppercase',
                   }}
                 >
-                  Compartir
+                  Código de invitación
                 </Text>
-              </Pressable>
-            </View>
-          </>
-        )}
+                <Text
+                  style={{
+                    fontFamily: typography.fontFamily.bold,
+                    fontSize: 28,
+                    color: theme.colors.primary,
+                    letterSpacing: 4,
+                    marginTop: 4,
+                  }}
+                  selectable
+                >
+                  {code}
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: typography.fontFamily.regular,
+                    fontSize: 11,
+                    color: theme.colors.textSecondary,
+                    marginTop: 6,
+                    textAlign: 'center',
+                  }}
+                >
+                  El otro user lo pega desde Perfil → "Tengo un código"
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: typography.fontFamily.regular,
+                    fontSize: 10,
+                    color: theme.colors.textSecondary,
+                    marginTop: 4,
+                  }}
+                >
+                  Vence en 7 días
+                </Text>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Pressable
+                  onPress={handleCopyCode}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: theme.colors.border,
+                    backgroundColor: theme.colors.surface,
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <Icon name={copied ? 'Check' : 'Copy'} size={16} color={theme.colors.textPrimary} />
+                  <Text
+                    style={{
+                      fontFamily: typography.fontFamily.semibold,
+                      fontSize: 14,
+                      color: theme.colors.textPrimary,
+                    }}
+                  >
+                    {copied ? 'Copiado' : 'Copiar código'}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleShare}
+                  style={{
+                    flex: 1,
+                    paddingVertical: 12,
+                    borderRadius: 12,
+                    backgroundColor: theme.colors.primary,
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <Icon name="Share2" size={16} color="#fff" />
+                  <Text
+                    style={{
+                      fontFamily: typography.fontFamily.semibold,
+                      fontSize: 14,
+                      color: '#fff',
+                    }}
+                  >
+                    Compartir
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          )}
+        </ScrollView>
       </View>
     </Modal>
   );

@@ -36,6 +36,9 @@ import { withAlpha } from '@/components/IconBox';
 
 type DetailTab = 'gastos' | 'resumen' | 'miembros';
 
+// Referencia estable para evitar bucles de render en selectores Zustand
+const EMPTY_MEMBERS: WalletMember[] = [];
+
 function resolveLucideIcon(walletIcon: string): IconName {
   const def = WALLET_ICONS.find((i) => i.id === walletIcon);
   return (def?.lucide ?? 'Wallet') as IconName;
@@ -151,7 +154,7 @@ function ExpensesList({ walletId }: { walletId: string }) {
 function MembersTab({ walletId, walletName }: { walletId: string; walletName: string }) {
   const { theme } = useTheme();
   const userId = useAuth((s) => s.user?.id);
-  const members = useWallets((s) => s.membersByWallet[walletId] ?? []);
+  const members = useWallets((s) => s.membersByWallet[walletId]) ?? EMPTY_MEMBERS;
   const fetchMembers = useWallets((s) => s.fetchMembers);
   const [refreshing, setRefreshing] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
@@ -299,7 +302,7 @@ export default function WalletDetailScreen() {
   const wallet = useWallets((s) => (id ? s.byId(id) : undefined));
   const fetchById = useWallets((s) => s.fetchById);
   const fetchMembers = useWallets((s) => s.fetchMembers);
-  const members = useWallets((s) => (wallet?.id ? s.membersByWallet[wallet.id] ?? [] : []));
+  const members = useWallets((s) => (wallet?.id ? s.membersByWallet[wallet.id] : undefined)) ?? EMPTY_MEMBERS;
   const [tab, setTab] = useState<DetailTab>('gastos');
   const [resolving, setResolving] = useState(false);
   const [notFound, setNotFound] = useState(false);
