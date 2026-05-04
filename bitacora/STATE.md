@@ -1,9 +1,9 @@
 # Estado actual del proyecto WallaTeam
 
-**Última actualización:** 2026-04-29 (máquina: antigravity)
-**Fase activa:** 03-fase-gastos
-**Último módulo completado:** 03.03-screen-add-expense
-**Próximo módulo a ejecutar:** [prompts/03-fase-gastos/04-edit-delete-expense.md](../prompts/03-fase-gastos/04-edit-delete-expense.md)
+**Última actualización:** 2026-05-04 (máquina: notebook)
+**Fase activa:** 04-fase-equipo (pendiente de diseño de prompts)
+**Último módulo completado:** 03.99-close-phase (Fase 3 cerrada ✅)
+**Próximo módulo a ejecutar:** _diseñar prompts/04-fase-equipo/_ (ver plantilla al fondo)
 
 ---
 
@@ -23,8 +23,8 @@
 | Fase | Estado | Módulos done |
 |---|---|---|
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
-| 02 — Wallets personales | ✅ Cerrada (validación visual diferida) | 7 / 7 |
-| 03 — Gastos | 🟡 En curso | 3 / 7 |
+| 02 — Wallets personales | ✅ Cerrada | 7 / 7 |
+| 03 — Gastos | ✅ Cerrada | 7 / 7 |
 | 04 — Equipo | ⚪ Pendiente | — |
 | 05 — Splits | ⚪ Pendiente | — |
 | 06 — Balance | ⚪ Pendiente | — |
@@ -33,45 +33,32 @@
 
 ## Notas del momento
 
-- **Fase 1 (Auth) completa**: setup Expo SDK 54, theme tokens light/dark, fuentes Inter, Supabase project + schema + RLS, Login/Registro funcional con sesión persistente
+- **Fase 3 (Gastos) completa**: CRUD expenses funcional, ExpenseRow, CategoryPicker, WalletPickerSheet, edición y eliminación con ConfirmDeleteSheet, métricas reactivas (gastado/restante/usedPct), over-budget en warning amarillo, useTotalBalance con datos reales en Home
 - Project Supabase activo: `azfcmdihftxtiwrvcfsh.supabase.co`
 - Confirm email **OFF en dev** (re-activar antes de release a prod)
 - Stack en producción: Expo SDK 54 + React 19.1 + RN 0.81.5
-- 9 commits en main: bootstrap → 01.01..01.05 → cierre Fase 1 → prompt-pack Fase 2
-- **Prompt-pack Fase 2 escrito** (`prompts/02-fase-wallets-personales/00..99` listos)
-- **Pantalla Detalle de Wallet** implementada en `app/(app)/wallet/[id].tsx`: header gradient (color wallet → secondary), métricas (Presupuesto/Gastado/Restante), progress bar, tabs underline (Gastos activo, Resumen y Miembros con placeholders), EmptyExpenses, FAB de "agregar gasto" (Alert por ahora — Fase 3 lo wirea).
-- Métricas usan `gastado=0` y `restante=initial_balance` mientras Fase 3 no calcule sumatoria de expenses (consistente con ADR-009).
-- **Próxima acción:** ejecutar [`prompts/02-fase-wallets-personales/06-validate-vs-mock.md`](../prompts/02-fase-wallets-personales/06-validate-vs-mock.md) — checklist visual de las 3 pantallas (Home / Crear / Detalle) contra el prototipo HTML.
+- ADR-009 resuelto: `useTotalBalance` y `useWalletMetrics` calculan con expenses reales
+- Prompts de Fase 4 creados en `prompts/04-fase-equipo/` (00-overview + 01..06 + 99)
 
-## Plantilla para arrancar Fase 2
-
-Pegar este prompt al usuario o al próximo agente cuando se vaya a iniciar Fase 2:
+## Plantilla para arrancar Fase 4
 
 ```
-Empezá Fase 2 (Wallets personales) del proyecto WallaTeam.
+Empezá Fase 4 (Equipo) del proyecto WallaTeam.
 
-Lectura obligatoria antes de cualquier acción:
+Lectura obligatoria:
 1. prompts/00-AGENT-HANDOFF.md
 2. prompts/00-MASTER.md
 3. bitacora/STATE.md, CHANGELOG.md, TASKS.md, DECISIONS.md
+4. prompts/04-fase-equipo/00-overview.md
 
-Después:
-- Crear los archivos de prompts/02-fase-wallets-personales/ siguiendo
-  la estructura de prompts/01-fase-auth/ (00-overview, 01..N módulos, 99-close-phase)
-- Mocks ground truth: design_handoff_wallateam_mvp/lib/screen-home.jsx,
-  screen-create-wallet.jsx, screen-wallet-detail.jsx (este último mostrará data
-  dummy hasta Fase 4)
-- Módulos sugeridos:
-  01 - BottomNav component + (app)/(tabs) layout
-  02 - Wallet store + queries Supabase (CRUD wallets personales)
-  03 - Pantalla Home (balance card gradient, quick actions, lista wallets)
-  04 - Pantalla Crear Wallet (form completo SIN sección team que va Fase 4)
-  05 - Pantalla Detalle Wallet (sin gastos reales, placeholder lista)
-  06 - Validación visual contra prototipo
-  99 - Cerrar fase
+Mocks ground truth:
+- design_handoff_wallateam_mvp/lib/screen-create-wallet.jsx (sección "Miembros" para type='team')
+- design_handoff_wallateam_mvp/lib/screen-wallet-detail.jsx (avatares overlap, balance del grupo, tab Miembros)
+
+Ejecutar el módulo apuntado por STATE.md → Próximo módulo a ejecutar.
 
 Recordá: actualizar bitácora al cerrar cada módulo, commit por módulo,
-no inventar componentes (reusar Icon/Button/Input/Theme), microcopy literal es-PY.
+no inventar componentes (reusar Avatar/Chip/IconBox/etc.), microcopy literal es-PY.
 ```
 
 ## Comandos útiles

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './auth';
+import { useExpenses } from './expenses';
 import { Wallet, NewWalletInput } from '@/lib/types';
 
 interface WalletsState {
@@ -129,15 +130,18 @@ export const useWallets = create<WalletsState>((set, get) => ({
 export function useTotalBalance(): { personal: number; team: number; total: number } {
   const wallets = useWallets((s) => s.wallets);
   const userId = useAuth((s) => s.user?.id);
+  const expensesByWallet = useExpenses((s) => s.byWallet);
 
   let personal = 0;
   let team = 0;
 
   wallets.forEach((w) => {
+    const spent = (expensesByWallet[w.id] ?? []).reduce((acc, e) => acc + Number(e.amount), 0);
+    const balance = Number(w.initial_balance) - spent;
     if (w.type === 'personal' && w.owner_id === userId) {
-      personal += w.initial_balance;
+      personal += balance;
     } else if (w.type === 'team') {
-      team += w.initial_balance;
+      team += balance;
     }
   });
 

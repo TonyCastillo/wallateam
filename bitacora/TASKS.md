@@ -7,7 +7,7 @@
 
 ## En curso
 
-- [ ] [Fase 3] 04 — Editar y eliminar gastos
+_(ninguno — Fase 3 cerrada, Fase 4 pendiente de inicio)_
 
 ## Pendiente
 
@@ -16,18 +16,16 @@
 - [ ] [Fase 1.5] Forgot password real (`supabase.auth.resetPasswordForEmail` + deep link)
 - [ ] [Fase 1.5] Re-activar Confirm email en Supabase antes de release a producción
 
-### Fase 2 — Wallets personales (prompts listos para ejecutar)
+### Fase 4 — Equipo
+- [ ] [Fase 4] 01 — Habilitar type='team' en CreateWallet (sección Miembros + invite link UX)
+- [ ] [Fase 4] 02 — wallet_invites: store + queries (crear invite, generar invite_code, accept)
+- [ ] [Fase 4] 03 — Pantalla "Aceptar invitación" via deep link (wallateam://invite/CODE)
+- [ ] [Fase 4] 04 — Mostrar miembros en Detalle Wallet (avatares overlap + lista en tab Miembros)
+- [ ] [Fase 4] 05 — paid_by selector en Agregar Gasto (entre miembros del wallet)
+- [ ] [Fase 4] 06 — Validación visual + cierre
+- [ ] [Fase 4] 99 — Cerrar fase
 
-- [ ] [Fase 2] 99 — Cerrar fase
-
-### Fase 3 — Gastos (prompts listos para ejecutar)
-
-- [ ] [Fase 3] 05 — Recálculo de métricas (cierra ADR-009)
-- [ ] [Fase 3] 06 — Validación visual contra prototipo
-- [ ] [Fase 3] 99 — Cerrar fase
-
-### Fases 4-8 (a planificar al cerrar la previa)
-- [ ] [Fase 4] Equipo (wallets type='team', invitaciones, miembros)
+### Fases 5-8 (a planificar al cerrar la previa)
 - [ ] [Fase 5] Splits (=, %, ₲) con validaciones
 - [ ] [Fase 6] Balance del grupo (cálculo deudas, saldar)
 - [ ] [Fase 7] Multimoneda (USD, ARS, conversión)
@@ -53,3 +51,7 @@
 - ✅ [Fase 3] 01 — Expense store + queries Supabase (2026-04-29)
 - ✅ [Fase 3] 02 — ExpenseRow + lista en Detalle (2026-04-29)
 - ✅ [Fase 3] 03 — Pantalla Agregar Gasto (2026-04-29)
+- ✅ [Fase 3] 04 — Editar y eliminar gastos (2026-05-04)
+- ✅ [Fase 3] 05 — Recálculo de métricas (2026-05-04)
+- ✅ [Fase 3] 06 — Validación visual contra prototipo (2026-05-04)
+- ✅ [Fase 3] 99 — Cerrar fase (2026-05-04)

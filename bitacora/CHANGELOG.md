@@ -177,3 +177,40 @@
 - 📁 Tocados: `app/lib/format.ts`, `app/components/ExpenseRow.tsx`, `app/components/EmptyExpenses.tsx`, `app/app/(app)/wallet/[id].tsx`
 - 🧪 Verificación: `tsc --noEmit` limpio. Smoke real: tap a una wallet con gastos muestra los `ExpenseRow` ordenados (sort por `occurred_at desc` viene del store), el empty state navega a una ruta que aún no existe (404 hasta 3.03 — esperado).
 - 🧠 Notas: las métricas del header siguen siendo placeholder (gastado=0). El recálculo real es módulo 3.05.
+
+## [03.04] 2026-05-04 — Editar y eliminar gastos
+- ✅ `expense/new.tsx` detecta `?expenseId=...` → modo edit con `reset()` del form al cargar el gasto
+- ✅ AppBar título/subtítulo y CTA cambian según modo (Nuevo/Editar, Guardar gasto/Guardar cambios)
+- ✅ `onSubmit` bifurcado: llama `update()` en edit, `create()` en new
+- ✅ Campo Wallet bloqueado en modo edit (sin `onPress`)
+- ✅ Botón "Eliminar gasto" rojo outline + Trash2, visible solo en edit
+- ✅ Nuevo componente `ConfirmDeleteSheet`: bottom sheet con icono danger, título, mensaje y botones Cancelar/Eliminar
+- ✅ Confirmación de borrado usa `ConfirmDeleteSheet` en lugar de `Alert.alert` anidado (en edit screen y en long-press del detalle)
+- ✅ `ExpenseRow` long-press → Alert action sheet (Editar/Eliminar) → Eliminar abre `ConfirmDeleteSheet`
+- 📁 Tocados: `app/app/(app)/expense/new.tsx`, `app/app/(app)/wallet/[id].tsx`, `app/components/ConfirmDeleteSheet.tsx`
+
+## [03.05] 2026-05-04 — Recálculo de métricas con expenses reales
+- ✅ `useTotalBalance` actualizado: resta `sum(expenses.amount)` del `initial_balance` por wallet (cierra ADR-009)
+- ✅ Nuevo hook `useWalletMetrics(walletId)` en `lib/walletMetrics.ts` → `presupuesto`, `gastado`, `restante`, `usedPct`, `count`, `overBudget`
+- ✅ Header del Detalle Wallet usa `useWalletMetrics`; ProgressBar y métricas reactivos a cambios de expenses
+- ✅ Texto "% usado" en color `warning` y semibold cuando `overBudget === true`
+- ✅ ADR-009 marcado como **Resuelto** en DECISIONS.md
+- ✅ Home BalanceCard refleja balance neto de todas las wallets (via `useTotalBalance`)
+- 📁 Tocados: `app/stores/wallets.ts`, `app/lib/walletMetrics.ts`, `app/app/(app)/wallet/[id].tsx`, `bitacora/DECISIONS.md`
+
+## [03.06] 2026-05-04 — Validación visual Fase 3
+- ✅ Detalle Wallet con expenses: ExpenseRow (IconBox categoría, descripción, "Pagó Vos · fecha", monto Unicode −), FlatList gap 8, paddingBottom 96, skeleton, EmptyExpenses, pull-to-refresh
+- ✅ Métricas header reactivas: Gastado = suma real, Restante = presupuesto − gastado, ProgressBar a usedPct, texto "X% usado · días", warning amarillo en over-budget
+- ✅ Interactividad: tap → edit precargado, long-press → ActionSheet Editar/Eliminar, FAB con walletId
+- ✅ Pantalla Agregar Gasto: AmountInput con máscara, chip PYG, FormRow Descripción/Categoría/Wallet/Fecha/PagadoPor, CategoryPicker sheet, WalletPickerSheet, sección Splits disabled (Fase 5), adjuntar ticket placeholder, CTA bar Cancelar + Guardar gasto
+- ✅ Modo Edit: título "Editar gasto", subtítulo "Modificá los datos", CTA "Guardar cambios", Wallet bloqueado, botón Eliminar rojo
+- ✅ ConfirmDeleteSheet: pill handle, icono danger, mensaje, botones Cancelar/Eliminar (no Alert nativo)
+- ✅ Microcopy 100% literal es-PY verificado contra mock HTML
+- ✅ `tsc --noEmit` sin errores
+- 🧠 Desviaciones: ninguna estructural. AppBar back usa ChevronLeft 26px en lugar del círculo 36×36 del prototipo (diferencia cosmética menor, se unifica en Fase 8)
+
+## [03.99] 2026-05-04 — Fase 3 (Gastos) cerrada ✅
+- Smoke test E2E: creación → header recalcula, edición → update reflejado, long-press eliminar → ConfirmDeleteSheet → header recalcula, force-quit → datos persistidos
+- ADR-009 marcado como Resuelto (useTotalBalance y useWalletMetrics con datos reales)
+- `tsc --noEmit` limpio, working tree limpio tras commit
+- Próxima fase: 04-fase-equipo (wallets type='team', invitaciones, miembros, RLS team)

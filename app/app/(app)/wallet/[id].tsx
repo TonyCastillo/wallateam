@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,9 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
 import { useWallets } from '@/stores/wallets';
 import { useExpenses } from '@/stores/expenses';
-import { fmtGsCompact } from '@/lib/format';
+import { useWalletMetrics } from '@/lib/walletMetrics';
+import { fmtGs, fmtGsCompact } from '@/lib/format';
+import { Expense } from '@/lib/types';
 import { WALLET_ICONS } from '@/lib/walletIcons';
 import { Icon, IconName } from '@/components/Icon';
 import { Tabs } from '@/components/Tabs';
@@ -25,6 +27,7 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { Metric } from '@/components/Metric';
 import { EmptyExpenses } from '@/components/EmptyExpenses';
 import { ExpenseRow } from '@/components/ExpenseRow';
+import { ConfirmDeleteSheet } from '@/components/ConfirmDeleteSheet';
 import { withAlpha } from '@/components/IconBox';
 
 type DetailTab = 'gastos' | 'resumen' | 'miembros';
@@ -44,6 +47,7 @@ function ExpensesList({ walletId }: { walletId: string }) {
   const loading = useExpenses((s) => s.loading);
   const fetchByWallet = useExpenses((s) => s.fetchByWallet);
   const [refreshing, setRefreshing] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<Expense | null>(null);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -51,62 +55,89 @@ function ExpensesList({ walletId }: { walletId: string }) {
     setRefreshing(false);
   };
 
-  if (loading && list.length === 0) {
-    return (
-      <View style={{ padding: 16, gap: 8 }}>
-        {[0, 1, 2].map((i) => (
-          <View
-            key={i}
-            style={{
-              height: 68,
-              borderRadius: 14,
-              backgroundColor: theme.colors.surfaceAlt,
-              opacity: 0.5,
-            }}
-          />
-        ))}
-      </View>
+  const handleLongPress = useCallback((expense: Expense) => {
+    Alert.alert(
+      expense.description,
+      fmtGs(expense.amount),
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Editar', onPress: () => router.push(`/expense/new?expenseId=${expense.id}`) },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: () => setPendingDelete(expense),
+        },
+      ],
     );
-  }
-
-  if (list.length === 0) {
-    return (
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={theme.colors.primary}
-          />
-        }
-      >
-        <EmptyExpenses walletId={walletId} />
-      </ScrollView>
-    );
-  }
+  }, [router]);
 
   return (
-    <FlatList
-      data={list}
-      keyExtractor={(e) => e.id}
-      contentContainerStyle={{ padding: 16, paddingBottom: 96 }}
-      ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          tintColor={theme.colors.primary}
-        />
-      }
-      renderItem={({ item }) => (
-        <ExpenseRow
-          expense={item}
-          onPress={() => router.push(`/expense/new?expenseId=${item.id}`)}
-          // onLongPress se conecta en módulo 3.04 (edit/delete con ActionSheet)
+    <View style={{ flex: 1 }}>
+      {loading && list.length === 0 ? (
+        <View style={{ padding: 16, gap: 8 }}>
+          {[0, 1, 2].map((i) => (
+            <View
+              key={i}
+              style={{
+                height: 68,
+                borderRadius: 14,
+                backgroundColor: theme.colors.surfaceAlt,
+                opacity: 0.5,
+              }}
+            />
+          ))}
+        </View>
+      ) : list.length === 0 ? (
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={theme.colors.primary}
+            />
+          }
+        >
+          <EmptyExpenses walletId={walletId} />
+        </ScrollView>
+      ) : (
+        <FlatList
+          data={list}
+          keyExtractor={(e) => e.id}
+          contentContainerStyle={{ padding: 16, paddingBottom: 96 }}
+          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={theme.colors.primary}
+            />
+          }
+          renderItem={({ item }) => (
+            <ExpenseRow
+              expense={item}
+              onPress={() => router.push(`/expense/new?expenseId=${item.id}`)}
+              onLongPress={() => handleLongPress(item)}
+            />
+          )}
         />
       )}
-    />
+
+      <ConfirmDeleteSheet
+        visible={!!pendingDelete}
+        title="Eliminar gasto"
+        message={`¿Seguro que querés eliminar "${pendingDelete?.description}"? Esta acción no se puede deshacer.`}
+        onConfirm={async () => {
+          if (!pendingDelete) return;
+          try {
+            await useExpenses.getState().remove(pendingDelete.id);
+          } catch {
+            Alert.alert('Error', 'No se pudo eliminar');
+          }
+        }}
+        onClose={() => setPendingDelete(null)}
+      />
+    </View>
   );
 }
 
@@ -123,6 +154,9 @@ export default function WalletDetailScreen() {
   const [tab, setTab] = useState<DetailTab>('gastos');
   const [resolving, setResolving] = useState(false);
   const [notFound, setNotFound] = useState(false);
+
+  // Debe estar antes de los early returns para respetar las Rules of Hooks
+  const metrics = useWalletMetrics(wallet?.id);
 
   useEffect(() => {
     if (!id) return;
@@ -169,12 +203,7 @@ export default function WalletDetailScreen() {
     );
   }
 
-  // Fase 2: gastado y restante son placeholder (initial_balance). El recálculo
-  // real con sum(expenses.amount) llega en módulo 3.05 (cierra ADR-009).
-  const presupuesto = wallet.initial_balance;
-  const gastado = 0;
-  const restante = presupuesto - gastado;
-  const usedPct = presupuesto > 0 ? gastado / presupuesto : 0;
+  const { presupuesto, gastado, restante, usedPct, overBudget } = metrics;
 
   const lucide = resolveLucideIcon(wallet.icon);
   const isPersonal = wallet.type === 'personal';
@@ -304,9 +333,9 @@ export default function WalletDetailScreen() {
           <Text
             style={{
               marginTop: 8,
-              color: 'rgba(255,255,255,0.7)',
+              color: overBudget ? theme.colors.warning : 'rgba(255,255,255,0.7)',
               fontSize: 11,
-              fontFamily: typography.fontFamily.regular,
+              fontFamily: overBudget ? typography.fontFamily.semibold : typography.fontFamily.regular,
             }}
           >
             {Math.round(usedPct * 100)}% usado · {daysLabel}

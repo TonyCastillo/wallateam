@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, Pressable, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -12,74 +12,99 @@ import { useAuth } from '@/stores/auth';
 import { useWallets } from '@/stores/wallets';
 import { useExpenses } from '@/stores/expenses';
 import { newExpenseSchema, NewExpenseForm } from '@/schemas/expense';
-import { categoryById } from '@/lib/categories';
+import { categoryById, CategoryId } from '@/lib/categories';
 
 import { Icon } from '@/components/Icon';
 import { AmountInput } from '@/components/AmountInput';
 import { FormRow } from '@/components/FormRow';
 import { CategoryPicker } from '@/components/CategoryPicker';
 import { WalletPickerSheet } from '@/components/WalletPickerSheet';
+import { ConfirmDeleteSheet } from '@/components/ConfirmDeleteSheet';
 import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
 
-// Utility for formatting PYG
 const formatPYG = (n: number) => n.toLocaleString('es-PY');
 
 export default function AddExpenseScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const params = useLocalSearchParams<{ walletId?: string }>();
+  const params = useLocalSearchParams<{ walletId?: string; expenseId?: string }>();
   const insets = useSafeAreaInsets();
-  
+
+  const isEdit = !!params.expenseId;
+
   const { user } = useAuth();
   const fullName = (user?.user_metadata?.full_name as string | undefined) ?? user?.email ?? 'Usuario';
 
   const allWallets = useWallets((s) => s.wallets);
   const wallets = allWallets.filter((w) => w.type === 'personal' && !w.archived_at);
-  
-  // Si no viene walletId, intentamos preseleccionar la única, si es que hay una. Si hay varias, quedará vacío para forzar selección.
+
+  const existing = useExpenses((s) =>
+    params.expenseId
+      ? Object.values(s.byWallet).flat().find((e) => e.id === params.expenseId)
+      : undefined
+  );
+
   const initialWalletId = params.walletId ?? (wallets.length === 1 ? wallets[0].id : '');
 
   const [submitting, setSubmitting] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
-  
-  // Controlamos la apertura automática del picker de wallets si es necesario
-  const [showWalletPicker, setShowWalletPicker] = useState(!initialWalletId && wallets.length > 1);
-
-  // DatePicker state
+  const [showWalletPicker, setShowWalletPicker] = useState(!isEdit && !initialWalletId && wallets.length > 1);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<NewExpenseForm>({
+  const { control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<NewExpenseForm>({
     resolver: zodResolver(newExpenseSchema),
-    defaultValues: {
-      wallet_id: initialWalletId,
-      description: '',
-      amount: 0,
-      category: 'food',
-      occurred_at: new Date().toISOString(),
-      note: null,
-    },
+    defaultValues: existing
+      ? {
+          wallet_id: existing.wallet_id,
+          description: existing.description,
+          amount: Number(existing.amount),
+          category: (existing.category ?? 'other') as CategoryId,
+          occurred_at: existing.occurred_at,
+          note: existing.note,
+        }
+      : {
+          wallet_id: initialWalletId,
+          description: '',
+          amount: 0,
+          category: 'food',
+          occurred_at: new Date().toISOString(),
+          note: null,
+        },
   });
+
+  useEffect(() => {
+    if (existing) {
+      reset({
+        wallet_id: existing.wallet_id,
+        description: existing.description,
+        amount: Number(existing.amount),
+        category: (existing.category ?? 'other') as CategoryId,
+        occurred_at: existing.occurred_at,
+        note: existing.note,
+      });
+    }
+  }, [existing?.id]);
 
   const watchedWalletId = watch('wallet_id');
   const watchedCategory = watch('category');
   const watchedOccurredAt = watch('occurred_at');
   const watchedAmount = watch('amount');
 
-  const selectedWallet = wallets.find((w) => w.id === watchedWalletId);
+  const selectedWallet = wallets.find((w) => w.id === watchedWalletId)
+    ?? allWallets.find((w) => w.id === watchedWalletId);
   const selectedCategoryDef = categoryById(watchedCategory);
   const expenseDate = new Date(watchedOccurredAt);
 
-  // Format Date (Hoy · 17 mar 2026, etc)
   const formatDateForDisplay = (d: Date) => {
     const isToday = new Date().toDateString() === d.toDateString();
     const dateStr = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     return isToday ? `Hoy · ${dateStr}` : dateStr;
   };
-  const formatTimeForDisplay = (d: Date) => {
-    return d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-  };
+  const formatTimeForDisplay = (d: Date) =>
+    d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
   async function onSubmit(values: NewExpenseForm) {
     if (!values.wallet_id) {
@@ -88,14 +113,24 @@ export default function AddExpenseScreen() {
     }
     setSubmitting(true);
     try {
-      await useExpenses.getState().create({
-        wallet_id: values.wallet_id,
-        description: values.description.trim(),
-        amount: values.amount,
-        category: values.category,
-        occurred_at: values.occurred_at,
-        note: values.note ?? null,
-      });
+      if (isEdit && params.expenseId) {
+        await useExpenses.getState().update(params.expenseId, {
+          description: values.description.trim(),
+          amount: values.amount,
+          category: values.category,
+          occurred_at: values.occurred_at,
+          note: values.note ?? null,
+        });
+      } else {
+        await useExpenses.getState().create({
+          wallet_id: values.wallet_id,
+          description: values.description.trim(),
+          amount: values.amount,
+          category: values.category,
+          occurred_at: values.occurred_at,
+          note: values.note ?? null,
+        });
+      }
       router.back();
     } catch (err) {
       Alert.alert('Error', err instanceof Error ? err.message : 'No se pudo guardar');
@@ -104,10 +139,20 @@ export default function AddExpenseScreen() {
     }
   }
 
+  async function confirmDelete() {
+    if (!params.expenseId) return;
+    try {
+      await useExpenses.getState().remove(params.expenseId);
+      router.back();
+    } catch {
+      Alert.alert('Error', 'No se pudo eliminar');
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.colors.background }} edges={['top']}>
-      <KeyboardAvoidingView 
-        style={{ flex: 1 }} 
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {/* AppBar */}
@@ -123,10 +168,10 @@ export default function AddExpenseScreen() {
           </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 16, color: theme.colors.textPrimary, letterSpacing: -0.2 }}>
-              Nuevo gasto
+              {isEdit ? 'Editar gasto' : 'Nuevo gasto'}
             </Text>
             <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary }}>
-              Registrá un movimiento
+              {isEdit ? 'Modificá los datos' : 'Registrá un movimiento'}
             </Text>
           </View>
         </View>
@@ -145,7 +190,7 @@ export default function AddExpenseScreen() {
               name="amount"
               render={({ field: { onChange, value } }) => (
                 <AmountInput
-                  autoFocus
+                  autoFocus={!isEdit}
                   value={value}
                   onChange={onChange}
                 />
@@ -154,7 +199,6 @@ export default function AddExpenseScreen() {
             {errors.amount && (
               <Text style={{ color: theme.colors.danger, fontSize: 11, marginTop: 4 }}>{errors.amount.message}</Text>
             )}
-            
             <View style={{
               flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10,
               paddingVertical: 4, paddingHorizontal: 10, borderRadius: 8,
@@ -204,12 +248,13 @@ export default function AddExpenseScreen() {
             error={errors.category?.message}
           />
 
+          {/* Wallet: no editable en modo edit */}
           <FormRow
             iconName="Wallet"
             label="Wallet"
             value={selectedWallet ? selectedWallet.name : 'Seleccionar wallet...'}
             chip={selectedWallet?.type === 'personal' ? { text: 'PERSONAL', tone: 'primary' } : undefined}
-            onPress={!params.walletId ? () => setShowWalletPicker(true) : undefined} // No permite cambiar si vino en URL
+            onPress={isEdit ? undefined : (!params.walletId ? () => setShowWalletPicker(true) : undefined)}
             error={errors.wallet_id?.message}
           />
 
@@ -242,7 +287,6 @@ export default function AddExpenseScreen() {
                 <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 13, color: theme.colors.textPrimary }}>Cómo dividir</Text>
                 <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary, marginTop: 2 }}>Multi-split disponible en Fase 5</Text>
               </View>
-              {/* Fake Segmented Control */}
               <View style={{ flexDirection: 'row', gap: 4, padding: 3, backgroundColor: theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border, opacity: 0.4 }}>
                 <View style={{ width: 36, paddingVertical: 6, alignItems: 'center', borderRadius: 7, backgroundColor: theme.colors.primary }}>
                   <Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>=</Text>
@@ -256,7 +300,6 @@ export default function AddExpenseScreen() {
               </View>
             </View>
 
-            {/* SplitRow Placeholder */}
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, opacity: 0.4 }}>
               <Avatar name={fullName} size={32} />
               <View style={{ flex: 1 }}>
@@ -276,7 +319,6 @@ export default function AddExpenseScreen() {
               </View>
             </View>
 
-            {/* Footer asignado */}
             <View style={{ marginTop: 12, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border, flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 12, color: theme.colors.textSecondary }}>Total asignado</Text>
               <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 12, color: theme.colors.accent }}>
@@ -302,6 +344,28 @@ export default function AddExpenseScreen() {
             </Pressable>
           </View>
 
+          {/* Botón Eliminar — solo en modo edit */}
+          {isEdit && (
+            <Pressable
+              onPress={() => setShowDeleteConfirm(true)}
+              style={{
+                marginTop: 24,
+                paddingVertical: 14,
+                borderRadius: 14,
+                borderWidth: 1,
+                borderColor: theme.colors.danger,
+                alignItems: 'center',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                gap: 8,
+              }}
+            >
+              <Icon name="Trash2" size={18} color={theme.colors.danger} />
+              <Text style={{ color: theme.colors.danger, fontFamily: typography.fontFamily.semibold, fontSize: 15 }}>
+                Eliminar gasto
+              </Text>
+            </Pressable>
+          )}
         </ScrollView>
 
         {/* CTA Bar */}
@@ -319,7 +383,7 @@ export default function AddExpenseScreen() {
             style={{ flex: 1 }}
           />
           <Button
-            label="Guardar gasto"
+            label={isEdit ? 'Guardar cambios' : 'Guardar gasto'}
             variant="primary"
             iconLeft="Check"
             onPress={handleSubmit(onSubmit)}
@@ -327,7 +391,6 @@ export default function AddExpenseScreen() {
             style={{ flex: 2 }}
           />
         </View>
-
       </KeyboardAvoidingView>
 
       {/* Pickers */}
@@ -355,22 +418,19 @@ export default function AddExpenseScreen() {
               setShowDatePicker(false);
             }
             if (date) {
-              const newDate = new Date(expenseDate);
               if (Platform.OS === 'ios') {
-                 // iOS sets both date and time in datetime mode
-                 setValue('occurred_at', date.toISOString());
+                setValue('occurred_at', date.toISOString());
               } else {
-                 // Android only sets date
-                 newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
-                 setValue('occurred_at', newDate.toISOString());
-                 // Auto open time picker after date on Android
-                 setTimeout(() => setShowTimePicker(true), 50);
+                const newDate = new Date(expenseDate);
+                newDate.setFullYear(date.getFullYear(), date.getMonth(), date.getDate());
+                setValue('occurred_at', newDate.toISOString());
+                setTimeout(() => setShowTimePicker(true), 50);
               }
             }
           }}
         />
       )}
-      
+
       {Platform.OS === 'android' && showTimePicker && (
         <DateTimePicker
           value={expenseDate}
@@ -386,6 +446,14 @@ export default function AddExpenseScreen() {
           }}
         />
       )}
+
+      <ConfirmDeleteSheet
+        visible={showDeleteConfirm}
+        title="Eliminar gasto"
+        message={`¿Seguro que querés eliminar "${existing?.description}"? Esta acción no se puede deshacer.`}
+        onConfirm={confirmDelete}
+        onClose={() => setShowDeleteConfirm(false)}
+      />
     </SafeAreaView>
   );
 }

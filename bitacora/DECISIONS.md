@@ -80,13 +80,13 @@
 
 ---
 
-## ADR-009 · useTotalBalance usa initial_balance
+## ADR-009 · useTotalBalance usa initial_balance ~~(resuelto en 03.05)~~
 
 **Fecha:** 2026-04-28
+**Estado:** **Resuelto el 2026-05-04 en módulo 03.05**
 **Contexto:** En Fase 2 (Wallets personales) aún no existen gastos, por lo que el balance real no puede calcularse.
-**Decisión:** El hook `useTotalBalance` en `stores/wallets.ts` utilizará `initial_balance` como el valor total momentáneamente.
-**Consecuencias:**
-- Esto debe reemplazarse en la Fase 3 restando la sumatoria de gastos del wallet al `initial_balance`.
+**Decisión original:** El hook `useTotalBalance` en `stores/wallets.ts` utilizará `initial_balance` como el valor total momentáneamente.
+**Resolución:** `useTotalBalance` ahora calcula `balance = initial_balance - sum(expenses.amount)` consumiendo `useExpenses.byWallet`. El header del Detalle Wallet usa el nuevo hook `useWalletMetrics(walletId)` (en `lib/walletMetrics.ts`) que devuelve `presupuesto`, `gastado`, `restante`, `usedPct`, `count`, `overBudget`.
 
 ## ADR-011 · RPC `create_expense_with_split` para insert atómico expense + split
 
