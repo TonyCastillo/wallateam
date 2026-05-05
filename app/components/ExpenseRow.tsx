@@ -20,9 +20,14 @@ export function ExpenseRow({ expense, payerName, onPress, onLongPress }: Props) 
   const isIncome = expense.kind === 'income';
   const cat = anyCategoryById(expense.category, expense.kind);
   const currentUserId = useAuth((s) => s.user?.id);
-  const actorLabel =
-    payerName ?? (expense.paid_by === currentUserId ? 'Vos' : 'Otro');
-  const verb = isIncome ? 'Cargó' : 'Pagó';
+  const isMe = expense.paid_by === currentUserId;
+  let actionText = '';
+  if (isMe) {
+    actionText = isIncome ? 'Cargado por vos' : 'Pagado por vos';
+  } else {
+    const actorName = payerName ?? 'Otro';
+    actionText = isIncome ? `Cargó ${actorName}` : `Pagó ${actorName}`;
+  }
   const amountColor = isIncome ? theme.colors.accent : theme.colors.textPrimary;
   const amountPrefix = isIncome ? '+' : '−';
 
@@ -57,7 +62,7 @@ export function ExpenseRow({ expense, payerName, onPress, onLongPress }: Props) 
           }}
           numberOfLines={1}
         >
-          {`${verb} ${actorLabel} · ${formatExpenseDate(expense.occurred_at)}`}
+          {`${actionText} · ${formatExpenseDate(expense.occurred_at)}`}
         </Text>
       </View>
       <View style={{ alignItems: 'flex-end', gap: 2 }}>

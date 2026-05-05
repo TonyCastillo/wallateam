@@ -34,11 +34,12 @@ alter table expense_splits   enable row level security;
 alter table wallet_invites   enable row level security;
 
 -- ----------------------------------------------------------------------------
--- profiles: cada user ve y edita su propio profile
+-- profiles: todos los autenticados pueden ver perfiles (para ver nombres en wallets)
 -- ----------------------------------------------------------------------------
 drop policy if exists "profiles_select_own" on profiles;
-create policy "profiles_select_own" on profiles
-  for select using (auth.uid() = id);
+drop policy if exists "profiles_select_all" on profiles;
+create policy "profiles_select_all" on profiles
+  for select using (auth.role() = 'authenticated');
 
 drop policy if exists "profiles_update_own" on profiles;
 create policy "profiles_update_own" on profiles

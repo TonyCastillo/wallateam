@@ -6,7 +6,7 @@
 **Próximo módulo a ejecutar:** [prompts/05-fase-splits/99-close-phase.md](../prompts/05-fase-splits/99-close-phase.md)
 
 ## ⚠️ SQL pendiente de aplicar en Supabase Dashboard
-- [ ] Correr `app/supabase/expenses_rpc_v2.sql` (actualiza RPC para aceptar JSON array de splits)
+- [ ] Correr `app/supabase/profiles_rls_fix.sql` (hace públicos los perfiles para que se vean los nombres de otros miembros en el equipo)
 
 Antes de probar en Expo Go:
 1. Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
