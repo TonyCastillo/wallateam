@@ -10,7 +10,7 @@
 ## Pendiente
 
 ### Fase 5 — Splits
-- [ ] [Fase 5] 00 — Overview y planificación de prompts
+- [ ] [Fase 5] 02 — UI Toggle de Modos de Split
 - [ ] [Fase 5] Splits (=, %, ₲) con validaciones
 
 ### Fase 1.5 (deferred)
@@ -32,6 +32,9 @@
 - [ ] [Fase 8] Extras (foto ticket, push notifications, charts)
 
 ## Done
+
+- ✅ [Fase 5] 01 — Splits Store y Types (2026-05-05)
+- ✅ [Fase 5] 00 — Overview y planificación de prompts (2026-05-05)
 
 - ✅ [Fase 4] 99 — Cerrar fase (2026-05-05)
 

@@ -303,3 +303,13 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 ## [04.99] 2026-05-05 — Fase 4 (Equipo) cerrada ✅
 - Smoke test E2E: creación wallet team, invitación, aceptación, paid_by por otro miembro
 - Próxima fase: 05-fase-splits (=, %, ₲ con validaciones)
+
+## [05.01] 2026-05-05 — Splits Store y Types
+- ✅ `SplitMode` en `NewExpenseInput` y `newExpenseSchema`.
+- ✅ Array de splits en types y validación en Zod.
+- ✅ Actualizado `useExpenses.create` para enviar `p_split_mode` y `p_splits` al RPC.
+- ✅ Creado `app/supabase/expenses_rpc_v2.sql` para aceptar `jsonb` e iterar `jsonb_array_elements`.
+- 🧠 Desviaciones: ninguna.
+- 📁 Tocados: `types.ts`, `expense.ts` (schemas), `expenses.ts` (store), `expenses_rpc_v2.sql`, `DECISIONS.md` (ADR-014).
+
+⚠️ **Pendiente al usuario:** correr `supabase/expenses_rpc_v2.sql` en Supabase Dashboard antes de probar la creación de gastos.

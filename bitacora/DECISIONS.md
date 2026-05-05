@@ -130,4 +130,14 @@
 - El UI distingue: en wallets personales el FAB abre un `TransactionTypeSheet` (Gasto / Cargar saldo); en team el FAB sigue yendo directo al form de gasto
 - Trade-off semántico: el nombre `expenses` queda desactualizado. Aceptable para MVP. Si en una iteración futura justifica el costo, se puede renombrar a `transactions` con una migración + actualización de policies/RPC/clientes en una sola PR
 
+## ADR-014 · RPC `create_expense_with_split` v2 (soporte jsonb para multi-splits)
+
+**Fecha:** 2026-05-05
+**Contexto:** En la Fase 3, el RPC solo soportaba un pagador y le asignaba el 100% de la deuda automáticamente. En la Fase 5, se introdujo el reparto personalizado (igual, porcentajes, monto fijo). El cliente necesita enviar una lista de splits al crear el gasto de forma atómica.
+**Decisión:** Se actualizó `create_expense_with_split` agregando dos parámetros: `p_split_mode text` y `p_splits jsonb` (array de splits). Si `p_splits` es nulo, hace fallback al comportamiento legacy. Si contiene JSON, usa `jsonb_array_elements` para insertar los registros iterativamente en `expense_splits`.
+**Consecuencias:**
+- Transición suave: las llamadas viejas sin `p_splits` seguirán funcionando como pagador único 100%.
+- La inserción de los N splits sigue siendo atómica junto con el expense.
+- El usuario debe correr `app/supabase/expenses_rpc_v2.sql` en Supabase Dashboard.
+
 > Las siguientes ADRs se irán agregando a medida que se tomen decisiones durante la ejecución de las fases.

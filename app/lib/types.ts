@@ -102,5 +102,6 @@ export interface NewExpenseInput {
   occurred_at?: string;
   note?: string | null;
   paid_by?: string;  // Fase 4: opcional para wallets team — default al user actual
-  // split_mode='equal' fijo hasta Fase 5
+  split_mode: SplitMode;
+  splits: { user_id: string; percentage?: number | null; amount: number }[];
 }

@@ -116,6 +116,8 @@ export const useExpenses = create<ExpensesState>((set, get) => ({
         p_occurred_at: input.occurred_at ?? new Date().toISOString(),
         p_note: input.note ?? null,
         p_kind: input.kind ?? 'expense',
+        p_split_mode: input.split_mode,
+        p_splits: input.splits,
       });
       if (error) throw error;
       const created = normalizeExpense(data as Expense);
