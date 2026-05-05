@@ -268,7 +268,7 @@ export default function CreateWallet() {
               control={control}
               name="icon"
               render={({ field: { value } }) => (
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 12 }}>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 12, justifyContent: 'center' }}>
                   {WALLET_ICONS.map((iconDef) => {
                     const selected = value === iconDef.id;
                     return (
@@ -313,7 +313,7 @@ export default function CreateWallet() {
               control={control}
               name="color"
               render={({ field: { value } }) => (
-                <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+                <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
                   {COLOR_PALETTE.map((hex) => {
                     const selected = value === hex;
                     return (

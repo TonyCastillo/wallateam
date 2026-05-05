@@ -463,53 +463,67 @@ export default function WalletDetailScreen() {
           </View>
         </View>
 
-        {/* Métricas — apiladas verticalmente para dar lugar a montos completos (es-PY).
-            En personal modelamos cuenta bancaria (saldo / ingresos / gastos);
-            en team mantenemos el modelo presupuestario (presupuesto / gastado / restante). */}
+        {/* Métricas — organizadas para mostrar el saldo principal arriba y el desglose abajo */}
         <View style={styles.metricsRow}>
           {isPersonal ? (
             <>
-              <Metric
-                label="Saldo actual"
-                value={fmtGs(saldoActual)}
-                labelColor="rgba(255,255,255,0.7)"
-                valueColor={theme.colors.accent}
-                highlight
-              />
-              <Metric
-                label="Ingresos"
-                value={fmtGs(ingresos)}
-                labelColor="rgba(255,255,255,0.7)"
-                valueColor="#fff"
-              />
-              <Metric
-                label="Gastos"
-                value={fmtGs(gastado)}
-                labelColor="rgba(255,255,255,0.7)"
-                valueColor="#fff"
-              />
+              <View style={{ marginBottom: 16 }}>
+                <Metric
+                  label="Saldo actual"
+                  value={fmtGs(saldoActual)}
+                  labelColor="rgba(255,255,255,0.7)"
+                  valueColor={theme.colors.accent}
+                  highlight
+                />
+              </View>
+              <View style={{ flexDirection: 'row', gap: 24 }}>
+                <View style={{ flex: 1 }}>
+                  <Metric
+                    label="Ingresos"
+                    value={fmtGs(ingresos)}
+                    labelColor="rgba(255,255,255,0.7)"
+                    valueColor="#fff"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Metric
+                    label="Gastos"
+                    value={fmtGs(gastado)}
+                    labelColor="rgba(255,255,255,0.7)"
+                    valueColor="#fff"
+                  />
+                </View>
+              </View>
             </>
           ) : (
             <>
-              <Metric
-                label="Presupuesto"
-                value={fmtGs(presupuesto)}
-                labelColor="rgba(255,255,255,0.7)"
-                valueColor="#fff"
-              />
-              <Metric
-                label="Gastado"
-                value={fmtGs(gastado)}
-                labelColor="rgba(255,255,255,0.7)"
-                valueColor="#fff"
-              />
-              <Metric
-                label="Restante"
-                value={fmtGs(restante)}
-                labelColor="rgba(255,255,255,0.7)"
-                valueColor={theme.colors.accent}
-                highlight
-              />
+              <View style={{ marginBottom: 16 }}>
+                <Metric
+                  label="Restante"
+                  value={fmtGs(restante)}
+                  labelColor="rgba(255,255,255,0.7)"
+                  valueColor={theme.colors.accent}
+                  highlight
+                />
+              </View>
+              <View style={{ flexDirection: 'row', gap: 24 }}>
+                <View style={{ flex: 1 }}>
+                  <Metric
+                    label="Presupuesto"
+                    value={fmtGs(presupuesto)}
+                    labelColor="rgba(255,255,255,0.7)"
+                    valueColor="#fff"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Metric
+                    label="Gastado"
+                    value={fmtGs(gastado)}
+                    labelColor="rgba(255,255,255,0.7)"
+                    valueColor="#fff"
+                  />
+                </View>
+              </View>
             </>
           )}
         </View>
@@ -619,9 +633,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   metricsRow: {
-    flexDirection: 'column',
-    gap: 10,
-    marginTop: 18,
+    marginTop: 20,
   },
   fab: {
     position: 'absolute',
