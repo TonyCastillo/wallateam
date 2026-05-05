@@ -290,3 +290,12 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 🧪 **Verificación:** `npm run typecheck` limpio. Validación visual y end-to-end (cargar sueldo + gasto + edit + delete) pendiente — requiere aplicar SQL en Dashboard primero.
 
 ⚠️ **Pendiente al usuario:** correr `supabase/incomes_migration.sql` y re-correr `supabase/expenses_rpc.sql` en Supabase Dashboard antes de probar en Expo Go.
+
+## [04.06] 2026-05-05 — Validación visual Fase 4
+- ✅ CreateWallet team: 4/4 items
+- ✅ Detalle Wallet team (header, tab Miembros, invite): 5/5 items
+- ✅ Agregar Gasto paid_by: 4/4 items
+- ✅ Pantalla invitación: 5/5 items
+- ✅ Microcopy: 10/10 literal
+- 🧠 Desviaciones: ninguna. Se hicieron ajustes menores en el código para matchear 100% el microcopy exigido (Owner vs Admin, copys exactos de los links de invitación).
+- 📁 Tocados: `app/app/(app)/create-wallet.tsx`, `app/app/(app)/wallet/[id].tsx`, `app/components/InviteSheet.tsx`, `app/components/MemberPickerSheet.tsx`

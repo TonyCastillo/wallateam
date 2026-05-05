@@ -56,8 +56,8 @@ export function InviteSheet({ visible, walletId, walletName, onClose }: InviteSh
   const code = invite?.invite_code ?? '';
 
   const handleCopyCode = async () => {
-    if (!code) return;
-    await Clipboard.setStringAsync(code);
+    if (!url) return;
+    await Clipboard.setStringAsync(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
   };
@@ -214,7 +214,7 @@ export function InviteSheet({ visible, walletId, walletName, onClose }: InviteSh
                       color: theme.colors.textPrimary,
                     }}
                   >
-                    {copied ? 'Copiado' : 'Copiar código'}
+                    {copied ? 'Link copiado al portapapeles' : 'Copiar link'}
                   </Text>
                 </Pressable>
                 <Pressable

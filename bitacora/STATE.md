@@ -1,9 +1,9 @@
 # Estado actual del proyecto WallaTeam
 
 **Última actualización:** 2026-05-05 (máquina: notebook)
-**Fase activa:** 04-fase-equipo (módulos 01-05 + polish post-fase implementados, falta validación + cierre)
-**Último módulo completado:** [polish] Formato es-PY sin abreviar + ingresos en wallet personal (cuenta bancaria MVP)
-**Próximo módulo a ejecutar:** [prompts/04-fase-equipo/06-validate-vs-mock.md](../prompts/04-fase-equipo/06-validate-vs-mock.md) (requiere Expo Go + 2 cuentas)
+**Fase activa:** 04-fase-equipo (falta cierre de fase)
+**Último módulo completado:** 06-validate-vs-mock
+**Próximo módulo a ejecutar:** [prompts/04-fase-equipo/99-close-phase.md](../prompts/04-fase-equipo/99-close-phase.md)
 
 ## ⚠️ SQL pendiente de aplicar en Supabase Dashboard
 
@@ -32,7 +32,7 @@ Antes de probar en Expo Go:
 | 01 — Auth | ✅ Cerrada | 7 / 7 |
 | 02 — Wallets personales | ✅ Cerrada | 7 / 7 |
 | 03 — Gastos | ✅ Cerrada | 7 / 7 |
-| 04 — Equipo | 🟡 En curso | 5 / 7 |
+| 04 — Equipo | 🟡 En curso | 6 / 7 |
 | 05 — Splits | ⚪ Pendiente | — |
 | 06 — Balance | ⚪ Pendiente | — |
 | 07 — Multimoneda | ⚪ Pendiente | — |

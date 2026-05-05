@@ -231,7 +231,7 @@ export default function CreateWallet() {
                   color: theme.colors.textPrimary,
                   lineHeight: 16,
                 }}>
-                  Vas a poder invitar miembros una vez creada la wallet.
+                  Podés invitar miembros después de crear la wallet
                 </Text>
               </View>
             )}

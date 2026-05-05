@@ -7,7 +7,7 @@
 
 ## En curso
 
-- [ ] [Fase 4] 06 — Validación visual contra prototipo (requiere Expo Go + 2 cuentas)
+- [ ] [Fase 4] 99 — Cerrar fase
 
 ## Pendiente
 
@@ -16,8 +16,7 @@
 - [ ] [Fase 1.5] Forgot password real (`supabase.auth.resetPasswordForEmail` + deep link)
 - [ ] [Fase 1.5] Re-activar Confirm email en Supabase antes de release a producción
 
-### Fase 4 — Equipo (queda pendiente solo cierre)
-- [ ] [Fase 4] 99 — Cerrar fase
+### Fases 5-8 (a planificar al cerrar la previa)
 
 ### SQL pendiente de aplicar en Supabase Dashboard
 - [ ] Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
@@ -33,6 +32,7 @@
 
 ## Done
 
+- ✅ [Fase 4] 06 — Validación visual contra prototipo (2026-05-05)
 - ✅ [polish] Formato es-PY sin M/k + ingresos en wallet personal (cuenta bancaria MVP) (2026-05-05)
 - ✅ [Bootstrap] Crear prompts/ + bitacora/ + Fase 1 completa + git init (2026-04-28)
 - ✅ [Fase 1] 01 — Setup Expo + dependencias (2026-04-28)

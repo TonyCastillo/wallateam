@@ -111,7 +111,7 @@ export function MemberPickerSheet({
                       color: theme.colors.textSecondary,
                     }}
                   >
-                    {item.role === 'admin' ? 'Admin' : 'Miembro'}
+                    {item.role === 'admin' ? 'Owner' : 'Miembro'}
                   </Text>
                 </View>
                 {isSelected && <Icon name="Check" size={18} color={theme.colors.primary} />}

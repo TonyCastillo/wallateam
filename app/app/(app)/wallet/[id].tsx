@@ -220,7 +220,7 @@ function MembersTab({ walletId, walletName }: { walletId: string; walletName: st
                   color: theme.colors.textSecondary,
                 }}
               >
-                Compartí un link para sumar a otros
+                Compartí este link para invitar
               </Text>
             </View>
             <Icon name="ChevronRight" size={18} color={theme.colors.textSecondary} />
@@ -261,7 +261,7 @@ function MembersTab({ walletId, walletName }: { walletId: string; walletName: st
                     color: theme.colors.textSecondary,
                   }}
                 >
-                  {item.role === 'admin' ? 'Admin' : 'Miembro'}
+                  {item.role === 'admin' ? 'Owner' : 'Miembro'}
                 </Text>
               </View>
             </View>
