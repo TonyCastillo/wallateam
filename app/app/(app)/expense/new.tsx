@@ -109,6 +109,7 @@ export default function AddExpenseScreen() {
   const watchedOccurredAt = watch('occurred_at');
   const watchedAmount = watch('amount');
   const watchedPaidBy = watch('paid_by');
+  const watchedSplitMode = watch('split_mode');
 
   const selectedWallet = wallets.find((w) => w.id === watchedWalletId)
     ?? allWallets.find((w) => w.id === watchedWalletId);
@@ -399,18 +400,31 @@ export default function AddExpenseScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <View>
                 <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 13, color: theme.colors.textPrimary }}>Cómo dividir</Text>
-                <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary, marginTop: 2 }}>Multi-split disponible en Fase 5</Text>
+                <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary, marginTop: 2 }}>
+                  {watchedSplitMode === 'equal' && 'Por partes iguales'}
+                  {watchedSplitMode === 'percent' && 'Por porcentajes personalizados'}
+                  {watchedSplitMode === 'amount' && 'Por montos fijos'}
+                </Text>
               </View>
-              <View style={{ flexDirection: 'row', gap: 4, padding: 3, backgroundColor: theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border, opacity: 0.4 }}>
-                <View style={{ width: 36, paddingVertical: 6, alignItems: 'center', borderRadius: 7, backgroundColor: theme.colors.primary }}>
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: '#fff' }}>=</Text>
-                </View>
-                <View style={{ width: 36, paddingVertical: 6, alignItems: 'center', borderRadius: 7 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: theme.colors.textSecondary }}>%</Text>
-                </View>
-                <View style={{ width: 36, paddingVertical: 6, alignItems: 'center', borderRadius: 7 }}>
-                  <Text style={{ fontSize: 12, fontWeight: '700', color: theme.colors.textSecondary }}>₲</Text>
-                </View>
+              <View style={{ flexDirection: 'row', gap: 4, padding: 3, backgroundColor: theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border }}>
+                <Pressable
+                  onPress={() => setValue('split_mode', 'equal')}
+                  style={{ width: 36, paddingVertical: 6, alignItems: 'center', borderRadius: 7, backgroundColor: watchedSplitMode === 'equal' ? theme.colors.primary : 'transparent' }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: watchedSplitMode === 'equal' ? '#fff' : theme.colors.textSecondary }}>=</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setValue('split_mode', 'percent')}
+                  style={{ width: 36, paddingVertical: 6, alignItems: 'center', borderRadius: 7, backgroundColor: watchedSplitMode === 'percent' ? theme.colors.primary : 'transparent' }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: watchedSplitMode === 'percent' ? '#fff' : theme.colors.textSecondary }}>%</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setValue('split_mode', 'amount')}
+                  style={{ width: 36, paddingVertical: 6, alignItems: 'center', borderRadius: 7, backgroundColor: watchedSplitMode === 'amount' ? theme.colors.primary : 'transparent' }}
+                >
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: watchedSplitMode === 'amount' ? '#fff' : theme.colors.textSecondary }}>₲</Text>
+                </Pressable>
               </View>
             </View>
 

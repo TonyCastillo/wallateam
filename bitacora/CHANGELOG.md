@@ -313,3 +313,9 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - 📁 Tocados: `types.ts`, `expense.ts` (schemas), `expenses.ts` (store), `expenses_rpc_v2.sql`, `DECISIONS.md` (ADR-014).
 
 ⚠️ **Pendiente al usuario:** correr `supabase/expenses_rpc_v2.sql` en Supabase Dashboard antes de probar la creación de gastos.
+
+## [05.02] 2026-05-05 — UI Toggle de Modos de Split
+- ✅ Se reactivó la sección "Cómo dividir" quitando la opacidad y el cartel de "Fase 5".
+- ✅ Se implementó el toggle interactivo (`=`, `%`, `₲`) conectado a `split_mode` en el form.
+- ✅ Los subtítulos de la sección cambian dinámicamente según el modo seleccionado.
+- 📁 Tocados: `app/app/(app)/expense/new.tsx`.

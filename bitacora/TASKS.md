@@ -10,7 +10,7 @@
 ## Pendiente
 
 ### Fase 5 — Splits
-- [ ] [Fase 5] 02 — UI Toggle de Modos de Split
+- [ ] [Fase 5] 03 — Modo Partes Iguales (=)
 - [ ] [Fase 5] Splits (=, %, ₲) con validaciones
 
 ### Fase 1.5 (deferred)
@@ -33,6 +33,7 @@
 
 ## Done
 
+- ✅ [Fase 5] 02 — UI Toggle de Modos de Split (2026-05-05)
 - ✅ [Fase 5] 01 — Splits Store y Types (2026-05-05)
 - ✅ [Fase 5] 00 — Overview y planificación de prompts (2026-05-05)
 
