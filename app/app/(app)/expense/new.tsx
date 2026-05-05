@@ -124,6 +124,10 @@ export default function AddExpenseScreen() {
   // (mantenemos el kind original al editar para no romper supuestos del usuario).
   const showKindToggle = isPersonalWallet && !isEdit;
   const walletMembers = isTeamWallet && selectedWallet ? membersByWallet[selectedWallet.id] ?? [] : [];
+  
+  const sumPct = watchedSplits.reduce((acc, curr) => acc + (curr.percentage ?? 0), 0);
+  const isPercentValid = Math.abs(sumPct - 100) < 0.01;
+  const isPercentMode = watchedSplitMode === 'percent';
   const canPickPayer = isTeamWallet && walletMembers.length > 1;
   const selectedPayer = walletMembers.find((m) => m.user_id === watchedPaidBy);
   const payerName = selectedPayer
@@ -191,6 +195,33 @@ export default function AddExpenseScreen() {
     setValue('splits', newSplits);
   };
 
+  const handleChangePct = (uid: string, pct: number) => {
+    const current = getValues('splits') ?? [];
+    let updated = [...current];
+    const idx = updated.findIndex((s) => s.user_id === uid);
+    
+    if (idx >= 0) {
+      updated[idx] = { ...updated[idx], percentage: pct, amount: (watchedAmount * pct) / 100 };
+    } else {
+      updated.push({ user_id: uid, percentage: pct, amount: (watchedAmount * pct) / 100 });
+    }
+    setValue('splits', updated);
+  };
+
+  // Sync splits amount when watchedAmount changes in percent mode
+  useEffect(() => {
+    if (watchedSplitMode === 'percent' && isTeamWallet) {
+      const current = getValues('splits') ?? [];
+      const updated = current.map(s => ({
+        ...s,
+        amount: (watchedAmount * (s.percentage ?? 0)) / 100
+      }));
+      if (JSON.stringify(current) !== JSON.stringify(updated)) {
+        setValue('splits', updated);
+      }
+    }
+  }, [watchedAmount, watchedSplitMode, isTeamWallet, getValues, setValue]);
+
   const formatDateForDisplay = (d: Date) => {
     const isToday = new Date().toDateString() === d.toDateString();
     const dateStr = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -202,6 +233,10 @@ export default function AddExpenseScreen() {
   async function onSubmit(values: NewExpenseForm) {
     if (!values.wallet_id) {
       Alert.alert('Falta wallet', 'Por favor seleccioná una wallet');
+      return;
+    }
+    if (values.split_mode === 'percent' && !isPercentValid) {
+      Alert.alert('Revisá los porcentajes', 'La suma de porcentajes debe ser exactamente 100%.');
       return;
     }
     setSubmitting(true);
@@ -470,26 +505,30 @@ export default function AddExpenseScreen() {
               </View>
             </View>
 
-            {watchedSplitMode === 'equal' && walletMembers.map((m) => {
-              const isIncluded = watchedSplits.some((s) => s.user_id === m.user_id);
+            {(watchedSplitMode === 'equal' || watchedSplitMode === 'percent') && walletMembers.map((m) => {
+              const isIncluded = watchedSplitMode === 'equal'
+                ? watchedSplits.some((s) => s.user_id === m.user_id)
+                : true; // En percent mode siempre están listados
               const splitData = watchedSplits.find((s) => s.user_id === m.user_id);
               const name = m.user_id === user?.id ? 'Vos' : (m.profile?.full_name ?? '?');
               return (
                 <SplitRow
                   key={m.user_id}
                   name={name}
-                  pct={isIncluded ? (splitData?.percentage ?? 0) : 0}
-                  amount={isIncluded ? (splitData?.amount ?? 0) : 0}
+                  mode={watchedSplitMode}
+                  pct={splitData?.percentage ?? 0}
+                  amount={splitData?.amount ?? 0}
                   isIncluded={isIncluded}
-                  onToggle={() => handleToggleEqual(m.user_id)}
+                  onToggle={watchedSplitMode === 'equal' ? () => handleToggleEqual(m.user_id) : undefined}
+                  onChangePct={watchedSplitMode === 'percent' ? (pct) => handleChangePct(m.user_id, pct) : undefined}
                 />
               );
             })}
 
-            <View style={{ marginTop: 12, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 12, color: theme.colors.textSecondary }}>Total asignado</Text>
-              <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 12, color: theme.colors.accent }}>
-                100% · {watchedAmount > 0 ? formatPYG(watchedAmount) : '0'}
+            <View style={{ marginTop: 12, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: isPercentMode && !isPercentValid ? theme.colors.danger + '1A' : theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: isPercentMode && !isPercentValid ? theme.colors.danger : theme.colors.border, flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 12, color: isPercentMode && !isPercentValid ? theme.colors.danger : theme.colors.textSecondary }}>Total asignado</Text>
+              <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 12, color: isPercentMode && !isPercentValid ? theme.colors.danger : theme.colors.accent }}>
+                {isPercentMode ? Number(sumPct.toFixed(1)) : 100}% · {watchedAmount > 0 ? formatPYG(watchedAmount) : '0'}
               </Text>
             </View>
           </View>
@@ -560,6 +599,7 @@ export default function AddExpenseScreen() {
             iconLeft="Check"
             onPress={handleSubmit(onSubmit)}
             loading={submitting}
+            disabled={isPercentMode && !isPercentValid}
             style={{ flex: 2 }}
           />
         </View>

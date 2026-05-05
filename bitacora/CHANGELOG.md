@@ -325,3 +325,9 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Implementada lógica `handleToggleEqual` y efecto de recálculo en `new.tsx`.
 - ✅ Render dinámico de miembros en modo `=`.
 - 📁 Tocados: `app/components/SplitRow.tsx`, `app/app/(app)/expense/new.tsx`.
+
+## [05.04] 2026-05-05 — Modo Porcentajes (%)
+- ✅ Ampliado `SplitRow.tsx` para aceptar `mode="percent"` y renderizar un `TextInput` con estado local protegido.
+- ✅ Implementado `handleChangePct` en `new.tsx` para actualizar los splits y recalcular montos derivados.
+- ✅ Validaciones visuales: total de % mostrado en el footer, color de error y botón "Guardar" deshabilitado si != 100%.
+- 📁 Tocados: `app/components/SplitRow.tsx`, `app/app/(app)/expense/new.tsx`.
