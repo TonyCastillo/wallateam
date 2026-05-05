@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, Modal, Pressable, Alert, Share, ActivityIndicator, ScrollView } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import QRCode from 'react-native-qrcode-svg';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
 import { Icon } from './Icon';
@@ -134,35 +133,11 @@ export function InviteSheet({ visible, walletId, walletName, onClose }: InviteSh
             </View>
           ) : (
             <>
-              {/* QR */}
-              <View
-                style={{
-                  alignItems: 'center',
-                  paddingVertical: 18,
-                  borderRadius: 14,
-                  backgroundColor: '#fff',
-                  borderWidth: 1,
-                  borderColor: theme.colors.border,
-                }}
-              >
-                <QRCode value={url} size={180} backgroundColor="#fff" color="#000" />
-                <Text
-                  style={{
-                    marginTop: 10,
-                    fontFamily: typography.fontFamily.regular,
-                    fontSize: 11,
-                    color: '#555',
-                  }}
-                >
-                  Escaneá con la cámara desde otra cuenta
-                </Text>
-              </View>
-
               {/* Código grande */}
               <View
                 style={{
-                  padding: 14,
-                  borderRadius: 12,
+                  padding: 18,
+                  borderRadius: 14,
                   backgroundColor: theme.colors.surface,
                   borderWidth: 1,
                   borderColor: theme.colors.border,
