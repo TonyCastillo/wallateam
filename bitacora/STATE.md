@@ -1,8 +1,8 @@
 # Estado actual del proyecto WallaTeam
 
-**Última actualización:** 2026-05-04 (máquina: notebook)
-**Fase activa:** 04-fase-equipo (módulos 01-05 implementados, falta validación + cierre)
-**Último módulo completado:** 04.05-paid-by-selector
+**Última actualización:** 2026-05-05 (máquina: notebook)
+**Fase activa:** 04-fase-equipo (módulos 01-05 + polish post-fase implementados, falta validación + cierre)
+**Último módulo completado:** [polish] Formato es-PY sin abreviar + ingresos en wallet personal (cuenta bancaria MVP)
 **Próximo módulo a ejecutar:** [prompts/04-fase-equipo/06-validate-vs-mock.md](../prompts/04-fase-equipo/06-validate-vs-mock.md) (requiere Expo Go + 2 cuentas)
 
 ## ⚠️ SQL pendiente de aplicar en Supabase Dashboard
@@ -10,6 +10,7 @@
 Antes de probar en Expo Go:
 1. Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
 2. Re-correr `app/supabase/policies.sql` (policy `exp_insert` actualizada)
+3. **Nuevo (polish 2026-05-05):** correr `app/supabase/incomes_migration.sql` (`alter table expenses add column kind`) y re-correr `app/supabase/expenses_rpc.sql` (parámetro `p_kind`)
 
 ---
 
@@ -40,6 +41,7 @@ Antes de probar en Expo Go:
 ## Notas del momento
 
 - **Fase 3 (Gastos) completa**: CRUD expenses funcional, ExpenseRow, CategoryPicker, WalletPickerSheet, edición y eliminación con ConfirmDeleteSheet, métricas reactivas (gastado/restante/usedPct), over-budget en warning amarillo, useTotalBalance con datos reales en Home
+- **Polish 2026-05-05**: formato `fmtGs` sin abreviaciones M/k en toda la app (ADR-012). Wallets personales ahora soportan ingresos (kind='income') con flujo cuenta bancaria — saldo = initial + ingresos − gastos (ADR-013). FAB del Wallet Detail en personal abre TransactionTypeSheet (Gasto / Cargar saldo). WalletRow muestra balance actual real, no `initial_balance` fijo.
 - Project Supabase activo: `azfcmdihftxtiwrvcfsh.supabase.co`
 - Confirm email **OFF en dev** (re-activar antes de release a prod)
 - Stack en producción: Expo SDK 54 + React 19.1 + RN 0.81.5

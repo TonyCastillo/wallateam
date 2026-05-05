@@ -1,18 +1,24 @@
 import { Modal, View, Text, Pressable } from 'react-native';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
-import { CATEGORIES, CategoryId } from '@/lib/categories';
+import { CATEGORIES, INCOME_CATEGORIES } from '@/lib/categories';
 import { IconBox } from './IconBox';
 
 interface Props {
   visible: boolean;
-  selected: CategoryId | null;
-  onSelect: (id: CategoryId) => void;
+  /** Set de categorías a mostrar. 'expense' (default) usa CATEGORIES, 'income' usa INCOME_CATEGORIES. */
+  kind?: 'expense' | 'income';
+  selected: string | null;
+  onSelect: (id: string) => void;
   onClose: () => void;
 }
 
-export function CategoryPicker({ visible, selected, onSelect, onClose }: Props) {
+export function CategoryPicker({ visible, kind = 'expense', selected, onSelect, onClose }: Props) {
   const { theme } = useTheme();
+  const list = kind === 'income' ? INCOME_CATEGORIES : CATEGORIES;
+  const title = kind === 'income' ? 'Elegir tipo de ingreso' : 'Elegir categoría';
+  const accent = kind === 'income' ? theme.colors.accent : theme.colors.primary;
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable
@@ -36,10 +42,10 @@ export function CategoryPicker({ visible, selected, onSelect, onClose }: Props) 
             marginBottom: 16,
           }}
         >
-          Elegir categoría
+          {title}
         </Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-          {CATEGORIES.map((cat) => {
+          {list.map((cat) => {
             const isSelected = selected === cat.id;
             return (
               <Pressable
@@ -55,7 +61,7 @@ export function CategoryPicker({ visible, selected, onSelect, onClose }: Props) 
                   padding: 12,
                   borderRadius: 14,
                   borderWidth: isSelected ? 2.5 : 1,
-                  borderColor: isSelected ? theme.colors.primary : theme.colors.border,
+                  borderColor: isSelected ? accent : theme.colors.border,
                   backgroundColor: theme.colors.surface,
                 }}
               >

@@ -22,6 +22,8 @@
 ### SQL pendiente de aplicar en Supabase Dashboard
 - [ ] Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
 - [ ] Re-correr `app/supabase/policies.sql` (policy `exp_insert` actualizada para soportar paid_by != auth.uid)
+- [ ] Correr `app/supabase/incomes_migration.sql` (alter table expenses add column kind) — polish 2026-05-05
+- [ ] Re-correr `app/supabase/expenses_rpc.sql` (parámetro `p_kind` en `create_expense_with_split`) — polish 2026-05-05
 
 ### Fases 5-8 (a planificar al cerrar la previa)
 - [ ] [Fase 5] Splits (=, %, ₲) con validaciones
@@ -31,6 +33,7 @@
 
 ## Done
 
+- ✅ [polish] Formato es-PY sin M/k + ingresos en wallet personal (cuenta bancaria MVP) (2026-05-05)
 - ✅ [Bootstrap] Crear prompts/ + bitacora/ + Fase 1 completa + git init (2026-04-28)
 - ✅ [Fase 1] 01 — Setup Expo + dependencias (2026-04-28)
 - ✅ [Fase 1] 02 — Theme tokens + ThemeProvider (2026-04-28)

@@ -16,7 +16,7 @@ interface ExpensesState {
   remove: (id: string) => Promise<void>;
 
   list: (walletId: string) => Expense[];
-  totals: (walletId: string) => { spent: number; count: number };
+  totals: (walletId: string) => { spent: number; income: number; count: number };
 }
 
 const EMPTY_LIST: Expense[] = [];
@@ -43,7 +43,11 @@ function setupRealtimeOnce() {
  * cuando el driver no convierte). Aplicar a `amount` siempre.
  */
 function normalizeExpense(raw: Expense): Expense {
-  return { ...raw, amount: Number(raw.amount) };
+  return {
+    ...raw,
+    amount: Number(raw.amount),
+    kind: raw.kind === 'income' ? 'income' : 'expense',
+  };
 }
 
 export const useExpenses = create<ExpensesState>((set, get) => ({
@@ -111,6 +115,7 @@ export const useExpenses = create<ExpensesState>((set, get) => ({
         p_paid_by: input.paid_by ?? userId,
         p_occurred_at: input.occurred_at ?? new Date().toISOString(),
         p_note: input.note ?? null,
+        p_kind: input.kind ?? 'expense',
       });
       if (error) throw error;
       const created = normalizeExpense(data as Expense);
@@ -191,9 +196,13 @@ export const useExpenses = create<ExpensesState>((set, get) => ({
 
   totals: (walletId) => {
     const list = get().byWallet[walletId] ?? EMPTY_LIST;
-    return {
-      spent: list.reduce((acc, e) => acc + Number(e.amount), 0),
-      count: list.length,
-    };
+    let spent = 0;
+    let income = 0;
+    for (const e of list) {
+      const amt = Number(e.amount);
+      if (e.kind === 'income') income += amt;
+      else spent += amt;
+    }
+    return { spent, income, count: list.length };
   },
 }));

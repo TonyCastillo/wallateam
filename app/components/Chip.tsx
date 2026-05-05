@@ -31,7 +31,8 @@ export function Chip({ label, tone = 'primary' }: ChipProps) {
         paddingHorizontal: 10,
         borderRadius: 999,
         backgroundColor: bgColor,
-        alignSelf: 'flex-start',
+        alignSelf: 'flex-end',
+        marginLeft: 'auto',
       }}
     >
       <Text

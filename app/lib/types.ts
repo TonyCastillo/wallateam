@@ -1,5 +1,3 @@
-import type { CategoryId } from './categories';
-
 export type WalletType = 'personal' | 'team';
 
 export type WalletIcon =
@@ -65,6 +63,14 @@ export interface WalletInvite {
 
 export type SplitMode = 'equal' | 'percent' | 'amount';
 
+/**
+ * Tipo de transacción en la tabla `expenses`. Se mantiene el nombre de tabla por
+ * legacy / no romper RLS y RPC; semánticamente la tabla es "transactions".
+ *   - 'expense' → resta del saldo (gasto)
+ *   - 'income'  → suma al saldo (ingreso, ej: sueldo) — solo en wallets personales por ahora
+ */
+export type ExpenseKind = 'expense' | 'income';
+
 export interface ExpenseSplit {
   expense_id: string;
   user_id: string;
@@ -77,7 +83,8 @@ export interface Expense {
   wallet_id: string;
   description: string;
   amount: number;
-  category: CategoryId | null;
+  category: string | null;
+  kind: ExpenseKind;
   paid_by: string;
   occurred_at: string;
   photo_url: string | null;
@@ -90,7 +97,8 @@ export interface NewExpenseInput {
   wallet_id: string;
   description: string;
   amount: number;
-  category: CategoryId;
+  category: string;
+  kind?: ExpenseKind;  // default 'expense' si no viene
   occurred_at?: string;
   note?: string | null;
   paid_by?: string;  // Fase 4: opcional para wallets team — default al user actual

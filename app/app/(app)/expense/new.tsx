@@ -12,7 +12,8 @@ import { useAuth } from '@/stores/auth';
 import { useWallets } from '@/stores/wallets';
 import { useExpenses } from '@/stores/expenses';
 import { newExpenseSchema, NewExpenseForm } from '@/schemas/expense';
-import { categoryById, CategoryId } from '@/lib/categories';
+import { anyCategoryById, CATEGORIES, INCOME_CATEGORIES } from '@/lib/categories';
+import { ExpenseKind } from '@/lib/types';
 
 import { Icon } from '@/components/Icon';
 import { AmountInput } from '@/components/AmountInput';
@@ -29,7 +30,7 @@ const formatPYG = (n: number) => n.toLocaleString('es-PY');
 export default function AddExpenseScreen() {
   const { theme } = useTheme();
   const router = useRouter();
-  const params = useLocalSearchParams<{ walletId?: string; expenseId?: string }>();
+  const params = useLocalSearchParams<{ walletId?: string; expenseId?: string; kind?: ExpenseKind }>();
   const insets = useSafeAreaInsets();
 
   const isEdit = !!params.expenseId;
@@ -58,6 +59,10 @@ export default function AddExpenseScreen() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showMemberPicker, setShowMemberPicker] = useState(false);
 
+  const initialKind: ExpenseKind = existing?.kind ?? params.kind ?? 'expense';
+  const defaultIncomeCat = INCOME_CATEGORIES[0].id;
+  const defaultExpenseCat = CATEGORIES[0].id;
+
   const { control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<NewExpenseForm>({
     resolver: zodResolver(newExpenseSchema),
     defaultValues: existing
@@ -65,7 +70,8 @@ export default function AddExpenseScreen() {
           wallet_id: existing.wallet_id,
           description: existing.description,
           amount: Number(existing.amount),
-          category: (existing.category ?? 'other') as CategoryId,
+          category: existing.category ?? (existing.kind === 'income' ? defaultIncomeCat : 'other'),
+          kind: existing.kind,
           occurred_at: existing.occurred_at,
           note: existing.note,
           paid_by: existing.paid_by,
@@ -74,7 +80,8 @@ export default function AddExpenseScreen() {
           wallet_id: initialWalletId,
           description: '',
           amount: 0,
-          category: 'food',
+          category: initialKind === 'income' ? defaultIncomeCat : defaultExpenseCat,
+          kind: initialKind,
           occurred_at: new Date().toISOString(),
           note: null,
           paid_by: user?.id,
@@ -87,7 +94,8 @@ export default function AddExpenseScreen() {
         wallet_id: existing.wallet_id,
         description: existing.description,
         amount: Number(existing.amount),
-        category: (existing.category ?? 'other') as CategoryId,
+        category: existing.category ?? (existing.kind === 'income' ? defaultIncomeCat : 'other'),
+        kind: existing.kind,
         occurred_at: existing.occurred_at,
         note: existing.note,
         paid_by: existing.paid_by,
@@ -97,15 +105,21 @@ export default function AddExpenseScreen() {
 
   const watchedWalletId = watch('wallet_id');
   const watchedCategory = watch('category');
+  const watchedKind = watch('kind');
   const watchedOccurredAt = watch('occurred_at');
   const watchedAmount = watch('amount');
   const watchedPaidBy = watch('paid_by');
 
   const selectedWallet = wallets.find((w) => w.id === watchedWalletId)
     ?? allWallets.find((w) => w.id === watchedWalletId);
-  const selectedCategoryDef = categoryById(watchedCategory);
+  const isIncome = watchedKind === 'income';
+  const selectedCategoryDef = anyCategoryById(watchedCategory, watchedKind);
   const expenseDate = new Date(watchedOccurredAt);
   const isTeamWallet = selectedWallet?.type === 'team';
+  const isPersonalWallet = selectedWallet?.type === 'personal';
+  // El toggle Gasto/Ingreso solo aplica a wallets personales y no en modo edit
+  // (mantenemos el kind original al editar para no romper supuestos del usuario).
+  const showKindToggle = isPersonalWallet && !isEdit;
   const walletMembers = isTeamWallet && selectedWallet ? membersByWallet[selectedWallet.id] ?? [] : [];
   const canPickPayer = isTeamWallet && walletMembers.length > 1;
   const selectedPayer = walletMembers.find((m) => m.user_id === watchedPaidBy);
@@ -128,6 +142,13 @@ export default function AddExpenseScreen() {
       setValue('paid_by', user.id);
     }
   }, [isTeamWallet, user?.id, watchedPaidBy, setValue]);
+
+  // En wallets team, el kind siempre es 'expense' (los ingresos son MVP solo personal).
+  useEffect(() => {
+    if (isTeamWallet && watchedKind !== 'expense') {
+      setValue('kind', 'expense');
+    }
+  }, [isTeamWallet, watchedKind, setValue]);
 
   const formatDateForDisplay = (d: Date) => {
     const isToday = new Date().toDateString() === d.toDateString();
@@ -159,6 +180,7 @@ export default function AddExpenseScreen() {
           description: values.description.trim(),
           amount: values.amount,
           category: values.category,
+          kind: values.kind,
           occurred_at: values.occurred_at,
           note: values.note ?? null,
           paid_by: values.paid_by,
@@ -201,22 +223,70 @@ export default function AddExpenseScreen() {
           </Pressable>
           <View style={{ flex: 1 }}>
             <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 16, color: theme.colors.textPrimary, letterSpacing: -0.2 }}>
-              {isEdit ? 'Editar gasto' : 'Nuevo gasto'}
+              {isEdit
+                ? (isIncome ? 'Editar ingreso' : 'Editar gasto')
+                : (isIncome ? 'Cargar saldo' : 'Nuevo gasto')}
             </Text>
             <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary }}>
-              {isEdit ? 'Modificá los datos' : 'Registrá un movimiento'}
+              {isEdit
+                ? 'Modificá los datos'
+                : (isIncome ? 'Sumá un ingreso a tu wallet' : 'Registrá un movimiento')}
             </Text>
           </View>
         </View>
 
         <ScrollView contentContainerStyle={{ paddingHorizontal: 18, paddingBottom: 100, paddingTop: 6 }}>
+          {/* Toggle Gasto / Ingreso — solo en wallets personales y solo en modo create */}
+          {showKindToggle && (
+            <View style={{
+              flexDirection: 'row',
+              padding: 4,
+              borderRadius: 14,
+              backgroundColor: theme.colors.surface,
+              borderWidth: 1,
+              borderColor: theme.colors.border,
+              marginBottom: 12,
+            }}>
+              {(['expense', 'income'] as const).map((k) => {
+                const active = watchedKind === k;
+                const label = k === 'expense' ? 'Gasto' : 'Ingreso';
+                const activeColor = k === 'income' ? theme.colors.accent : theme.colors.primary;
+                return (
+                  <Pressable
+                    key={k}
+                    onPress={() => {
+                      setValue('kind', k);
+                      // Reset a la primera categoría del set correspondiente
+                      setValue('category', k === 'income' ? defaultIncomeCat : defaultExpenseCat);
+                    }}
+                    style={{
+                      flex: 1,
+                      paddingVertical: 10,
+                      borderRadius: 10,
+                      backgroundColor: active ? activeColor : 'transparent',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Text style={{
+                      fontFamily: typography.fontFamily.semibold,
+                      fontSize: 13,
+                      color: active ? '#fff' : theme.colors.textSecondary,
+                    }}>
+                      {label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
+
           {/* Card de Monto */}
           <View style={{
             padding: 18, borderRadius: 18, backgroundColor: theme.colors.surface,
-            borderWidth: 1, borderColor: theme.colors.border,
+            borderWidth: 1, borderColor: isIncome ? theme.colors.accent : theme.colors.border,
           }}>
-            <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 11, color: theme.colors.textSecondary, letterSpacing: 0.3, textTransform: 'uppercase' }}>
-              Monto
+            <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 11, color: isIncome ? theme.colors.accent : theme.colors.textSecondary, letterSpacing: 0.3, textTransform: 'uppercase' }}>
+              {isIncome ? 'Ingreso' : 'Monto'}
             </Text>
             <Controller
               control={control}
@@ -275,7 +345,7 @@ export default function AddExpenseScreen() {
 
           <FormRow
             iconName={selectedCategoryDef.icon}
-            label="Categoría"
+            label={isIncome ? 'Tipo de ingreso' : 'Categoría'}
             value={selectedCategoryDef.label}
             onPress={() => setShowCategoryPicker(true)}
             error={errors.category?.message}
@@ -312,15 +382,19 @@ export default function AddExpenseScreen() {
             error={errors.occurred_at?.message}
           />
 
-          <FormRow
-            iconName="User"
-            label="Pagado por"
-            value={payerName}
-            trailing={<Avatar name={payerName} size={26} />}
-            onPress={canPickPayer ? () => setShowMemberPicker(true) : undefined}
-          />
+          {/* "Pagado por" solo aplica en wallets team — en personal el pagador siempre es el dueño */}
+          {isTeamWallet && (
+            <FormRow
+              iconName="User"
+              label={isIncome ? 'Cargado por' : 'Pagado por'}
+              value={payerName}
+              trailing={<Avatar name={payerName} size={26} />}
+              onPress={canPickPayer ? () => setShowMemberPicker(true) : undefined}
+            />
+          )}
 
-          {/* Sección Cómo dividir (Fase 5) */}
+          {/* Sección Cómo dividir (Fase 5) — solo aplica en wallets team de gasto */}
+          {isTeamWallet && !isIncome && (
           <View style={{ marginTop: 14, padding: 16, borderRadius: 18, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.border }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
               <View>
@@ -366,6 +440,7 @@ export default function AddExpenseScreen() {
               </Text>
             </View>
           </View>
+          )}
 
           {/* Adjuntar ticket */}
           <View style={{ marginTop: 12, flexDirection: 'row', gap: 10 }}>
@@ -423,7 +498,11 @@ export default function AddExpenseScreen() {
             style={{ flex: 1 }}
           />
           <Button
-            label={isEdit ? 'Guardar cambios' : 'Guardar gasto'}
+            label={
+              isEdit
+                ? 'Guardar cambios'
+                : (isIncome ? 'Cargar saldo' : 'Guardar gasto')
+            }
             variant="primary"
             iconLeft="Check"
             onPress={handleSubmit(onSubmit)}
@@ -436,6 +515,7 @@ export default function AddExpenseScreen() {
       {/* Pickers */}
       <CategoryPicker
         visible={showCategoryPicker}
+        kind={watchedKind}
         selected={watchedCategory}
         onSelect={(cat) => setValue('category', cat)}
         onClose={() => setShowCategoryPicker(false)}

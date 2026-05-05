@@ -19,7 +19,7 @@ import { useWallets } from '@/stores/wallets';
 import { useExpenses } from '@/stores/expenses';
 import { useAuth } from '@/stores/auth';
 import { useWalletMetrics } from '@/lib/walletMetrics';
-import { fmtGs, fmtGsCompact } from '@/lib/format';
+import { fmtGs } from '@/lib/format';
 import { Expense, WalletMember } from '@/lib/types';
 import { WALLET_ICONS } from '@/lib/walletIcons';
 import { Icon, IconName } from '@/components/Icon';
@@ -32,6 +32,7 @@ import { ConfirmDeleteSheet } from '@/components/ConfirmDeleteSheet';
 import { Avatar } from '@/components/Avatar';
 import { AvatarStack } from '@/components/AvatarStack';
 import { InviteSheet } from '@/components/InviteSheet';
+import { TransactionTypeSheet } from '@/components/TransactionTypeSheet';
 import { withAlpha } from '@/components/IconBox';
 
 type DetailTab = 'gastos' | 'resumen' | 'miembros';
@@ -306,6 +307,7 @@ export default function WalletDetailScreen() {
   const [tab, setTab] = useState<DetailTab>('gastos');
   const [resolving, setResolving] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [showTxTypeSheet, setShowTxTypeSheet] = useState(false);
 
   // Debe estar antes de los early returns para respetar las Rules of Hooks
   const metrics = useWalletMetrics(wallet?.id);
@@ -362,7 +364,7 @@ export default function WalletDetailScreen() {
     );
   }
 
-  const { presupuesto, gastado, restante, usedPct, overBudget } = metrics;
+  const { presupuesto, gastado, ingresos, restante, saldoActual, usedPct, overBudget } = metrics;
 
   const lucide = resolveLucideIcon(wallet.icon);
   const isPersonal = wallet.type === 'personal';
@@ -461,49 +463,77 @@ export default function WalletDetailScreen() {
           </View>
         </View>
 
-        {/* Métricas */}
+        {/* Métricas — apiladas verticalmente para dar lugar a montos completos (es-PY).
+            En personal modelamos cuenta bancaria (saldo / ingresos / gastos);
+            en team mantenemos el modelo presupuestario (presupuesto / gastado / restante). */}
         <View style={styles.metricsRow}>
-          <Metric
-            label="Presupuesto"
-            value={fmtGsCompact(presupuesto)}
-            labelColor="rgba(255,255,255,0.7)"
-            valueColor="#fff"
-          />
-          <Metric
-            label="Gastado"
-            value={fmtGsCompact(gastado)}
-            labelColor="rgba(255,255,255,0.7)"
-            valueColor="#fff"
-            align="center"
-          />
-          <Metric
-            label="Restante"
-            value={fmtGsCompact(restante)}
-            labelColor="rgba(255,255,255,0.7)"
-            valueColor={theme.colors.accent}
-            align="flex-end"
-            highlight
-          />
+          {isPersonal ? (
+            <>
+              <Metric
+                label="Saldo actual"
+                value={fmtGs(saldoActual)}
+                labelColor="rgba(255,255,255,0.7)"
+                valueColor={theme.colors.accent}
+                highlight
+              />
+              <Metric
+                label="Ingresos"
+                value={fmtGs(ingresos)}
+                labelColor="rgba(255,255,255,0.7)"
+                valueColor="#fff"
+              />
+              <Metric
+                label="Gastos"
+                value={fmtGs(gastado)}
+                labelColor="rgba(255,255,255,0.7)"
+                valueColor="#fff"
+              />
+            </>
+          ) : (
+            <>
+              <Metric
+                label="Presupuesto"
+                value={fmtGs(presupuesto)}
+                labelColor="rgba(255,255,255,0.7)"
+                valueColor="#fff"
+              />
+              <Metric
+                label="Gastado"
+                value={fmtGs(gastado)}
+                labelColor="rgba(255,255,255,0.7)"
+                valueColor="#fff"
+              />
+              <Metric
+                label="Restante"
+                value={fmtGs(restante)}
+                labelColor="rgba(255,255,255,0.7)"
+                valueColor={theme.colors.accent}
+                highlight
+              />
+            </>
+          )}
         </View>
 
-        {/* Progress */}
-        <View style={{ marginTop: 14 }}>
-          <ProgressBar
-            value={usedPct}
-            tint="#fff"
-            bg="rgba(255,255,255,0.2)"
-          />
-          <Text
-            style={{
-              marginTop: 8,
-              color: overBudget ? theme.colors.warning : 'rgba(255,255,255,0.7)',
-              fontSize: 11,
-              fontFamily: overBudget ? typography.fontFamily.semibold : typography.fontFamily.regular,
-            }}
-          >
-            {Math.round(usedPct * 100)}% usado · {daysLabel}
-          </Text>
-        </View>
+        {/* Progress — solo en team (en personal "% usado" no aplica al haber ingresos) */}
+        {!isPersonal && (
+          <View style={{ marginTop: 14 }}>
+            <ProgressBar
+              value={usedPct}
+              tint="#fff"
+              bg="rgba(255,255,255,0.2)"
+            />
+            <Text
+              style={{
+                marginTop: 8,
+                color: overBudget ? theme.colors.warning : 'rgba(255,255,255,0.7)',
+                fontSize: 11,
+                fontFamily: overBudget ? typography.fontFamily.semibold : typography.fontFamily.regular,
+              }}
+            >
+              {Math.round(usedPct * 100)}% usado · {daysLabel}
+            </Text>
+          </View>
+        )}
       </LinearGradient>
 
       {/* Tabs */}
@@ -538,9 +568,15 @@ export default function WalletDetailScreen() {
         {tab === 'miembros' && <MembersTab walletId={wallet.id} walletName={wallet.name} />}
       </View>
 
-      {/* FAB Agregar gasto → /expense/new?walletId=... */}
+      {/* FAB → en team va directo a "nuevo gasto"; en personal abre selector Gasto/Ingreso */}
       <Pressable
-        onPress={() => router.push(`/expense/new?walletId=${wallet.id}`)}
+        onPress={() => {
+          if (isPersonal) {
+            setShowTxTypeSheet(true);
+          } else {
+            router.push(`/expense/new?walletId=${wallet.id}`);
+          }
+        }}
         style={[
           styles.fab,
           {
@@ -552,6 +588,14 @@ export default function WalletDetailScreen() {
       >
         <Icon name="Plus" size={26} color="#fff" strokeWidth={2.4} />
       </Pressable>
+
+      <TransactionTypeSheet
+        visible={showTxTypeSheet}
+        onClose={() => setShowTxTypeSheet(false)}
+        onSelect={(kind) => {
+          router.push(`/expense/new?walletId=${wallet.id}&kind=${kind}`);
+        }}
+      />
     </View>
   );
 }
@@ -575,9 +619,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   metricsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
+    flexDirection: 'column',
+    gap: 10,
+    marginTop: 18,
   },
   fab: {
     position: 'absolute',

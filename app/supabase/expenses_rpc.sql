@@ -11,7 +11,8 @@ create or replace function public.create_expense_with_split(
   p_category   text,
   p_paid_by    uuid,
   p_occurred_at timestamptz,
-  p_note       text default null
+  p_note       text default null,
+  p_kind       text default 'expense'
 )
 returns expenses
 language plpgsql
@@ -20,13 +21,17 @@ as $$
 declare
   new_expense expenses;
 begin
+  if p_kind not in ('expense','income') then
+    raise exception 'kind inválido: %, debe ser expense o income', p_kind;
+  end if;
+
   insert into expenses (
     wallet_id, description, amount, category,
-    paid_by, occurred_at, note, split_mode
+    paid_by, occurred_at, note, split_mode, kind
   )
   values (
     p_wallet_id, p_description, p_amount, p_category,
-    p_paid_by, p_occurred_at, p_note, 'equal'
+    p_paid_by, p_occurred_at, p_note, 'equal', p_kind
   )
   returning * into new_expense;
 

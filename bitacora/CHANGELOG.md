@@ -254,3 +254,39 @@
 - ✅ Chip "EQUIPO" (secondary) en FormRow Wallet
 - 📁 Tocados: app/supabase/policies.sql, app/schemas/expense.ts, app/lib/types.ts, app/stores/expenses.ts, app/(app)/expense/new.tsx, app/components/{MemberPickerSheet,WalletPickerSheet}.tsx
 - ⚠️ Pendiente: usuario debe re-correr `policies.sql` en Supabase Dashboard
+
+## [polish] 2026-05-05 — Formato G sin abreviar (Paraguay) + ingresos en wallet personal (MVP cuenta bancaria)
+
+Fix transversal previo al cierre de Fase 4. Dos bloques:
+
+**Bloque 1 — Formato es-PY sin M/k:**
+- ✅ Borrada `fmtGsCompact` de `lib/format.ts`. La app ahora usa siempre `fmtGs` → "₲ 7.500.000" en vez de "₲ 7.5M". Razón: usuarios paraguayos no esperan formato de redes sociales en montos financieros (ADR-012).
+- ✅ `BalanceCard.tsx`: secciones PERSONAL/EQUIPO bajan a fontSize 14 + `numberOfLines=1` + `adjustsFontSizeToFit minimumFontScale=0.75`; divisor central pasa de 16 a 10 px para dar más espacio.
+- ✅ `WalletRow.tsx`: restructurado a layout 2-niveles tipo app bancaria. IconBox + columna middle con (nombre+chip) sobre (balance+disponible). Balance ahora es 17px y muestra el **balance actual real** (initial_balance + ingresos − gastos), no `initial_balance` fijo. Subtítulo "1 miembro" eliminado por redundante con el chip.
+- ✅ `wallet/[id].tsx` métricas: pasaron de fila horizontal de 3 columnas a stack vertical (gap 10) — los montos completos no entran en 3 columnas a fontSize 18. En wallets personales se muestran ahora `Saldo actual / Ingresos / Gastos`; en team se mantienen `Presupuesto / Gastado / Restante`. ProgressBar oculta en personales (no aplica "% usado" cuando hay ingresos).
+- ✅ `lib/walletMetrics.ts`: añadido helper `useWalletBalance(walletId)` y campos `ingresos` + `saldoActual` a `WalletMetrics`.
+- ✅ `stores/wallets.ts → useTotalBalance`: balance por wallet ahora es `initial + sum(income) − sum(expense)`.
+
+**Bloque 2 — Ingresos en wallet personal:**
+- ✅ `supabase/incomes_migration.sql` (NUEVO): `alter table expenses add column kind text default 'expense' check (kind in ('expense','income'))` + índice `(wallet_id, kind)`. Idempotente. **Pendiente aplicar en Supabase Dashboard**.
+- ✅ `supabase/expenses_rpc.sql`: `create_expense_with_split` agrega parámetro `p_kind text default 'expense'` con validación. **Re-correr en Dashboard**.
+- ✅ `lib/types.ts`: nuevo `ExpenseKind = 'expense' | 'income'`. `Expense.kind` y `NewExpenseInput.kind` agregados. `Expense.category` se relaja a `string | null` para soportar el set de income (`INCOME_CATEGORIES`) sin un union type que crezca por cada feature.
+- ✅ `lib/categories.ts`: nuevas `IncomeCategoryId`, `INCOME_CATEGORIES` (Salario, Freelance, Regalo, Otro), helpers `incomeCategoryById` y `anyCategoryById(id, kind)` para callers que renderizan ambos tipos.
+- ✅ `stores/expenses.ts`: `normalizeExpense` defaultea `kind` a 'expense' si Postgres lo manda undefined; `create` propaga `p_kind` al RPC; `totals` ahora retorna `{ spent, income, count }` separados por kind.
+- ✅ `schemas/expense.ts`: `kind` requerido en el schema (default vive en `defaultValues` del form para que input/output type del Resolver sean iguales). `category` se relaja a `z.string().min(1)` por mismo motivo de set dual.
+- ✅ `expense/new.tsx`: nuevo toggle Gasto/Ingreso (segmented control) renderizado solo en wallets personales y solo en modo create. Income switchea CategoryPicker al set de incomes, pinta el card de monto y label en accent verde, oculta la sección "Cómo dividir" (no aplica), y cambia el copy del CTA a "Cargar saldo". Acepta `?kind=expense|income` en query params para invocación desde el FAB. En wallets team el `kind` se fuerza a 'expense'.
+- ✅ `components/CategoryPicker.tsx`: prop `kind` opcional para alternar entre `CATEGORIES` e `INCOME_CATEGORIES`.
+- ✅ `components/ExpenseRow.tsx`: usa `anyCategoryById` para resolver icon. Renderiza `+ ₲ X` en accent verde para income, `− ₲ X` en textPrimary para expense. Verbo "Cargó" / "Pagó" según kind.
+- ✅ `components/TransactionTypeSheet.tsx` (NUEVO): bottom sheet con dos opciones (Nuevo gasto / Cargar saldo). Reusa el patrón visual de `ConfirmDeleteSheet`.
+- ✅ `wallet/[id].tsx`: en wallets personales el FAB abre `TransactionTypeSheet`; en team mantiene navegación directa a `/expense/new`. `useWalletMetrics` se desestructura con los nuevos campos.
+
+**Bitácora:**
+- ✅ ADR-012 (Formato es-PY) y ADR-013 (Columna `kind` en expenses) en DECISIONS.md.
+- ✅ TASKS.md: agregada la migración SQL pendiente.
+- ✅ STATE.md actualizado.
+
+📁 **Tocados:** app/lib/{format,types,categories,walletMetrics}.ts, app/stores/{expenses,wallets}.ts, app/components/{BalanceCard,WalletRow,ExpenseRow,CategoryPicker,TransactionTypeSheet}.tsx, app/app/(app)/{expense/new,wallet/[id]}.tsx, app/schemas/expense.ts, app/supabase/{incomes_migration.sql,expenses_rpc.sql}, bitacora/{STATE,CHANGELOG,TASKS,DECISIONS}.md.
+
+🧪 **Verificación:** `npm run typecheck` limpio. Validación visual y end-to-end (cargar sueldo + gasto + edit + delete) pendiente — requiere aplicar SQL en Dashboard primero.
+
+⚠️ **Pendiente al usuario:** correr `supabase/incomes_migration.sql` y re-correr `supabase/expenses_rpc.sql` en Supabase Dashboard antes de probar en Expo Go.

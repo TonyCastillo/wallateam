@@ -108,4 +108,26 @@
 - Un poco más de uso de red en lugar de actualizaciones incrementales del store.
 - En la Fase 4 puede requerir una implementación más sofisticada para manejar setups multi-usuarios.
 
+## ADR-012 · Formato de moneda completo (es-PY) sin abreviaciones M/k
+
+**Fecha:** 2026-05-05
+**Contexto:** El handoff y la primera implementación usaban `fmtGsCompact` para mostrar montos altos como "₲ 7.5M" o "₲ 119M" (estilo redes sociales). El usuario lanza la app primero en Paraguay, donde los usuarios financieros esperan el monto completo con separador de miles paraguayo: "₲ 7.500.000".
+**Decisión:** Borrar `fmtGsCompact` y usar siempre `fmtGs` (locale `es-PY` con separador de miles). Adaptar layouts que asumían strings cortos: `BalanceCard` (autoshrink + fontSize 14 en columnas), `WalletRow` (restructurado a 2 niveles tipo app bancaria), `wallet/[id].tsx` métricas (apiladas verticalmente en lugar de 3 columnas).
+**Consecuencias:**
+- Una sola función de formato → menos divergencia entre callsites
+- Layouts más altos (especialmente el header del Wallet Detail con 3 métricas apiladas), pero predecibles para cualquier rango de montos
+- Si alguna vista futura realmente necesita formato compacto (ej: chart axis labels), se reintroducirá una función dedicada en ese contexto, no en componentes principales
+
+## ADR-013 · Columna `kind` en `expenses` para ingresos vs gastos (modelo cuenta bancaria)
+
+**Fecha:** 2026-05-05
+**Contexto:** Las wallets personales necesitan soportar ingresos (ej: cargar el sueldo mensual de ₲ 7.000.000) que sumen al saldo, además de los gastos que restan. El modelo previo (`balance = initial_balance − sum(expenses)`) trataba la wallet como presupuesto fijo, no como cuenta bancaria.
+**Decisión:** Agregar columna `kind text default 'expense' check (kind in ('expense','income'))` a la tabla `expenses`, en lugar de crear una tabla `incomes` separada. El RPC `create_expense_with_split` recibe `p_kind`. Las filas existentes adoptan `'expense'` por la default — sin backfill. El nombre de la tabla `expenses` se mantiene (semánticamente queda como "transactions" pero renombrar implicaría tocar RLS, RPC, índices, store y referencias por todo el código).
+**Consecuencias:**
+- Reutiliza toda la infraestructura existente: RLS (`exp_select/exp_insert/exp_update/exp_delete` aplican igual), RPC (atomicidad expense + split), realtime subscription, store de Zustand, normalizers
+- `Expense.category` se relaja a `string | null` (en TS) y `category` en zod a `z.string()` para soportar el set dual `CATEGORIES` (gastos) + `INCOME_CATEGORIES` (ingresos) sin acoplar el schema a uno solo
+- `useWalletMetrics` y `useTotalBalance` ahora calculan `saldoActual = initial_balance + sum(income) − sum(expense)` para cubrir el modelo cuenta bancaria. Las métricas legacy `presupuesto/gastado/restante/usedPct` se conservan para wallets `team` (modelo presupuestario)
+- El UI distingue: en wallets personales el FAB abre un `TransactionTypeSheet` (Gasto / Cargar saldo); en team el FAB sigue yendo directo al form de gasto
+- Trade-off semántico: el nombre `expenses` queda desactualizado. Aceptable para MVP. Si en una iteración futura justifica el costo, se puede renombrar a `transactions` con una migración + actualización de policies/RPC/clientes en una sola PR
+
 > Las siguientes ADRs se irán agregando a medida que se tomen decisiones durante la ejecución de las fases.

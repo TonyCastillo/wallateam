@@ -182,8 +182,12 @@ export function useTotalBalance(): { personal: number; team: number; total: numb
   let team = 0;
 
   wallets.forEach((w) => {
-    const spent = (expensesByWallet[w.id] ?? []).reduce((acc, e) => acc + Number(e.amount), 0);
-    const balance = Number(w.initial_balance) - spent;
+    let delta = 0;
+    for (const e of expensesByWallet[w.id] ?? []) {
+      const amt = Number(e.amount);
+      delta += e.kind === 'income' ? amt : -amt;
+    }
+    const balance = Number(w.initial_balance) + delta;
     if (w.type === 'personal' && w.owner_id === userId) {
       personal += balance;
     } else if (w.type === 'team') {

@@ -2,7 +2,7 @@ import { View, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography, shadows } from '@/theme/tokens';
-import { fmtGs, fmtGsCompact } from '@/lib/format';
+import { fmtGs } from '@/lib/format';
 
 interface BalanceCardProps {
   total: number;
@@ -73,11 +73,14 @@ export function BalanceCard({ total, personal, team }: BalanceCardProps) {
           <Text
             style={{
               fontFamily: typography.fontFamily.semibold,
-              fontSize: 16,
+              fontSize: 14,
               color: '#FFFFFF',
             }}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
           >
-            {fmtGsCompact(personal)}
+            {fmtGs(personal)}
           </Text>
         </View>
 
@@ -86,7 +89,7 @@ export function BalanceCard({ total, personal, team }: BalanceCardProps) {
             width: 1,
             height: 30,
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            marginHorizontal: 16,
+            marginHorizontal: 10,
           }}
         />
 
@@ -106,11 +109,14 @@ export function BalanceCard({ total, personal, team }: BalanceCardProps) {
           <Text
             style={{
               fontFamily: typography.fontFamily.semibold,
-              fontSize: 16,
+              fontSize: 14,
               color: '#FFFFFF',
             }}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
           >
-            {fmtGsCompact(team)}
+            {fmtGs(team)}
           </Text>
         </View>
       </View>

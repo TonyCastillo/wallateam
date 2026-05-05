@@ -1,7 +1,7 @@
 import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme/ThemeProvider';
 import { typography } from '@/theme/tokens';
-import { categoryById } from '@/lib/categories';
+import { anyCategoryById } from '@/lib/categories';
 import { fmtGs, formatExpenseDate } from '@/lib/format';
 import { IconBox } from './IconBox';
 import { useAuth } from '@/stores/auth';
@@ -17,10 +17,14 @@ interface Props {
 
 export function ExpenseRow({ expense, payerName, onPress, onLongPress }: Props) {
   const { theme } = useTheme();
-  const cat = categoryById(expense.category);
+  const isIncome = expense.kind === 'income';
+  const cat = anyCategoryById(expense.category, expense.kind);
   const currentUserId = useAuth((s) => s.user?.id);
-  const payerLabel =
+  const actorLabel =
     payerName ?? (expense.paid_by === currentUserId ? 'Vos' : 'Otro');
+  const verb = isIncome ? 'Cargó' : 'Pagó';
+  const amountColor = isIncome ? theme.colors.accent : theme.colors.textPrimary;
+  const amountPrefix = isIncome ? '+' : '−';
 
   return (
     <Pressable
@@ -53,18 +57,18 @@ export function ExpenseRow({ expense, payerName, onPress, onLongPress }: Props) 
           }}
           numberOfLines={1}
         >
-          {`Pagó ${payerLabel} · ${formatExpenseDate(expense.occurred_at)}`}
+          {`${verb} ${actorLabel} · ${formatExpenseDate(expense.occurred_at)}`}
         </Text>
       </View>
       <View style={{ alignItems: 'flex-end', gap: 2 }}>
         <Text
           style={{
-            color: theme.colors.textPrimary,
+            color: amountColor,
             fontSize: 15,
             fontFamily: typography.fontFamily.semibold,
           }}
         >
-          {`− ${fmtGs(expense.amount)}`}
+          {`${amountPrefix} ${fmtGs(expense.amount)}`}
         </Text>
         {/* Fase 3: split_mode siempre 'equal' single-user → no se muestra chip. Fase 5 lo agregará. */}
       </View>

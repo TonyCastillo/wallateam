@@ -4,7 +4,10 @@ export const newExpenseSchema = z.object({
   wallet_id: z.string().uuid('Wallet inválida'),
   description: z.string().min(2, 'Mínimo 2 caracteres').max(80, 'Máximo 80 caracteres'),
   amount: z.number().int().positive('Debe ser mayor a 0'),
-  category: z.enum(['food', 'transport', 'home', 'shopping', 'entertainment', 'health', 'work', 'other']),
+  // category: aceptamos string libre porque income tiene su propio set (INCOME_CATEGORIES).
+  // El front se encarga de presentar las categorías válidas según el `kind`.
+  category: z.string().min(1, 'Categoría requerida'),
+  kind: z.enum(['expense', 'income']),
   occurred_at: z.string(), // ISO
   note: z.string().max(280, 'Máximo 280 caracteres').nullable().optional(),
   paid_by: z.string().uuid().optional(),
