@@ -23,7 +23,7 @@ export function ExpenseRow({ expense, payerName, onPress, onLongPress }: Props) 
   const isMe = expense.paid_by === currentUserId;
   let actionText = '';
   if (isMe) {
-    actionText = isIncome ? 'Cargado por vos' : 'Pagado por vos';
+    actionText = isIncome ? 'Cargado por ti' : 'Pagado por ti';
   } else {
     const actorName = payerName ?? 'Otro';
     actionText = isIncome ? `Cargó ${actorName}` : `Pagó ${actorName}`;

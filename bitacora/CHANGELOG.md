@@ -343,3 +343,11 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ SplitRow: 4/4 items (Avatar, nombre, barra gradiente, input/formato de ₲).
 - ✅ Validaciones footer: 2/2 items (sumas perfectas).
 - 🧠 Desviaciones: Ninguna. Todo validado contra el mock y ADR-012.
+
+## [05.99] 2026-05-05 — Fase 5 (Splits) cerrada ✅
+- ✅ `npm run typecheck` limpio. Fix puntual: `split_mode` en `schemas/expense.ts` quitado el `.default('equal')` para alinear input/output type del Resolver de react-hook-form (mismo patrón aplicado en su momento a `kind`; ver ADR-013). El default sigue viviendo en `defaultValues` del form.
+- ✅ Recap funcional Fase 5: `expenses` soporta multi-split atómico vía RPC v2 (`expenses_rpc_v2.sql`, jsonb), schema/types con array de splits validado, UI con toggle `=`/`%`/`₲` en `expense/new`, componente `SplitRow` interactivo con barra de porcentaje y formateo PYG, validaciones strict de sumas (% = 100 / ₲ = total) que bloquean el submit, sección "Cómo dividir" oculta en wallets personales y en ingresos por design.
+- ✅ Pulido visual extra incluido en la fase (commits `d39f7de` y `41422d3`): create-wallet + wallet-detail + microcopy "Pagado por ti" / "Cargado por ti" cuando paid_by === currentUser en ExpenseRow.
+- ✅ Próxima fase: 06-fase-balance (algoritmo de simplificación de deudas en wallets team).
+- 📁 Tocados: `app/schemas/expense.ts`, `bitacora/{STATE,CHANGELOG,TASKS}.md`.
+- ⚠️ Sigue pendiente al usuario: aplicar todo el SQL acumulado en Supabase Dashboard antes de cualquier prueba en Expo Go o build APK (lista en STATE.md).

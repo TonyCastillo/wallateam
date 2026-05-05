@@ -1,17 +1,21 @@
 # Estado actual del proyecto WallaTeam
 
 **Última actualización:** 2026-05-05 (máquina: notebook)
-**Fase activa:** 05-fase-splits
-**Último módulo completado:** 06-validate-vs-mock
-**Próximo módulo a ejecutar:** [prompts/05-fase-splits/99-close-phase.md](../prompts/05-fase-splits/99-close-phase.md)
+**Fase activa:** 06-fase-balance (no arrancada — pendiente diseñar prompt-pack)
+**Último módulo completado:** 05.99 — Cierre Fase 5 (Splits)
+**Próximo módulo a ejecutar:** diseñar `prompts/06-fase-balance/00-overview.md` + módulos 01..06 + 99 siguiendo plantilla de Fases 4 y 5
+
+> 🔀 **Decisión paralela en curso (2026-05-05):** preparar APK alfa para pruebas internas en familia con la app actual (control de gastos personal). Los pasos de EAS Build, perfil `preview` y firma del APK se documentarán al ejecutarlos.
 
 ## ⚠️ SQL pendiente de aplicar en Supabase Dashboard
-- [ ] Correr `app/supabase/profiles_rls_fix.sql` (hace públicos los perfiles para que se vean los nombres de otros miembros en el equipo)
 
-Antes de probar en Expo Go:
-1. Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
-2. Re-correr `app/supabase/policies.sql` (policy `exp_insert` actualizada)
-3. **Nuevo (polish 2026-05-05):** correr `app/supabase/incomes_migration.sql` (`alter table expenses add column kind`) y re-correr `app/supabase/expenses_rpc.sql` (parámetro `p_kind`)
+Antes de probar en Expo Go o de generar el APK alfa, aplicar **todo** lo siguiente en orden:
+1. `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
+2. `app/supabase/policies.sql` (policy `exp_insert` actualizada para soportar paid_by != auth.uid)
+3. `app/supabase/incomes_migration.sql` (`alter table expenses add column kind`)
+4. `app/supabase/expenses_rpc.sql` (parámetro `p_kind` en `create_expense_with_split`)
+5. `app/supabase/expenses_rpc_v2.sql` (jsonb splits — Fase 5)
+6. `app/supabase/profiles_rls_fix.sql` (perfiles públicos para que se lean nombres de otros miembros)
 
 ---
 
@@ -34,7 +38,7 @@ Antes de probar en Expo Go:
 | 02 — Wallets personales | ✅ Cerrada | 7 / 7 |
 | 03 — Gastos | ✅ Cerrada | 7 / 7 |
 | 04 — Equipo | ✅ Cerrada | 7 / 7 |
-| 05 — Splits | 🟡 En curso | 6 / 7 |
+| 05 — Splits | ✅ Cerrada | 7 / 7 |
 | 06 — Balance | ⚪ Pendiente | — |
 | 07 — Multimoneda | ⚪ Pendiente | — |
 | 08 — Extras | ⚪ Pendiente | — |
@@ -49,22 +53,33 @@ Antes de probar en Expo Go:
 - ADR-009 resuelto: `useTotalBalance` y `useWalletMetrics` calculan con expenses reales
 - Prompts de Fase 4 creados en `prompts/04-fase-equipo/` (00-overview + 01..06 + 99)
 
-## Plantilla para arrancar Fase 4
+## Plantilla para arrancar Fase 6
 
 ```
-Empezá Fase 4 (Equipo) del proyecto WallaTeam.
+Empezá Fase 6 (Balance del grupo) del proyecto WallaTeam.
 
 Lectura obligatoria:
 1. prompts/00-AGENT-HANDOFF.md
 2. prompts/00-MASTER.md
 3. bitacora/STATE.md, CHANGELOG.md, TASKS.md, DECISIONS.md
-4. prompts/04-fase-equipo/00-overview.md
+
+Tareas:
+1. Diseñar prompts/06-fase-balance/ siguiendo plantilla de Fases 4 y 5:
+   00-overview.md, 01-balance-algorithm.md, 02-balance-store-hook.md,
+   03-balance-ui-tab.md, 04-saldar-flow.md (placeholder Fase 6.1 si queda
+   fuera de scope), 05-empty-states.md, 06-validate-vs-mock.md, 99-close-phase.md
+2. Objetivo funcional: en Wallet Detail tipo team, mostrar tab/sección
+   "Balance del grupo" con quién debe a quién, usando algoritmo de
+   simplificación de deudas (minimizar transacciones) sobre saldos netos.
+   Considerar split_mode 'equal' / 'percent' / 'amount' (todos resueltos
+   en Fase 5 — los splits ya están guardados en expense_splits).
+3. NO modificar wallets type='personal' — para esas el concepto de balance
+   no aplica.
 
 Mocks ground truth:
-- design_handoff_wallateam_mvp/lib/screen-create-wallet.jsx (sección "Miembros" para type='team')
-- design_handoff_wallateam_mvp/lib/screen-wallet-detail.jsx (avatares overlap, balance del grupo, tab Miembros)
-
-Ejecutar el módulo apuntado por STATE.md → Próximo módulo a ejecutar.
+- design_handoff_wallateam_mvp/lib/screen-wallet-detail.jsx (sección
+  "Balance del grupo" — quién debe a quién, botón "Saldar")
+- design_handoff_wallateam_mvp/lib/screen-saldar.jsx si existe
 
 Recordá: actualizar bitácora al cerrar cada módulo, commit por módulo,
 no inventar componentes (reusar Avatar/Chip/IconBox/etc.), microcopy literal es-PY.

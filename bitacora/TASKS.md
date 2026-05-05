@@ -7,10 +7,17 @@
 
 
 
+## En curso
+
+- [ ] [Alfa] Generar APK preview con EAS Build para pruebas internas en familia (control de gastos personal MVP)
+
 ## Pendiente
 
-### Fase 5 — Splits
-- [ ] [Fase 5] 99 — Cerrar fase
+### Fase 6 — Balance (a planificar)
+- [ ] [Fase 6] 00 — Overview + diseño de prompt-pack (módulos 01..06 + 99)
+- [ ] [Fase 6] Algoritmo de simplificación de deudas (minimizar transacciones)
+- [ ] [Fase 6] UI tab "Balance del grupo" en Wallet Detail team
+- [ ] [Fase 6] Cierre
 
 ### Fase 1.5 (deferred)
 - [ ] [Fase 1.5] Google OAuth real (config Google Cloud + Supabase OAuth provider)
@@ -32,6 +39,7 @@
 
 ## Done
 
+- ✅ [Fase 5] 99 — Cerrar fase (2026-05-05)
 - ✅ [Fase 5] 06 — Validación visual Fase 5 (2026-05-05)
 - ✅ [Fase 5] 05 — Modo Montos Fijos (₲) (2026-05-05)
 - ✅ [Fase 5] 04 — Modo Porcentajes (%) (2026-05-05)

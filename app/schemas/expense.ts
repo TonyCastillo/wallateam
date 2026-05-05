@@ -11,7 +11,7 @@ export const newExpenseSchema = z.object({
   occurred_at: z.string(), // ISO
   note: z.string().max(280, 'Máximo 280 caracteres').nullable().optional(),
   paid_by: z.string().uuid().optional(),
-  split_mode: z.enum(['equal', 'percent', 'amount']).default('equal'),
+  split_mode: z.enum(['equal', 'percent', 'amount']),
   splits: z.array(z.object({
     user_id: z.string().uuid(),
     percentage: z.number().nullable().optional(),
