@@ -24,6 +24,7 @@ import { ConfirmDeleteSheet } from '@/components/ConfirmDeleteSheet';
 import { MemberPickerSheet } from '@/components/MemberPickerSheet';
 import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/Button';
+import { SplitRow } from '@/components/SplitRow';
 
 const formatPYG = (n: number) => n.toLocaleString('es-PY');
 
@@ -63,7 +64,7 @@ export default function AddExpenseScreen() {
   const defaultIncomeCat = INCOME_CATEGORIES[0].id;
   const defaultExpenseCat = CATEGORIES[0].id;
 
-  const { control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<NewExpenseForm>({
+  const { control, handleSubmit, watch, setValue, getValues, reset, formState: { errors } } = useForm<NewExpenseForm>({
     resolver: zodResolver(newExpenseSchema),
     defaultValues: existing
       ? {
@@ -110,6 +111,7 @@ export default function AddExpenseScreen() {
   const watchedAmount = watch('amount');
   const watchedPaidBy = watch('paid_by');
   const watchedSplitMode = watch('split_mode');
+  const watchedSplits = watch('splits') ?? [];
 
   const selectedWallet = wallets.find((w) => w.id === watchedWalletId)
     ?? allWallets.find((w) => w.id === watchedWalletId);
@@ -151,6 +153,44 @@ export default function AddExpenseScreen() {
     }
   }, [isTeamWallet, watchedKind, setValue]);
 
+  // Effect to recalculate splits for 'equal' mode
+  useEffect(() => {
+    if (watchedSplitMode === 'equal' && isTeamWallet && walletMembers.length > 0) {
+      const currentSplits = getValues('splits') ?? [];
+      const activeIds = currentSplits.length > 0
+        ? currentSplits.map((s) => s.user_id)
+        : walletMembers.map((m) => m.user_id);
+
+      const expectedSplits = activeIds.map((uid) => ({
+        user_id: uid,
+        percentage: 100 / activeIds.length,
+        amount: (watchedAmount * (100 / activeIds.length)) / 100,
+      }));
+
+      // Solo actualizar si hay una diferencia real para no loopear
+      if (JSON.stringify(expectedSplits) !== JSON.stringify(currentSplits)) {
+        setValue('splits', expectedSplits);
+      }
+    }
+  }, [watchedAmount, watchedSplitMode, isTeamWallet, walletMembers.length, getValues, setValue]);
+
+  const handleToggleEqual = (uid: string) => {
+    if (watchedSplitMode !== 'equal') return;
+    const currentActive = watchedSplits.map((s) => s.user_id);
+    let nextActive = currentActive.includes(uid)
+      ? currentActive.filter((id) => id !== uid)
+      : [...currentActive, uid];
+
+    if (nextActive.length === 0) return; // no se puede excluir a todos
+
+    const newSplits = nextActive.map((id) => ({
+      user_id: id,
+      percentage: 100 / nextActive.length,
+      amount: (watchedAmount * (100 / nextActive.length)) / 100,
+    }));
+    setValue('splits', newSplits);
+  };
+
   const formatDateForDisplay = (d: Date) => {
     const isToday = new Date().toDateString() === d.toDateString();
     const dateStr = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -185,6 +225,8 @@ export default function AddExpenseScreen() {
           occurred_at: values.occurred_at,
           note: values.note ?? null,
           paid_by: values.paid_by,
+          split_mode: values.split_mode,
+          splits: values.splits,
         });
       }
       router.back();
@@ -428,24 +470,21 @@ export default function AddExpenseScreen() {
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, opacity: 0.4 }}>
-              <Avatar name={fullName} size={32} />
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 13, color: theme.colors.textPrimary }}>Vos</Text>
-                <View style={{ height: 5, marginTop: 5, borderRadius: 3, backgroundColor: theme.colors.background, overflow: 'hidden' }}>
-                  <View style={{ width: '100%', height: '100%', backgroundColor: theme.colors.primary }} />
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4, minWidth: 70, justifyContent: 'flex-end' }}>
-                <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 16, color: theme.colors.textPrimary }}>100</Text>
-                <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 11, color: theme.colors.textSecondary }}>%</Text>
-              </View>
-              <View style={{ minWidth: 64, alignItems: 'flex-end' }}>
-                <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary }}>
-                  {watchedAmount > 0 ? formatPYG(watchedAmount) : '0'}
-                </Text>
-              </View>
-            </View>
+            {watchedSplitMode === 'equal' && walletMembers.map((m) => {
+              const isIncluded = watchedSplits.some((s) => s.user_id === m.user_id);
+              const splitData = watchedSplits.find((s) => s.user_id === m.user_id);
+              const name = m.user_id === user?.id ? 'Vos' : (m.profile?.full_name ?? '?');
+              return (
+                <SplitRow
+                  key={m.user_id}
+                  name={name}
+                  pct={isIncluded ? (splitData?.percentage ?? 0) : 0}
+                  amount={isIncluded ? (splitData?.amount ?? 0) : 0}
+                  isIncluded={isIncluded}
+                  onToggle={() => handleToggleEqual(m.user_id)}
+                />
+              );
+            })}
 
             <View style={{ marginTop: 12, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: theme.colors.border, flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 12, color: theme.colors.textSecondary }}>Total asignado</Text>

@@ -319,3 +319,9 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Se implementó el toggle interactivo (`=`, `%`, `₲`) conectado a `split_mode` en el form.
 - ✅ Los subtítulos de la sección cambian dinámicamente según el modo seleccionado.
 - 📁 Tocados: `app/app/(app)/expense/new.tsx`.
+
+## [05.03] 2026-05-05 — Modo Partes Iguales (=)
+- ✅ Creado `SplitRow.tsx` (read-only) con soporte visual para opacidad y gradiente dinámico.
+- ✅ Implementada lógica `handleToggleEqual` y efecto de recálculo en `new.tsx`.
+- ✅ Render dinámico de miembros en modo `=`.
+- 📁 Tocados: `app/components/SplitRow.tsx`, `app/app/(app)/expense/new.tsx`.
