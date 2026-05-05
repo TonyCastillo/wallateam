@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-05-05 (máquina: notebook)
 **Fase activa:** 05-fase-splits
-**Último módulo completado:** 05-split-amount-mode
-**Próximo módulo a ejecutar:** [prompts/05-fase-splits/06-split-validation-smoke-test.md](../prompts/05-fase-splits/06-split-validation-smoke-test.md)
+**Último módulo completado:** 06-validate-vs-mock
+**Próximo módulo a ejecutar:** [prompts/05-fase-splits/99-close-phase.md](../prompts/05-fase-splits/99-close-phase.md)
 
 ## ⚠️ SQL pendiente de aplicar en Supabase Dashboard
 - [ ] Correr `app/supabase/expenses_rpc_v2.sql` (actualiza RPC para aceptar JSON array de splits)
@@ -34,7 +34,7 @@ Antes de probar en Expo Go:
 | 02 — Wallets personales | ✅ Cerrada | 7 / 7 |
 | 03 — Gastos | ✅ Cerrada | 7 / 7 |
 | 04 — Equipo | ✅ Cerrada | 7 / 7 |
-| 05 — Splits | 🟡 En curso | 5 / 7 |
+| 05 — Splits | 🟡 En curso | 6 / 7 |
 | 06 — Balance | ⚪ Pendiente | — |
 | 07 — Multimoneda | ⚪ Pendiente | — |
 | 08 — Extras | ⚪ Pendiente | — |

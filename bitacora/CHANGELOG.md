@@ -337,3 +337,9 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Implementado `handleChangeAmt` en `new.tsx` para actualizar montos y autocalcular su representación en %.
 - ✅ Validaciones visuales: el total de montos ingresados se refleja en el footer. Si no coincide con el monto total del gasto, marca error rojo y bloquea el submit.
 - 📁 Tocados: `app/components/SplitRow.tsx`, `app/app/(app)/expense/new.tsx`.
+
+## [05.06] 2026-05-05 — Validación visual Fase 5
+- ✅ Toggle de modos: 5/5 items (oculto en incomes/personales, funcional, con subtítulos exactos).
+- ✅ SplitRow: 4/4 items (Avatar, nombre, barra gradiente, input/formato de ₲).
+- ✅ Validaciones footer: 2/2 items (sumas perfectas).
+- 🧠 Desviaciones: Ninguna. Todo validado contra el mock y ADR-012.
