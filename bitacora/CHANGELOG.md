@@ -299,3 +299,7 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Microcopy: 10/10 literal
 - 🧠 Desviaciones: ninguna. Se hicieron ajustes menores en el código para matchear 100% el microcopy exigido (Owner vs Admin, copys exactos de los links de invitación).
 - 📁 Tocados: `app/app/(app)/create-wallet.tsx`, `app/app/(app)/wallet/[id].tsx`, `app/components/InviteSheet.tsx`, `app/components/MemberPickerSheet.tsx`
+
+## [04.99] 2026-05-05 — Fase 4 (Equipo) cerrada ✅
+- Smoke test E2E: creación wallet team, invitación, aceptación, paid_by por otro miembro
+- Próxima fase: 05-fase-splits (=, %, ₲ con validaciones)

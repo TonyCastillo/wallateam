@@ -5,11 +5,13 @@
 
 ---
 
-## En curso
 
-- [ ] [Fase 4] 99 — Cerrar fase
 
 ## Pendiente
+
+### Fase 5 — Splits
+- [ ] [Fase 5] 00 — Overview y planificación de prompts
+- [ ] [Fase 5] Splits (=, %, ₲) con validaciones
 
 ### Fase 1.5 (deferred)
 - [ ] [Fase 1.5] Google OAuth real (config Google Cloud + Supabase OAuth provider)
@@ -25,12 +27,13 @@
 - [ ] Re-correr `app/supabase/expenses_rpc.sql` (parámetro `p_kind` en `create_expense_with_split`) — polish 2026-05-05
 
 ### Fases 5-8 (a planificar al cerrar la previa)
-- [ ] [Fase 5] Splits (=, %, ₲) con validaciones
 - [ ] [Fase 6] Balance del grupo (cálculo deudas, saldar)
 - [ ] [Fase 7] Multimoneda (USD, ARS, conversión)
 - [ ] [Fase 8] Extras (foto ticket, push notifications, charts)
 
 ## Done
+
+- ✅ [Fase 4] 99 — Cerrar fase (2026-05-05)
 
 - ✅ [Fase 4] 06 — Validación visual contra prototipo (2026-05-05)
 - ✅ [polish] Formato es-PY sin M/k + ingresos en wallet personal (cuenta bancaria MVP) (2026-05-05)
