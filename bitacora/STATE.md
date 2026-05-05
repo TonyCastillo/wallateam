@@ -2,8 +2,8 @@
 
 **Última actualización:** 2026-05-05 (máquina: notebook)
 **Fase activa:** 05-fase-splits
-**Último módulo completado:** 04.99-close-phase (Fase 4 cerrada ✅)
-**Próximo módulo a ejecutar:** prompts/05-fase-splits/
+**Último módulo completado:** 00-overview (planificación Fase 5)
+**Próximo módulo a ejecutar:** [prompts/05-fase-splits/01-splits-store-and-types.md](../prompts/05-fase-splits/01-splits-store-and-types.md)
 
 ## ⚠️ SQL pendiente de aplicar en Supabase Dashboard
 
