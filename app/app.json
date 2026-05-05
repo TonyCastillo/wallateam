@@ -39,6 +39,19 @@
     ],
     "experiments": {
       "typedRoutes": false
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f8d36c60-2504-4533-9226-b51dfce50636"
+      }
+    },
+    "owner": "tonycastillopy",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/f8d36c60-2504-4533-9226-b51dfce50636"
     }
   }
 }
