@@ -331,3 +331,9 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Implementado `handleChangePct` en `new.tsx` para actualizar los splits y recalcular montos derivados.
 - ✅ Validaciones visuales: total de % mostrado en el footer, color de error y botón "Guardar" deshabilitado si != 100%.
 - 📁 Tocados: `app/components/SplitRow.tsx`, `app/app/(app)/expense/new.tsx`.
+
+## [05.05] 2026-05-05 — Modo Montos Fijos (₲)
+- ✅ Ampliado `SplitRow.tsx` para aceptar `mode="amount"` y renderizar un `TextInput` formateado a PYG.
+- ✅ Implementado `handleChangeAmt` en `new.tsx` para actualizar montos y autocalcular su representación en %.
+- ✅ Validaciones visuales: el total de montos ingresados se refleja en el footer. Si no coincide con el monto total del gasto, marca error rojo y bloquea el submit.
+- 📁 Tocados: `app/components/SplitRow.tsx`, `app/app/(app)/expense/new.tsx`.

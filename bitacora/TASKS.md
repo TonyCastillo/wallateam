@@ -10,7 +10,6 @@
 ## Pendiente
 
 ### Fase 5 — Splits
-- [ ] [Fase 5] 05 — Modo Montos Fijos (₲)
 - [ ] [Fase 5] Splits (=, %, ₲) con validaciones
 
 ### Fase 1.5 (deferred)
@@ -33,6 +32,7 @@
 
 ## Done
 
+- ✅ [Fase 5] 05 — Modo Montos Fijos (₲) (2026-05-05)
 - ✅ [Fase 5] 04 — Modo Porcentajes (%) (2026-05-05)
 - ✅ [Fase 5] 03 — Modo Partes Iguales (=) (2026-05-05)
 - ✅ [Fase 5] 02 — UI Toggle de Modos de Split (2026-05-05)

@@ -23,12 +23,20 @@ export function SplitRow({ name, pct, amount, isIncluded = true, onToggle, mode 
   const { theme } = useTheme();
 
   const [localPct, setLocalPct] = useState(pct === 0 ? '' : String(pct));
+  const [localAmount, setLocalAmount] = useState(amount === 0 ? '' : Math.round(amount).toLocaleString('es-PY'));
 
   useEffect(() => {
     if (Number(localPct) !== pct) {
       setLocalPct(pct === 0 ? '' : String(pct));
     }
   }, [pct]);
+
+  useEffect(() => {
+    const numericLocal = Number(localAmount.replace(/\./g, ''));
+    if (numericLocal !== Math.round(amount)) {
+      setLocalAmount(amount === 0 ? '' : Math.round(amount).toLocaleString('es-PY'));
+    }
+  }, [amount]);
 
   return (
     <Pressable
@@ -106,9 +114,34 @@ export function SplitRow({ name, pct, amount, isIncluded = true, onToggle, mode 
         </Text>
       </View>
       <View style={{ minWidth: 64, alignItems: 'flex-end' }}>
-        <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary }}>
-          {amount > 0 ? formatPYG(Math.round(amount)) : '0'}
-        </Text>
+        {mode === 'amount' ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.colors.primary, paddingBottom: 2 }}>
+            <TextInput
+              style={{
+                fontFamily: typography.fontFamily.bold,
+                fontSize: 12,
+                color: theme.colors.textPrimary,
+                textAlign: 'right',
+                padding: 0,
+                minWidth: 40,
+              }}
+              keyboardType="numeric"
+              value={localAmount}
+              placeholder="0"
+              placeholderTextColor={theme.colors.textSecondary}
+              onChangeText={(txt) => {
+                const cleaned = txt.replace(/[^0-9]/g, '');
+                const numeric = cleaned === '' ? 0 : Number(cleaned);
+                setLocalAmount(numeric === 0 ? '' : numeric.toLocaleString('es-PY'));
+                onChangeAmount?.(numeric);
+              }}
+            />
+          </View>
+        ) : (
+          <Text style={{ fontFamily: typography.fontFamily.regular, fontSize: 11, color: theme.colors.textSecondary }}>
+            {amount > 0 ? formatPYG(Math.round(amount)) : '0'}
+          </Text>
+        )}
       </View>
     </Pressable>
   );

@@ -126,8 +126,12 @@ export default function AddExpenseScreen() {
   const walletMembers = isTeamWallet && selectedWallet ? membersByWallet[selectedWallet.id] ?? [] : [];
   
   const sumPct = watchedSplits.reduce((acc, curr) => acc + (curr.percentage ?? 0), 0);
+  const sumAmt = watchedSplits.reduce((acc, curr) => acc + (curr.amount ?? 0), 0);
   const isPercentValid = Math.abs(sumPct - 100) < 0.01;
   const isPercentMode = watchedSplitMode === 'percent';
+  const isAmountMode = watchedSplitMode === 'amount';
+  // En monto fijo, debe coincidir exactamente con watchedAmount (si hay monto > 0)
+  const isAmountValid = watchedAmount > 0 ? sumAmt === watchedAmount : true;
   const canPickPayer = isTeamWallet && walletMembers.length > 1;
   const selectedPayer = walletMembers.find((m) => m.user_id === watchedPaidBy);
   const payerName = selectedPayer
@@ -208,13 +212,38 @@ export default function AddExpenseScreen() {
     setValue('splits', updated);
   };
 
-  // Sync splits amount when watchedAmount changes in percent mode
+  const handleChangeAmt = (uid: string, amt: number) => {
+    const current = getValues('splits') ?? [];
+    let updated = [...current];
+    const idx = updated.findIndex((s) => s.user_id === uid);
+    
+    const pct = watchedAmount > 0 ? (amt / watchedAmount) * 100 : 0;
+
+    if (idx >= 0) {
+      updated[idx] = { ...updated[idx], amount: amt, percentage: pct };
+    } else {
+      updated.push({ user_id: uid, amount: amt, percentage: pct });
+    }
+    setValue('splits', updated);
+  };
+
+  // Sync splits amount/percentage when watchedAmount changes
   useEffect(() => {
-    if (watchedSplitMode === 'percent' && isTeamWallet) {
-      const current = getValues('splits') ?? [];
+    if (!isTeamWallet) return;
+    const current = getValues('splits') ?? [];
+
+    if (watchedSplitMode === 'percent') {
       const updated = current.map(s => ({
         ...s,
         amount: (watchedAmount * (s.percentage ?? 0)) / 100
+      }));
+      if (JSON.stringify(current) !== JSON.stringify(updated)) {
+        setValue('splits', updated);
+      }
+    } else if (watchedSplitMode === 'amount') {
+      const updated = current.map(s => ({
+        ...s,
+        percentage: watchedAmount > 0 ? (s.amount / watchedAmount) * 100 : 0
       }));
       if (JSON.stringify(current) !== JSON.stringify(updated)) {
         setValue('splits', updated);
@@ -237,6 +266,10 @@ export default function AddExpenseScreen() {
     }
     if (values.split_mode === 'percent' && !isPercentValid) {
       Alert.alert('Revisá los porcentajes', 'La suma de porcentajes debe ser exactamente 100%.');
+      return;
+    }
+    if (values.split_mode === 'amount' && !isAmountValid && values.amount > 0) {
+      Alert.alert('Revisá los montos', `La suma de montos debe coincidir con el total (₲ ${values.amount.toLocaleString('es-PY')}).`);
       return;
     }
     setSubmitting(true);
@@ -505,10 +538,10 @@ export default function AddExpenseScreen() {
               </View>
             </View>
 
-            {(watchedSplitMode === 'equal' || watchedSplitMode === 'percent') && walletMembers.map((m) => {
+            {walletMembers.map((m) => {
               const isIncluded = watchedSplitMode === 'equal'
                 ? watchedSplits.some((s) => s.user_id === m.user_id)
-                : true; // En percent mode siempre están listados
+                : true; // En percent/amount mode siempre están listados
               const splitData = watchedSplits.find((s) => s.user_id === m.user_id);
               const name = m.user_id === user?.id ? 'Vos' : (m.profile?.full_name ?? '?');
               return (
@@ -521,16 +554,22 @@ export default function AddExpenseScreen() {
                   isIncluded={isIncluded}
                   onToggle={watchedSplitMode === 'equal' ? () => handleToggleEqual(m.user_id) : undefined}
                   onChangePct={watchedSplitMode === 'percent' ? (pct) => handleChangePct(m.user_id, pct) : undefined}
+                  onChangeAmount={watchedSplitMode === 'amount' ? (amt) => handleChangeAmt(m.user_id, amt) : undefined}
                 />
               );
             })}
 
-            <View style={{ marginTop: 12, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: isPercentMode && !isPercentValid ? theme.colors.danger + '1A' : theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: isPercentMode && !isPercentValid ? theme.colors.danger : theme.colors.border, flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 12, color: isPercentMode && !isPercentValid ? theme.colors.danger : theme.colors.textSecondary }}>Total asignado</Text>
-              <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 12, color: isPercentMode && !isPercentValid ? theme.colors.danger : theme.colors.accent }}>
-                {isPercentMode ? Number(sumPct.toFixed(1)) : 100}% · {watchedAmount > 0 ? formatPYG(watchedAmount) : '0'}
-              </Text>
-            </View>
+            {(() => {
+              const hasError = (isPercentMode && !isPercentValid) || (isAmountMode && !isAmountValid);
+              return (
+                <View style={{ marginTop: 12, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: hasError ? theme.colors.danger + '1A' : theme.colors.background, borderRadius: 10, borderWidth: 1, borderColor: hasError ? theme.colors.danger : theme.colors.border, flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ fontFamily: typography.fontFamily.semibold, fontSize: 12, color: hasError ? theme.colors.danger : theme.colors.textSecondary }}>Total asignado</Text>
+                  <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 12, color: hasError ? theme.colors.danger : theme.colors.accent }}>
+                    {isPercentMode ? `${Number(sumPct.toFixed(1))}%` : '100%'} · {isAmountMode ? formatPYG(sumAmt) : (watchedAmount > 0 ? formatPYG(watchedAmount) : '0')}
+                  </Text>
+                </View>
+              );
+            })()}
           </View>
           )}
 
@@ -599,7 +638,7 @@ export default function AddExpenseScreen() {
             iconLeft="Check"
             onPress={handleSubmit(onSubmit)}
             loading={submitting}
-            disabled={isPercentMode && !isPercentValid}
+            disabled={(isPercentMode && !isPercentValid) || (isAmountMode && !isAmountValid)}
             style={{ flex: 2 }}
           />
         </View>
