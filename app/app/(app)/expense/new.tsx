@@ -76,6 +76,8 @@ export default function AddExpenseScreen() {
           occurred_at: existing.occurred_at,
           note: existing.note,
           paid_by: existing.paid_by,
+          split_mode: existing.split_mode || 'equal',
+          splits: [{ user_id: existing.paid_by || user?.id || '00000000-0000-0000-0000-000000000000', percentage: 100, amount: Number(existing.amount) }],
         }
       : {
           wallet_id: initialWalletId,
@@ -86,6 +88,8 @@ export default function AddExpenseScreen() {
           occurred_at: new Date().toISOString(),
           note: null,
           paid_by: user?.id,
+          split_mode: 'equal',
+          splits: user?.id ? [{ user_id: user.id, percentage: 100, amount: 0 }] : [],
         },
   });
 
@@ -100,6 +104,8 @@ export default function AddExpenseScreen() {
         occurred_at: existing.occurred_at,
         note: existing.note,
         paid_by: existing.paid_by,
+        split_mode: existing.split_mode || 'equal',
+        splits: [{ user_id: existing.paid_by || user?.id || '00000000-0000-0000-0000-000000000000', percentage: 100, amount: Number(existing.amount) }],
       });
     }
   }, [existing?.id]);
@@ -294,7 +300,7 @@ export default function AddExpenseScreen() {
           note: values.note ?? null,
           paid_by: values.paid_by,
           split_mode: values.split_mode,
-          splits: values.splits,
+          splits: isTeamWallet ? values.splits : [{ user_id: values.paid_by ?? user?.id ?? '', percentage: 100, amount: values.amount }],
         });
       }
       router.back();

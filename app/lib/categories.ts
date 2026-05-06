@@ -8,7 +8,8 @@ export type CategoryId =
   | 'entertainment'
   | 'health'
   | 'work'
-  | 'other';
+  | 'other'
+  | 'subscriptions';
 
 export interface CategoryDef {
   id: CategoryId;
@@ -26,6 +27,7 @@ export const CATEGORIES: CategoryDef[] = [
   { id: 'health',        label: 'Salud',           icon: 'Heart',           color: '#E74C3C' },
   { id: 'work',          label: 'Trabajo',         icon: 'Briefcase',       color: '#7F8C8D' },
   { id: 'other',         label: 'Otro',            icon: 'Tag',             color: '#16A085' },
+  { id: 'subscriptions', label: 'Suscripciones',   icon: 'CreditCard',      color: '#ca0fa2ff' },
 ];
 
 // ---------- Categorías de ingresos (solo wallets personales) ----------
