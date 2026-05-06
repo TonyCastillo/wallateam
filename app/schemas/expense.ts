@@ -7,7 +7,7 @@ export const newExpenseSchema = z.object({
   // category: aceptamos string libre porque income tiene su propio set (INCOME_CATEGORIES).
   // El front se encarga de presentar las categorías válidas según el `kind`.
   category: z.string().min(1, 'Categoría requerida'),
-  kind: z.enum(['expense', 'income']),
+  kind: z.enum(['expense', 'income', 'settlement']),
   occurred_at: z.string(), // ISO
   note: z.string().max(280, 'Máximo 280 caracteres').nullable().optional(),
   paid_by: z.string().uuid().optional(),

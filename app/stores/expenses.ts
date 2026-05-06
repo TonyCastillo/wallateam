@@ -1,16 +1,21 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from './auth';
-import { Expense, NewExpenseInput } from '@/lib/types';
+import { Expense, ExpenseKind, ExpenseSplit, NewExpenseInput } from '@/lib/types';
 
 interface ExpensesState {
   /** Cache: gastos por wallet_id (más recientes primero) */
   byWallet: Record<string, Expense[]>;
+  /** Cache: splits indexados por expense_id (cargados a demanda por wallet) */
+  splitsByExpense: Record<string, ExpenseSplit[]>;
   loading: boolean;
+  /** Loading separado para fetchSplitsByWallet (no comparte con loading principal) */
+  splitsLoading: boolean;
   error: string | null;
 
   fetchAll: () => Promise<void>;
   fetchByWallet: (walletId: string) => Promise<Expense[]>;
+  fetchSplitsByWallet: (walletId: string) => Promise<void>;
   create: (input: NewExpenseInput) => Promise<Expense>;
   update: (id: string, patch: Partial<NewExpenseInput>) => Promise<Expense>;
   remove: (id: string) => Promise<void>;
@@ -18,6 +23,8 @@ interface ExpensesState {
   list: (walletId: string) => Expense[];
   totals: (walletId: string) => { spent: number; income: number; count: number };
 }
+
+const VALID_KINDS: Set<ExpenseKind> = new Set(['expense', 'income', 'settlement']);
 
 const EMPTY_LIST: Expense[] = [];
 
@@ -43,16 +50,27 @@ function setupRealtimeOnce() {
  * cuando el driver no convierte). Aplicar a `amount` siempre.
  */
 function normalizeExpense(raw: Expense): Expense {
+  const kind = (raw.kind && VALID_KINDS.has(raw.kind) ? raw.kind : 'expense') as ExpenseKind;
   return {
     ...raw,
     amount: Number(raw.amount),
-    kind: raw.kind === 'income' ? 'income' : 'expense',
+    kind,
+  };
+}
+
+function normalizeSplit(raw: ExpenseSplit): ExpenseSplit {
+  return {
+    ...raw,
+    amount: Number(raw.amount),
+    percentage: raw.percentage === null ? null : Number(raw.percentage),
   };
 }
 
 export const useExpenses = create<ExpensesState>((set, get) => ({
   byWallet: {},
+  splitsByExpense: {},
   loading: false,
+  splitsLoading: false,
   error: null,
 
   fetchAll: async () => {
@@ -99,6 +117,48 @@ export const useExpenses = create<ExpensesState>((set, get) => ({
       const msg = err instanceof Error ? err.message : 'Error cargando gastos';
       set({ error: msg, loading: false });
       return [];
+    }
+  },
+
+  /**
+   * Carga los splits de todos los expenses de una wallet. Indispensable para
+   * calcular el balance del grupo en wallets team. Llama a la tabla
+   * expense_splits filtrando por los expense_ids ya cacheados (o haciendo un
+   * fetch previo de expenses si la cache está vacía).
+   */
+  fetchSplitsByWallet: async (walletId) => {
+    set({ splitsLoading: true });
+    try {
+      let expenseIds = (get().byWallet[walletId] ?? []).map((e) => e.id);
+      if (expenseIds.length === 0) {
+        const list = await get().fetchByWallet(walletId);
+        expenseIds = list.map((e) => e.id);
+      }
+      if (expenseIds.length === 0) {
+        set({ splitsLoading: false });
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('expense_splits')
+        .select('*')
+        .in('expense_id', expenseIds);
+      if (error) throw error;
+
+      const grouped: Record<string, ExpenseSplit[]> = {};
+      (data ?? []).forEach((row) => {
+        const sp = normalizeSplit(row as ExpenseSplit);
+        grouped[sp.expense_id] ??= [];
+        grouped[sp.expense_id].push(sp);
+      });
+
+      set((s) => ({
+        splitsByExpense: { ...s.splitsByExpense, ...grouped },
+        splitsLoading: false,
+      }));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error cargando splits';
+      set({ error: msg, splitsLoading: false });
     }
   },
 

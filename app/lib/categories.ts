@@ -58,12 +58,15 @@ export function incomeCategoryById(id: string | null | undefined): IncomeCategor
 }
 
 /**
- * Resuelve cualquier id de categoría sin importar si es de gasto o ingreso.
- * Útil para componentes que renderizan ambos tipos en una lista mezclada (ExpenseRow).
+ * Resuelve cualquier id de categoría sin importar el tipo de transacción.
+ * - 'income' → INCOME_CATEGORIES (Salario, Freelance, ...)
+ * - 'expense' / 'settlement' → CATEGORIES (Comida, Transporte, ...)
+ *   (settlement no tiene categorías propias; se renderiza con el set de gastos
+ *   pero típicamente no se muestra en el listado principal — ver Fase 6.04).
  */
 export function anyCategoryById(
   id: string | null | undefined,
-  kind: 'expense' | 'income',
+  kind: 'expense' | 'income' | 'settlement',
 ): CategoryDef | IncomeCategoryDef {
   return kind === 'income' ? incomeCategoryById(id) : categoryById(id);
 }

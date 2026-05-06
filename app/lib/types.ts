@@ -66,10 +66,13 @@ export type SplitMode = 'equal' | 'percent' | 'amount';
 /**
  * Tipo de transacción en la tabla `expenses`. Se mantiene el nombre de tabla por
  * legacy / no romper RLS y RPC; semánticamente la tabla es "transactions".
- *   - 'expense' → resta del saldo (gasto)
- *   - 'income'  → suma al saldo (ingreso, ej: sueldo) — solo en wallets personales por ahora
+ *   - 'expense'    → resta del saldo (gasto). Aplica a personal y team.
+ *   - 'income'     → suma al saldo (ingreso, ej: sueldo). Solo wallets personales.
+ *   - 'settlement' → pago entre miembros para saldar deudas. Solo wallets team.
+ *                    Matemáticamente equivalente a 'expense' (paid_by suma, split.user_id resta)
+ *                    pero filtrado del listado de gastos para no confundir.
  */
-export type ExpenseKind = 'expense' | 'income';
+export type ExpenseKind = 'expense' | 'income' | 'settlement';
 
 export interface ExpenseSplit {
   expense_id: string;

@@ -6,8 +6,13 @@ import { IconBox } from './IconBox';
 
 interface Props {
   visible: boolean;
-  /** Set de categorías a mostrar. 'expense' (default) usa CATEGORIES, 'income' usa INCOME_CATEGORIES. */
-  kind?: 'expense' | 'income';
+  /**
+   * Set de categorías a mostrar. 'expense' (default) y 'settlement' usan CATEGORIES,
+   * 'income' usa INCOME_CATEGORIES. (Settlements no requieren categoría visible al
+   * usuario — el picker no se abre desde el flujo de saldar — pero el tipo lo soporta
+   * para mantener consistencia con ExpenseKind.)
+   */
+  kind?: 'expense' | 'income' | 'settlement';
   selected: string | null;
   onSelect: (id: string) => void;
   onClose: () => void;

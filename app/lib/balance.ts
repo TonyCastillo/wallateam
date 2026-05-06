@@ -1,4 +1,8 @@
+import { useEffect, useMemo } from 'react';
 import type { Expense, ExpenseSplit } from './types';
+import { useWallets } from '@/stores/wallets';
+import { useExpenses } from '@/stores/expenses';
+import { useAuth } from '@/stores/auth';
 
 /**
  * Saldo neto de un miembro dentro de una wallet team.
@@ -135,3 +139,102 @@ export function balanceStatus(net: number, tolerance = 1): BalanceStatus {
 export function isFullySettled(nets: MemberNet[], tolerance = 1): boolean {
   return nets.every((n) => Math.abs(n.net) <= tolerance);
 }
+
+// ----------------------------------------------------------------------------
+// Hook React que conecta el algoritmo con los stores de Zustand
+// ----------------------------------------------------------------------------
+
+export interface BalanceResult {
+  /** Saldos por miembro, ordenados desc. Incluye miembros sin movimientos (net=0). */
+  nets: MemberNet[];
+  /** Transferencias mínimas necesarias para que todos queden en 0. */
+  transfers: Transfer[];
+  /** Saldo del usuario actual. 0 si no está en la wallet o no hay movimientos. */
+  myNet: number;
+  /** True si todos los miembros están en 0 (no hay deudas pendientes). */
+  isSettled: boolean;
+  /** True mientras se cargan los splits de la wallet. */
+  loading: boolean;
+}
+
+const EMPTY_NETS: MemberNet[] = [];
+const EMPTY_TRANSFERS: Transfer[] = [];
+const EMPTY_EXPENSES: Expense[] = [];
+const EMPTY_SPLITS_INDEX: Record<string, ExpenseSplit[]> = {};
+
+/**
+ * Hook que devuelve el balance del grupo para una wallet team. Hace fetch
+ * automático de splits + miembros si no están cacheados.
+ *
+ * Para wallets type='personal' devuelve estado vacío (no aplica el concepto).
+ *
+ * Renderiza con datos parciales mientras carga: si los expenses ya están en
+ * cache pero los splits no, devuelve nets=[] hasta que llegan los splits
+ * (no hay manera correcta de calcular saldos sin los splits reales).
+ */
+export function useBalance(walletId: string | undefined): BalanceResult {
+  const userId = useAuth((s) => s.user?.id);
+  const wallet = useWallets((s) => (walletId ? s.byId(walletId) : undefined));
+  const members = useWallets((s) => (walletId ? s.membersByWallet[walletId] : undefined));
+  const fetchMembers = useWallets((s) => s.fetchMembers);
+  const expenses = useExpenses((s) => (walletId ? s.byWallet[walletId] : undefined)) ?? EMPTY_EXPENSES;
+  const splitsByExpense = useExpenses((s) => s.splitsByExpense);
+  const fetchSplitsByWallet = useExpenses((s) => s.fetchSplitsByWallet);
+  const splitsLoading = useExpenses((s) => s.splitsLoading);
+
+  // Auto-fetch de splits al montar / cambiar wallet
+  useEffect(() => {
+    if (walletId && wallet?.type === 'team') {
+      fetchSplitsByWallet(walletId);
+    }
+  }, [walletId, wallet?.type, fetchSplitsByWallet]);
+
+  // Auto-fetch de miembros si no están en cache
+  useEffect(() => {
+    if (walletId && wallet?.type === 'team' && (!members || members.length === 0)) {
+      fetchMembers(walletId);
+    }
+  }, [walletId, wallet?.type, members, fetchMembers]);
+
+  return useMemo<BalanceResult>(() => {
+    if (!walletId || wallet?.type !== 'team') {
+      return {
+        nets: EMPTY_NETS,
+        transfers: EMPTY_TRANSFERS,
+        myNet: 0,
+        isSettled: true,
+        loading: false,
+      };
+    }
+
+    // Filtrar splits relevantes (los del store son globales por expense_id)
+    const relevantSplits: Record<string, ExpenseSplit[]> = {};
+    for (const exp of expenses) {
+      if (splitsByExpense[exp.id]) {
+        relevantSplits[exp.id] = splitsByExpense[exp.id];
+      }
+    }
+
+    const computed = computeNets(expenses, relevantSplits);
+
+    // Augment: miembros sin movimientos aparecen con net=0
+    const present = new Set(computed.map((n) => n.user_id));
+    const missing: MemberNet[] = (members ?? [])
+      .filter((m) => !present.has(m.user_id))
+      .map((m) => ({ user_id: m.user_id, net: 0 }));
+
+    const allNets = [...computed, ...missing].sort((a, b) => b.net - a.net);
+
+    return {
+      nets: allNets,
+      transfers: simplifyDebts(allNets),
+      myNet: userId ? allNets.find((n) => n.user_id === userId)?.net ?? 0 : 0,
+      isSettled: isFullySettled(allNets),
+      loading: splitsLoading,
+    };
+  }, [walletId, wallet?.type, userId, expenses, splitsByExpense, members, splitsLoading]);
+}
+
+// EMPTY_SPLITS_INDEX exportado para usuarios externos del módulo que necesiten
+// pasar un map vacío a computeNets sin crear refs nuevas en cada render.
+export { EMPTY_SPLITS_INDEX };

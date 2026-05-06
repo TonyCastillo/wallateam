@@ -344,6 +344,17 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Validaciones footer: 2/2 items (sumas perfectas).
 - 🧠 Desviaciones: Ninguna. Todo validado contra el mock y ADR-012.
 
+## [06.02] 2026-05-05 — useBalance hook + fetchSplits + ampliar ExpenseKind
+
+- ✅ `app/lib/types.ts`: `ExpenseKind` ampliado con `'settlement'` (preparación para 06.04).
+- ✅ `app/stores/expenses.ts`: agregado `splitsByExpense` (cache), `splitsLoading` (flag) y `fetchSplitsByWallet(walletId)` (carga splits desde Supabase con `.in('expense_id', ids)` reusando expenses cacheados). `normalizeExpense` ahora preserva el kind de la DB en lugar de forzarlo a 'expense' (validando contra `VALID_KINDS`). Agregado `normalizeSplit` con cast a Number para amount/percentage.
+- ✅ `app/lib/balance.ts`: hook `useBalance(walletId)` que conecta los stores con el algoritmo. Solo opera para wallets `type='team'`; para personal devuelve estado vacío. Auto-fetch de splits y miembros al montar. Augmenta los nets con miembros sin movimientos (net=0). Devuelve `{nets, transfers, myNet, isSettled, loading}`.
+- ✅ `app/lib/categories.ts`: `anyCategoryById` acepta `kind: 'expense' | 'income' | 'settlement'` (settlement usa CATEGORIES por default).
+- ✅ `app/components/CategoryPicker.tsx`: prop `kind` ampliado a 'settlement' (no se va a abrir desde saldar pero el tipo lo soporta).
+- ✅ `app/schemas/expense.ts`: enum `kind` ampliado con 'settlement'.
+- 📁 Tocados: `app/lib/{balance,types,categories}.ts`, `app/stores/expenses.ts`, `app/components/CategoryPicker.tsx`, `app/schemas/expense.ts`.
+- 🧪 Verificación: `npm run typecheck` limpio.
+
 ## [06.01] 2026-05-05 — Algoritmo de balance y simplificación de deudas
 
 - ✅ `app/lib/balance.ts` (NUEVO): funciones puras `computeNets()` y `simplifyDebts()` + helpers `balanceStatus()` / `isFullySettled()`.
