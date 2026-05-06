@@ -344,6 +344,15 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Validaciones footer: 2/2 items (sumas perfectas).
 - 🧠 Desviaciones: Ninguna. Todo validado contra el mock y ADR-012.
 
+## [06.01] 2026-05-05 — Algoritmo de balance y simplificación de deudas
+
+- ✅ `app/lib/balance.ts` (NUEVO): funciones puras `computeNets()` y `simplifyDebts()` + helpers `balanceStatus()` / `isFullySettled()`.
+- ✅ `computeNets(expenses, splitsByExpense)`: itera expenses con `kind in {'expense','settlement'}` (ignora 'income'), suma al `paid_by` y resta a cada `split.user_id`. Devuelve `MemberNet[]` ordenado desc por net (acreedores primero). Redondeo a entero (PYG sin decimales).
+- ✅ `simplifyDebts(nets)`: greedy clásico (mayor acreedor + mayor deudor → transferir min, repetir). Tolerancia de 1 G para evitar transferencias residuales por redondeo de splits porcentuales (ej: 33.33% × 100k = 33.333,33 → 33.333 deja 1 G huérfano).
+- ✅ Sin dependencias nuevas. Sin acoplamiento a stores ni a React.
+- 📁 Tocados: `app/lib/balance.ts`.
+- 🧪 Verificación: `npm run typecheck` limpio. Sanity check mental con ejemplo de 3 miembros (A paga 90k split equal entre 3, simplifyDebts produce 2 transferencias B→A y C→A por 30k cada una).
+
 ## [05.99] 2026-05-05 — Fase 5 (Splits) cerrada ✅
 - ✅ `npm run typecheck` limpio. Fix puntual: `split_mode` en `schemas/expense.ts` quitado el `.default('equal')` para alinear input/output type del Resolver de react-hook-form (mismo patrón aplicado en su momento a `kind`; ver ADR-013). El default sigue viviendo en `defaultValues` del form.
 - ✅ Recap funcional Fase 5: `expenses` soporta multi-split atómico vía RPC v2 (`expenses_rpc_v2.sql`, jsonb), schema/types con array de splits validado, UI con toggle `=`/`%`/`₲` en `expense/new`, componente `SplitRow` interactivo con barra de porcentaje y formateo PYG, validaciones strict de sumas (% = 100 / ₲ = total) que bloquean el submit, sección "Cómo dividir" oculta en wallets personales y en ingresos por design.
