@@ -19,13 +19,16 @@ import { useWallets } from '@/stores/wallets';
 import { useExpenses } from '@/stores/expenses';
 import { useAuth } from '@/stores/auth';
 import { useWalletMetrics } from '@/lib/walletMetrics';
-import { fmtGs } from '@/lib/format';
-import { Expense, WalletMember } from '@/lib/types';
+import { fmtGs, fmtGsSigned } from '@/lib/format';
+import { Expense, WalletMember, Wallet } from '@/lib/types';
 import { WALLET_ICONS } from '@/lib/walletIcons';
 import { Icon, IconName } from '@/components/Icon';
 import { Tabs } from '@/components/Tabs';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Metric } from '@/components/Metric';
+import { BalanceLine } from '@/components/BalanceLine';
+import { TransferLine } from '@/components/TransferLine';
+import { useBalance } from '@/lib/balance';
 import { EmptyExpenses } from '@/components/EmptyExpenses';
 import { ExpenseRow } from '@/components/ExpenseRow';
 import { ConfirmDeleteSheet } from '@/components/ConfirmDeleteSheet';
@@ -293,6 +296,106 @@ function MembersTab({ walletId, walletName }: { walletId: string; walletName: st
 }
 
 // ----------------------------------------------------------------------------
+// ResumenTab: tab Resumen del Detalle. Usa useBalance.
+// ----------------------------------------------------------------------------
+function ResumenTab({ wallet, members }: { wallet: Wallet; members: WalletMember[] }) {
+  const { theme } = useTheme();
+  const currentUserId = useAuth((s) => s.user?.id);
+  const { nets, transfers, myNet, isSettled, loading } = useBalance(wallet.id);
+
+  if (wallet.type === 'personal') {
+    return (
+      <ScrollView contentContainerStyle={{ padding: 24, alignItems: 'center', gap: 12 }}>
+        <Text
+          style={{
+            color: theme.colors.textPrimary,
+            fontSize: 16,
+            fontFamily: typography.fontFamily.semibold,
+          }}
+        >
+          Próximamente — Fase 8
+        </Text>
+        <Text
+          style={{
+            color: theme.colors.textSecondary,
+            fontSize: 13,
+            fontFamily: typography.fontFamily.regular,
+            textAlign: 'center',
+          }}
+        >
+          Vas a poder ver gráficos y resumen mensual de tus gastos.
+        </Text>
+      </ScrollView>
+    );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100, gap: 24 }}>
+      {/* Saldo del usuario actual */}
+      <View style={{ alignItems: 'center', marginVertical: 12 }}>
+        <Text style={{ color: theme.colors.textSecondary, fontSize: 11, fontFamily: typography.fontFamily.medium, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+          TU SALDO
+        </Text>
+        <Text style={{ color: myNet > 0 ? theme.colors.accent : myNet < 0 ? theme.colors.danger : theme.colors.textPrimary, fontSize: 32, fontFamily: typography.fontFamily.bold }}>
+          {fmtGsSigned(myNet)}
+        </Text>
+      </View>
+
+      {/* Balance del grupo */}
+      <View>
+        <Text style={{ color: theme.colors.textSecondary, fontSize: 11, fontFamily: typography.fontFamily.medium, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
+          BALANCE DEL GRUPO
+        </Text>
+        {loading && nets.length === 0 ? (
+          <ActivityIndicator color={theme.colors.primary} style={{ alignSelf: 'flex-start' }} />
+        ) : (
+          nets.map((net) => {
+            const member = members.find(m => m.user_id === net.user_id);
+            const name = net.user_id === currentUserId ? 'Vos' : (member?.profile?.full_name ?? '?');
+            return <BalanceLine key={net.user_id} name={name} net={net.net} />;
+          })
+        )}
+      </View>
+
+      {/* Transferencias necesarias */}
+      <View>
+        <Text style={{ color: theme.colors.textSecondary, fontSize: 11, fontFamily: typography.fontFamily.medium, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 12 }}>
+          TRANSFERENCIAS NECESARIAS
+        </Text>
+        {loading && transfers.length === 0 ? (
+          <ActivityIndicator color={theme.colors.primary} style={{ alignSelf: 'flex-start' }} />
+        ) : isSettled ? (
+          <View style={{ padding: 16, borderRadius: 14, backgroundColor: theme.colors.surface, alignItems: 'center' }}>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: 13, fontFamily: typography.fontFamily.medium }}>
+              ¡Todo saldado! Nadie debe nada.
+            </Text>
+          </View>
+        ) : (
+          transfers.map((t, idx) => {
+            const fromMember = members.find(m => m.user_id === t.from);
+            const toMember = members.find(m => m.user_id === t.to);
+            const fromName = t.from === currentUserId ? 'Vos' : (fromMember?.profile?.full_name ?? '?');
+            const toName = t.to === currentUserId ? 'Vos' : (toMember?.profile?.full_name ?? '?');
+            const isCurrentUserInvolved = t.from === currentUserId || t.to === currentUserId;
+            
+            return (
+              <TransferLine
+                key={idx}
+                fromName={fromName}
+                toName={toName}
+                amount={t.amount}
+                isCurrentUserInvolved={isCurrentUserInvolved}
+                onSettle={() => Alert.alert('Saldar deuda', 'Próximamente...')}
+              />
+            );
+          })
+        )}
+      </View>
+    </ScrollView>
+  );
+}
+
+// ----------------------------------------------------------------------------
 // WalletDetailScreen
 // ----------------------------------------------------------------------------
 export default function WalletDetailScreen() {
@@ -556,29 +659,7 @@ export default function WalletDetailScreen() {
       {/* Contenido por tab — cada uno maneja su propio scroll */}
       <View style={{ flex: 1 }}>
         {tab === 'gastos' && <ExpensesList walletId={wallet.id} />}
-        {tab === 'resumen' && (
-          <ScrollView contentContainerStyle={{ padding: 24, alignItems: 'center', gap: 12 }}>
-            <Text
-              style={{
-                color: theme.colors.textPrimary,
-                fontSize: 16,
-                fontFamily: typography.fontFamily.semibold,
-              }}
-            >
-              Próximamente — Fase 8
-            </Text>
-            <Text
-              style={{
-                color: theme.colors.textSecondary,
-                fontSize: 13,
-                fontFamily: typography.fontFamily.regular,
-                textAlign: 'center',
-              }}
-            >
-              Vas a poder ver gráficos y resumen mensual de tus gastos.
-            </Text>
-          </ScrollView>
-        )}
+        {tab === 'resumen' && <ResumenTab wallet={wallet} members={members} />}
         {tab === 'miembros' && <MembersTab walletId={wallet.id} walletName={wallet.name} />}
       </View>
 

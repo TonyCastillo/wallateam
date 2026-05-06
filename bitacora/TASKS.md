@@ -31,6 +31,7 @@
 - [ ] Re-correr `app/supabase/policies.sql` (policy `exp_insert` actualizada para soportar paid_by != auth.uid)
 - [ ] Correr `app/supabase/incomes_migration.sql` (alter table expenses add column kind) — polish 2026-05-05
 - [ ] Re-correr `app/supabase/expenses_rpc.sql` (parámetro `p_kind` en `create_expense_with_split`) — polish 2026-05-05
+- [ ] Correr `app/supabase/balance_migration.sql` (kind='settlement' en check) — Fase 6
 
 ### Fases 5-8 (a planificar al cerrar la previa)
 - [ ] [Fase 6] Balance del grupo (cálculo deudas, saldar)
