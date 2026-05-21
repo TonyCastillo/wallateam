@@ -97,7 +97,25 @@ export default function AddExpenseScreen() {
         },
   });
 
-  // Fetch splits if editing and they aren't loaded
+  const watchedWalletId = watch('wallet_id');
+  const watchedCategory = watch('category');
+  const watchedKind = watch('kind');
+  const watchedOccurredAt = watch('occurred_at');
+  const watchedAmount = watch('amount');
+  const watchedPaidBy = watch('paid_by');
+  const watchedSplitMode = watch('split_mode');
+  const watchedSplits = watch('splits') ?? [];
+
+  const selectedWallet = wallets.find((w) => w.id === watchedWalletId)
+    ?? allWallets.find((w) => w.id === watchedWalletId);
+  const isIncome = watchedKind === 'income';
+  const selectedCategoryDef = anyCategoryById(watchedCategory, watchedKind);
+  const expenseDate = new Date(watchedOccurredAt);
+  const isTeamWallet = selectedWallet?.type === 'team';
+  const isPersonalWallet = selectedWallet?.type === 'personal';
+  const showKindToggle = isPersonalWallet && !isEdit;
+  const walletMembers = isTeamWallet && selectedWallet ? membersByWallet[selectedWallet.id] ?? [] : [];
+
   useEffect(() => {
     if (isEdit && isTeamWallet && selectedWallet?.id && (!existingSplits || existingSplits.length === 0)) {
       useExpenses.getState().fetchSplitsByWallet(selectedWallet.id);
@@ -124,27 +142,6 @@ export default function AddExpenseScreen() {
       });
     }
   }, [existing?.id, existingSplits]);
-
-  const watchedWalletId = watch('wallet_id');
-  const watchedCategory = watch('category');
-  const watchedKind = watch('kind');
-  const watchedOccurredAt = watch('occurred_at');
-  const watchedAmount = watch('amount');
-  const watchedPaidBy = watch('paid_by');
-  const watchedSplitMode = watch('split_mode');
-  const watchedSplits = watch('splits') ?? [];
-
-  const selectedWallet = wallets.find((w) => w.id === watchedWalletId)
-    ?? allWallets.find((w) => w.id === watchedWalletId);
-  const isIncome = watchedKind === 'income';
-  const selectedCategoryDef = anyCategoryById(watchedCategory, watchedKind);
-  const expenseDate = new Date(watchedOccurredAt);
-  const isTeamWallet = selectedWallet?.type === 'team';
-  const isPersonalWallet = selectedWallet?.type === 'personal';
-  // El toggle Gasto/Ingreso solo aplica a wallets personales y no en modo edit
-  // (mantenemos el kind original al editar para no romper supuestos del usuario).
-  const showKindToggle = isPersonalWallet && !isEdit;
-  const walletMembers = isTeamWallet && selectedWallet ? membersByWallet[selectedWallet.id] ?? [] : [];
   
   const sumPct = watchedSplits.reduce((acc, curr) => acc + (curr.percentage ?? 0), 0);
   const sumAmt = watchedSplits.reduce((acc, curr) => acc + (curr.amount ?? 0), 0);

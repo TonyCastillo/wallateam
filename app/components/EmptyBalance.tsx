@@ -45,7 +45,7 @@ export function EmptyBalance({ variant, onInvite }: Props) {
   if (variant === 'no-expenses') {
     return (
       <View style={{ alignItems: 'center', paddingVertical: 40, paddingHorizontal: 24, gap: 16 }}>
-        <IconBox name="Receipt" size={64} color={theme.colors.primary} />
+        <IconBox iconName="Receipt" size={64} color={theme.colors.primary} />
         <View style={{ alignItems: 'center', gap: 6 }}>
           <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 18, color: theme.colors.textPrimary, textAlign: 'center', letterSpacing: -0.5 }}>
             Sin gastos
@@ -61,7 +61,7 @@ export function EmptyBalance({ variant, onInvite }: Props) {
   if (variant === 'no-members') {
     return (
       <View style={{ alignItems: 'center', paddingVertical: 40, paddingHorizontal: 24, gap: 16 }}>
-        <IconBox name="Users" size={64} color={theme.colors.primary} />
+        <IconBox iconName="Users" size={64} color={theme.colors.primary} />
         <View style={{ alignItems: 'center', gap: 6 }}>
           <Text style={{ fontFamily: typography.fontFamily.bold, fontSize: 18, color: theme.colors.textPrimary, textAlign: 'center', letterSpacing: -0.5 }}>
             Empezá a compartir

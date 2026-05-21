@@ -13,13 +13,8 @@
 
 ## Pendiente
 
-### Fase 6 — Balance (a planificar)
-- [ ] [Fase 6] 00 — Overview + diseño de prompt-pack (módulos 01..06 + 99)
-- [ ] [Fase 6] Algoritmo de simplificación de deudas (minimizar transacciones)
-- [ ] [Fase 6] UI tab "Balance del grupo" en Wallet Detail team
-- [ ] [Fase 6] Flujo "Marcar como saldado"
-- [ ] [Fase 6] Empty states y edge cases
-- [ ] [Fase 6] Cierre
+### Fase 6 — Balance (en cierre)
+- [ ] [Fase 6] 99 — Cerrar fase (smoke test E2E 3 cuentas + commit)
 
 ### Fase 1.5 (deferred)
 - [ ] [Fase 1.5] Google OAuth real (config Google Cloud + Supabase OAuth provider)
@@ -42,6 +37,7 @@
 
 ## Done
 
+- ✅ [Fase 6] 06 — Validación visual contra mock + fixes typecheck (2026-05-20)
 - ✅ [Fase 6] 05 — Empty states y edge cases (2026-05-06)
 - ✅ [Fase 6] 04 — Flujo "Marcar como saldado" (2026-05-06)
 - ✅ [Fase 6] 03 — Tab Resumen UI (2026-05-06)

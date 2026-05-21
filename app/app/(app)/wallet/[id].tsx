@@ -393,7 +393,7 @@ function ResumenTab({ wallet, members }: { wallet: Wallet; members: WalletMember
         <Text style={{ color: theme.colors.textSecondary, fontSize: 11, fontFamily: typography.fontFamily.medium, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
           TU SALDO
         </Text>
-        <Text style={{ color: myNet > 0 ? theme.colors.accent : myNet < 0 ? theme.colors.danger : theme.colors.textPrimary, fontSize: 32, fontFamily: typography.fontFamily.bold }}>
+        <Text style={{ color: myNet > 0 ? theme.colors.accent : myNet < 0 ? theme.colors.danger : theme.colors.textPrimary, fontSize: 22, fontFamily: typography.fontFamily.bold }}>
           {fmtGsSigned(myNet)}
         </Text>
       </View>

@@ -15,22 +15,20 @@ export function BalanceLine({ name, net }: Props) {
   const isPositive = net > 0;
   const isNegative = net < 0;
   const amountColor = isPositive ? theme.colors.accent : (isNegative ? theme.colors.danger : theme.colors.textSecondary);
-  
+  const avatarBg = isPositive ? theme.colors.primary : theme.colors.secondary;
+
   let sublabel = 'saldado';
   if (isPositive) sublabel = 'te deben';
   if (isNegative) sublabel = 'debés';
-  // Si no soy el current user, el texto debe ser genérico o podemos dejarlo como está si es genérico.
-  // Wait, el mock dice "te deben" / "debés" si el usuario es "Vos". Para otros usuarios sería "le deben" / "debe".
-  // Pero vamos a dejar la lógica de UI por ahora según el prompt, se puede ajustar después.
 
   return (
     <View style={{
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
+      gap: 10,
       paddingVertical: 10,
     }}>
-      <Avatar name={name} size={28} />
+      <Avatar name={name} size={28} bg={avatarBg} />
       <Text style={{
         flex: 1,
         fontFamily: typography.fontFamily.medium,

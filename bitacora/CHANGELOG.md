@@ -392,3 +392,14 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Se agregó el llamado a `InviteSheet` desde el empty state de "no-members" para incentivar la colaboración.
 - ✅ Mejorada la experiencia de carga de la pestaña "Resumen", reemplazando los ActivityIndicators simples por Skeletons animables.
 - 📁 Tocados: `app/components/EmptyBalance.tsx`, `app/app/(app)/wallet/[id].tsx`
+
+## [06.06] 2026-05-20 — Validación visual contra mock
+- ✅ `BalanceLine.tsx`: `Avatar` recibe `bg` condicional (primary si net>0, secondary si net≤0) replicando el mock JSX. Gap del row 12 → 10. Limpieza de comentarios dump.
+- ✅ `TransferLine.tsx`: icono `ArrowRight` size 14 → 16. Texto del botón "Saldar" → "Marcar como saldado" (microcopy literal del checklist).
+- ✅ `wallet/[id].tsx` `ResumenTab`: monto del header "TU SALDO" fontSize 32 → 22 (alineado al checklist).
+- 🛠️ Fix incidentales de typecheck (preexistentes, bloqueaban el smoke test del 06.99):
+  - `EmptyBalance.tsx`: prop incorrecta `name` → `iconName` en los dos usos de `IconBox` (variants `no-expenses` y `no-members`).
+  - `expense/new.tsx`: reordenadas las derivadas `selectedWallet` / `isTeamWallet` / `walletMembers` para que se declaren ANTES de los `useEffect` que las usan en dependency arrays (eliminado el TS2448 "used before declaration"). Sin cambio de comportamiento.
+- 📁 Tocados: `app/components/BalanceLine.tsx`, `app/components/TransferLine.tsx`, `app/components/EmptyBalance.tsx`, `app/app/(app)/wallet/[id].tsx`, `app/app/(app)/expense/new.tsx`.
+- 🧪 Verificación: `npm run typecheck` limpio.
+- ⚠️ Validación visual final en Expo Go pendiente del smoke test E2E del 06.99 (requiere 3 cuentas y los SQL aplicados en Supabase, incluyendo `balance_migration.sql`).

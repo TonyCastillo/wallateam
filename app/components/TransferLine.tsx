@@ -31,7 +31,7 @@ export function TransferLine({ fromName, toName, amount, isCurrentUserInvolved, 
     }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
         <Avatar name={fromName} size={24} />
-        <Icon name="ArrowRight" size={14} color={theme.colors.textSecondary} />
+        <Icon name="ArrowRight" size={16} color={theme.colors.textSecondary} />
         <Avatar name={toName} size={24} />
       </View>
       <View style={{ flex: 1 }}>
@@ -58,7 +58,7 @@ export function TransferLine({ fromName, toName, amount, isCurrentUserInvolved, 
             fontSize: 11,
             color: theme.colors.accent,
           }}>
-            Saldar
+            Marcar como saldado
           </Text>
         </Pressable>
       )}
