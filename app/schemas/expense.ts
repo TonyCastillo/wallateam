@@ -16,7 +16,7 @@ export const newExpenseSchema = z.object({
     user_id: z.string().uuid(),
     percentage: z.number().nullable().optional(),
     amount: z.number().nonnegative(),
-  })).min(1, 'Debe haber al menos un split'),
+  })),
 });
 
 export type NewExpenseForm = z.infer<typeof newExpenseSchema>;

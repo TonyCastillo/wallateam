@@ -371,3 +371,24 @@ Fix transversal previo al cierre de Fase 4. Dos bloques:
 - ✅ Próxima fase: 06-fase-balance (algoritmo de simplificación de deudas en wallets team).
 - 📁 Tocados: `app/schemas/expense.ts`, `bitacora/{STATE,CHANGELOG,TASKS}.md`.
 - ⚠️ Sigue pendiente al usuario: aplicar todo el SQL acumulado en Supabase Dashboard antes de cualquier prueba en Expo Go o build APK (lista en STATE.md).
+
+## [06.03] 2026-05-06 — Tab Resumen UI
+- ✅ Creados `BalanceLine.tsx` y `TransferLine.tsx`.
+- ✅ Actualizado `wallet/[id].tsx` para usar `useBalance` en `ResumenTab`.
+- ✅ En personal, mensaje de 'Próximamente', en team se muestran los balances de grupo y deudas.
+- ✅ Fix temporal añadido (bugfix) por fallos silenciosos de validación en gastos personales debidos a defaults faltantes.
+
+## [06.04] 2026-05-06 — Flujo "Marcar como saldado"
+- ✅ Creado el componente Bottom Sheet `SaldarSheet.tsx` para confirmar el monto del pago interno.
+- ✅ Conectado `TransferLine` a `SaldarSheet` a través del estado en la tab Resumen.
+- ✅ Al confirmar se guarda un `Expense` con `kind: 'settlement'`.
+- ✅ Se ocultan los movimientos de tipo `'settlement'` de la lista principal de la pestaña de "Gastos".
+- ✅ `DECISIONS.md` actualizado con el ADR-015 para formalizar la elección técnica.
+- 📁 Tocados: `app/components/SaldarSheet.tsx`, `app/app/(app)/wallet/[id].tsx`, `bitacora/DECISIONS.md`
+
+## [06.05] 2026-05-06 — Empty states y edge cases
+- ✅ Creado el componente `EmptyBalance.tsx` para manejar los 3 estados: `no-members`, `no-expenses`, `all-settled`.
+- ✅ Integrados los empty states en la pestaña Resumen (`ResumenTab`) de `wallet/[id].tsx`.
+- ✅ Se agregó el llamado a `InviteSheet` desde el empty state de "no-members" para incentivar la colaboración.
+- ✅ Mejorada la experiencia de carga de la pestaña "Resumen", reemplazando los ActivityIndicators simples por Skeletons animables.
+- 📁 Tocados: `app/components/EmptyBalance.tsx`, `app/app/(app)/wallet/[id].tsx`

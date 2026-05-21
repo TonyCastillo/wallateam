@@ -237,7 +237,7 @@ export default function CreateWallet() {
             )}
 
             {/* Nombre */}
-            <SectionLabel text="Nombre" />
+            <SectionLabel text="Nombre de la Wallet o Billetera" />
             <Controller
               control={control}
               name="name"
@@ -249,7 +249,7 @@ export default function CreateWallet() {
                       {value.length}/40
                     </Text>
                   }
-                  placeholder="Viaje en familia, Hogar, Ahorros..."
+                  placeholder="Viaje en familia, Gastos del Hogar, Ahorros..."
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}

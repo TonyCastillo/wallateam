@@ -140,4 +140,15 @@
 - La inserción de los N splits sigue siendo atómica junto con el expense.
 - El usuario debe correr `app/supabase/expenses_rpc_v2.sql` en Supabase Dashboard.
 
+## ADR-015 · Uso de `kind='settlement'` en `expenses` para registrar pagos entre miembros
+
+**Fecha:** 2026-05-06
+**Contexto:** En la Fase 6 (Balance), los usuarios necesitan poder registrar "transferencias" o pagos para saldar deudas calculadas por el algoritmo de simplificación de saldos. Este registro reduce la deuda entre dos miembros, afectando la métrica de neto individual, pero no se trata de un gasto del equipo que altere las métricas globales de "Gastado" y "Restante" del presupuesto del equipo.
+**Decisión:** Se introduce el valor `'settlement'` para la columna `kind` en la tabla `expenses` y se actualiza la constraínt `expenses_kind_check`. La app filtra los `settlement` para no mostrarlos en la lista general de gastos. Sin embargo, dado que usan la misma estructura de `expenses` y `expense_splits`, el hook `useBalance` los carga y el algoritmo `computeNets` los trata matemáticamente igual que a los gastos: el pagador suma un crédito, y el receptor del split suma un débito por el monto transferido, equilibrando los saldos netos resultantes de las deudas del equipo.
+**Consecuencias:**
+- El balance en la pestaña "Resumen" se actualiza dinámicamente y en tiempo real con las transferencias.
+- No ensucia el historial de "Gastos" real del equipo.
+- Requiere ejecutar `app/supabase/balance_migration.sql` en Supabase.
+- Se reutiliza la RLS, el RPC de creación atómica `create_expense_with_split`, y el realtime store existente sin tener que inventar otra tabla como `transfers`.
+
 > Las siguientes ADRs se irán agregando a medida que se tomen decisiones durante la ejecución de las fases.

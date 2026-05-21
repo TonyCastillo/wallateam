@@ -29,7 +29,6 @@ export function AvatarStack({ members, max = 4, size = 28 }: AvatarStackProps) {
             name={m.profile?.full_name ?? '?'}
             size={size}
             ring
-            bg={'rgba(255,255,255,0.35)'}
           />
         </View>
       ))}
@@ -40,7 +39,7 @@ export function AvatarStack({ members, max = 4, size = 28 }: AvatarStackProps) {
             width: size,
             height: size,
             borderRadius: size / 2,
-            backgroundColor: 'rgba(255,255,255,0.35)',
+            backgroundColor: 'rgba(0,0,0,0.6)',
             borderWidth: 2,
             borderColor: theme.colors.background,
             alignItems: 'center',

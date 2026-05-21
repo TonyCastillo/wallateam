@@ -1,9 +1,9 @@
 # Estado actual del proyecto WallaTeam
 
-**Última actualización:** 2026-05-05 (máquina: notebook)
+**Última actualización:** 2026-05-06 (máquina: notebook)
 **Fase activa:** 06-fase-balance
-**Último módulo completado:** 06.03 — Tab Resumen UI
-**Próximo módulo a ejecutar:** `prompts/06-fase-balance/04-saldar-flow.md`
+**Último módulo completado:** 06.05 — Empty states y edge cases
+**Próximo módulo a ejecutar:** `prompts/06-fase-balance/06-validar-mock.md`
 
 > 🔀 **Decisión paralela en curso (2026-05-05):** preparar APK alfa para pruebas internas en familia con la app actual (control de gastos personal). Los pasos de EAS Build, perfil `preview` y firma del APK se documentarán al ejecutarlos.
 
@@ -40,7 +40,7 @@ Antes de probar en Expo Go o de generar el APK alfa, aplicar **todo** lo siguien
 | 03 — Gastos | ✅ Cerrada | 7 / 7 |
 | 04 — Equipo | ✅ Cerrada | 7 / 7 |
 | 05 — Splits | ✅ Cerrada | 7 / 7 |
-| 06 — Balance | 🟡 En curso | 3 / 7 |
+| 06 — Balance | 🟡 En curso | 5 / 7 |
 | 07 — Multimoneda | ⚪ Pendiente | — |
 | 08 — Extras | ⚪ Pendiente | — |
 

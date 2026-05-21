@@ -200,17 +200,39 @@ export const useExpenses = create<ExpensesState>((set, get) => ({
   update: async (id, patch) => {
     set({ loading: true, error: null });
     try {
+      const { splits, ...expensePatch } = patch;
       const { data, error } = await supabase
         .from('expenses')
-        .update(patch)
+        .update(expensePatch)
         .eq('id', id)
         .select()
         .single();
       if (error) throw error;
       const updated = normalizeExpense(data as Expense);
 
-      // Si cambió amount, sincronizar el split (en Fase 3 hay 1 solo split = paid_by con 100%)
-      if (patch.amount !== undefined) {
+      // Si se proveen splits, actualizarlos
+      if (splits && splits.length > 0) {
+        // Eliminar splits anteriores
+        await supabase.from('expense_splits').delete().eq('expense_id', id);
+        
+        // Insertar los nuevos
+        const newSplits = splits.map(s => ({
+          expense_id: id,
+          user_id: s.user_id,
+          percentage: s.percentage,
+          amount: s.amount,
+        }));
+        await supabase.from('expense_splits').insert(newSplits);
+
+        // Actualizar caché de splitsByExpense
+        set((s) => ({
+          splitsByExpense: {
+            ...s.splitsByExpense,
+            [id]: newSplits.map(sp => normalizeSplit({ ...sp, id: '', created_at: new Date().toISOString() } as ExpenseSplit))
+          }
+        }));
+      } else if (patch.amount !== undefined) {
+        // Fallback por si no vienen splits (aunque ahora new.tsx siempre los manda)
         await supabase
           .from('expense_splits')
           .update({ amount: patch.amount, percentage: 100 })

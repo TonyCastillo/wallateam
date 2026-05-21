@@ -25,8 +25,8 @@ declare
   new_expense expenses;
   split_item jsonb;
 begin
-  if p_kind not in ('expense','income') then
-    raise exception 'kind inválido: %, debe ser expense o income', p_kind;
+  if p_kind not in ('expense','income','settlement') then
+    raise exception 'kind inválido: %, debe ser expense, income o settlement', p_kind;
   end if;
 
   if p_split_mode not in ('equal','percent','amount') then

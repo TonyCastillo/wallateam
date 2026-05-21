@@ -50,6 +50,10 @@ export default function AddExpenseScreen() {
       : undefined
   );
 
+  const existingSplits = useExpenses((s) =>
+    params.expenseId ? s.splitsByExpense[params.expenseId] : undefined
+  );
+
   const initialWalletId = params.walletId ?? (wallets.length === 1 ? wallets[0].id : '');
 
   const [submitting, setSubmitting] = useState(false);
@@ -89,12 +93,23 @@ export default function AddExpenseScreen() {
           note: null,
           paid_by: user?.id,
           split_mode: 'equal',
-          splits: user?.id ? [{ user_id: user.id, percentage: 100, amount: 0 }] : [],
+          splits: [],
         },
   });
 
+  // Fetch splits if editing and they aren't loaded
+  useEffect(() => {
+    if (isEdit && isTeamWallet && selectedWallet?.id && (!existingSplits || existingSplits.length === 0)) {
+      useExpenses.getState().fetchSplitsByWallet(selectedWallet.id);
+    }
+  }, [isEdit, isTeamWallet, selectedWallet?.id, existingSplits]);
+
   useEffect(() => {
     if (existing) {
+      const loadedSplits = existingSplits && existingSplits.length > 0
+        ? existingSplits
+        : [{ user_id: existing.paid_by || user?.id || '00000000-0000-0000-0000-000000000000', percentage: 100, amount: Number(existing.amount) }];
+
       reset({
         wallet_id: existing.wallet_id,
         description: existing.description,
@@ -105,10 +120,10 @@ export default function AddExpenseScreen() {
         note: existing.note,
         paid_by: existing.paid_by,
         split_mode: existing.split_mode || 'equal',
-        splits: [{ user_id: existing.paid_by || user?.id || '00000000-0000-0000-0000-000000000000', percentage: 100, amount: Number(existing.amount) }],
+        splits: loadedSplits,
       });
     }
-  }, [existing?.id]);
+  }, [existing?.id, existingSplits]);
 
   const watchedWalletId = watch('wallet_id');
   const watchedCategory = watch('category');
@@ -171,6 +186,7 @@ export default function AddExpenseScreen() {
   useEffect(() => {
     if (watchedSplitMode === 'equal' && isTeamWallet && walletMembers.length > 0) {
       const currentSplits = getValues('splits') ?? [];
+      // Si la lista está vacía (creación nueva), incluir a todos
       const activeIds = currentSplits.length > 0
         ? currentSplits.map((s) => s.user_id)
         : walletMembers.map((m) => m.user_id);
@@ -288,6 +304,8 @@ export default function AddExpenseScreen() {
           occurred_at: values.occurred_at,
           note: values.note ?? null,
           paid_by: values.paid_by,
+          split_mode: values.split_mode,
+          splits: isTeamWallet ? values.splits : [{ user_id: values.paid_by ?? user?.id ?? '', percentage: 100, amount: values.amount }],
         });
       } else {
         await useExpenses.getState().create({

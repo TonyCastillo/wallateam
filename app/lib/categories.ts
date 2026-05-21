@@ -9,7 +9,9 @@ export type CategoryId =
   | 'health'
   | 'work'
   | 'other'
-  | 'subscriptions';
+  | 'subscriptions'
+  | 'loans'
+  | 'supermarket';
 
 export interface CategoryDef {
   id: CategoryId;
@@ -23,11 +25,13 @@ export const CATEGORIES: CategoryDef[] = [
   { id: 'transport',     label: 'Transporte',      icon: 'Car',             color: '#3B82F6' },
   { id: 'home',          label: 'Hogar',           icon: 'Home',            color: '#1F3A5F' },
   { id: 'shopping',      label: 'Compras',         icon: 'ShoppingBag',     color: '#9B59B6' },
-  { id: 'entertainment', label: 'Entretenimiento', icon: 'Sparkles',        color: '#F39C12' },
+  { id: 'supermarket', label: 'Supermercado',      icon: 'ShoppingCart',    color: '#ff820eff' },
+  { id: 'entertainment', label: 'Entretenimiento', icon: 'Sparkles',        color: '#f7c679ff' },
   { id: 'health',        label: 'Salud',           icon: 'Heart',           color: '#E74C3C' },
   { id: 'work',          label: 'Trabajo',         icon: 'Briefcase',       color: '#7F8C8D' },
   { id: 'other',         label: 'Otro',            icon: 'Tag',             color: '#16A085' },
   { id: 'subscriptions', label: 'Suscripciones',   icon: 'CreditCard',      color: '#ca0fa2ff' },
+  { id: 'loans',          label: 'Cuotas / Créditos', icon: 'Calculator',      color: '#52a107ff' },
 ];
 
 // ---------- Categorías de ingresos (solo wallets personales) ----------

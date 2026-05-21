@@ -36,6 +36,8 @@ import { Avatar } from '@/components/Avatar';
 import { AvatarStack } from '@/components/AvatarStack';
 import { InviteSheet } from '@/components/InviteSheet';
 import { TransactionTypeSheet } from '@/components/TransactionTypeSheet';
+import { SaldarSheet } from '@/components/SaldarSheet';
+import { EmptyBalance } from '@/components/EmptyBalance';
 import { withAlpha } from '@/components/IconBox';
 
 type DetailTab = 'gastos' | 'resumen' | 'miembros';
@@ -54,7 +56,9 @@ function resolveLucideIcon(walletIcon: string): IconName {
 function ExpensesList({ walletId }: { walletId: string }) {
   const { theme } = useTheme();
   const router = useRouter();
-  const list = useExpenses((s) => s.list(walletId));
+  const rawList = useExpenses((s) => s.list(walletId));
+  // Ocultar los pagos internos del listado principal
+  const list = rawList.filter((e) => e.kind !== 'settlement');
   const loading = useExpenses((s) => s.loading);
   const fetchByWallet = useExpenses((s) => s.fetchByWallet);
   const [refreshing, setRefreshing] = useState(false);
@@ -298,10 +302,40 @@ function MembersTab({ walletId, walletName }: { walletId: string; walletName: st
 // ----------------------------------------------------------------------------
 // ResumenTab: tab Resumen del Detalle. Usa useBalance.
 // ----------------------------------------------------------------------------
+interface SelectedTransfer {
+  fromUserId: string;
+  toUserId: string;
+  fromName: string;
+  toName: string;
+  amount: number;
+}
+
 function ResumenTab({ wallet, members }: { wallet: Wallet; members: WalletMember[] }) {
   const { theme } = useTheme();
   const currentUserId = useAuth((s) => s.user?.id);
   const { nets, transfers, myNet, isSettled, loading } = useBalance(wallet.id);
+  const hasExpenses = useExpenses((s) => s.list(wallet.id).length > 0);
+  const [selectedTransfer, setSelectedTransfer] = useState<SelectedTransfer | null>(null);
+  const [showInvite, setShowInvite] = useState(false);
+
+  const handleSaldarConfirm = async (amount: number) => {
+    if (!selectedTransfer) return;
+    try {
+      await useExpenses.getState().create({
+        wallet_id: wallet.id,
+        description: 'Pago entre miembros',
+        amount,
+        category: 'other',
+        kind: 'settlement',
+        paid_by: selectedTransfer.fromUserId,
+        split_mode: 'amount',
+        splits: [{ user_id: selectedTransfer.toUserId, percentage: 100, amount }],
+      });
+      setSelectedTransfer(null);
+    } catch (error) {
+      Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo registrar el pago');
+    }
+  };
 
   if (wallet.type === 'personal') {
     return (
@@ -329,6 +363,29 @@ function ResumenTab({ wallet, members }: { wallet: Wallet; members: WalletMember
     );
   }
 
+  // Edge cases / Empty states
+  if (members.length <= 1) {
+    return (
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+        <EmptyBalance variant="no-members" onInvite={() => setShowInvite(true)} />
+        <InviteSheet
+          visible={showInvite}
+          walletId={wallet.id}
+          walletName={wallet.name}
+          onClose={() => setShowInvite(false)}
+        />
+      </ScrollView>
+    );
+  }
+
+  if (!hasExpenses && !loading) {
+    return (
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+        <EmptyBalance variant="no-expenses" />
+      </ScrollView>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100, gap: 24 }}>
       {/* Saldo del usuario actual */}
@@ -347,7 +404,19 @@ function ResumenTab({ wallet, members }: { wallet: Wallet; members: WalletMember
           BALANCE DEL GRUPO
         </Text>
         {loading && nets.length === 0 ? (
-          <ActivityIndicator color={theme.colors.primary} style={{ alignSelf: 'flex-start' }} />
+          <View style={{ gap: 8 }}>
+            {[0, 1, 2].map((i) => (
+              <View
+                key={i}
+                style={{
+                  height: 48,
+                  borderRadius: 14,
+                  backgroundColor: theme.colors.surfaceAlt,
+                  opacity: 0.5,
+                }}
+              />
+            ))}
+          </View>
         ) : (
           nets.map((net) => {
             const member = members.find(m => m.user_id === net.user_id);
@@ -363,13 +432,21 @@ function ResumenTab({ wallet, members }: { wallet: Wallet; members: WalletMember
           TRANSFERENCIAS NECESARIAS
         </Text>
         {loading && transfers.length === 0 ? (
-          <ActivityIndicator color={theme.colors.primary} style={{ alignSelf: 'flex-start' }} />
-        ) : isSettled ? (
-          <View style={{ padding: 16, borderRadius: 14, backgroundColor: theme.colors.surface, alignItems: 'center' }}>
-            <Text style={{ color: theme.colors.textSecondary, fontSize: 13, fontFamily: typography.fontFamily.medium }}>
-              ¡Todo saldado! Nadie debe nada.
-            </Text>
+          <View style={{ gap: 8 }}>
+            {[0, 1].map((i) => (
+              <View
+                key={i}
+                style={{
+                  height: 64,
+                  borderRadius: 14,
+                  backgroundColor: theme.colors.surfaceAlt,
+                  opacity: 0.5,
+                }}
+              />
+            ))}
           </View>
+        ) : isSettled ? (
+          <EmptyBalance variant="all-settled" />
         ) : (
           transfers.map((t, idx) => {
             const fromMember = members.find(m => m.user_id === t.from);
@@ -385,12 +462,32 @@ function ResumenTab({ wallet, members }: { wallet: Wallet; members: WalletMember
                 toName={toName}
                 amount={t.amount}
                 isCurrentUserInvolved={isCurrentUserInvolved}
-                onSettle={() => Alert.alert('Saldar deuda', 'Próximamente...')}
+                onSettle={() => setSelectedTransfer({
+                  fromUserId: t.from,
+                  toUserId: t.to,
+                  fromName,
+                  toName,
+                  amount: t.amount,
+                })}
               />
             );
           })
         )}
       </View>
+
+      {selectedTransfer && (
+        <SaldarSheet
+          visible={!!selectedTransfer}
+          walletId={wallet.id}
+          fromUserId={selectedTransfer.fromUserId}
+          toUserId={selectedTransfer.toUserId}
+          fromName={selectedTransfer.fromName}
+          toName={selectedTransfer.toName}
+          suggestedAmount={selectedTransfer.amount}
+          onConfirm={handleSaldarConfirm}
+          onClose={() => setSelectedTransfer(null)}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -560,7 +657,7 @@ export default function WalletDetailScreen() {
                 </Text>
               </View>
               {!isPersonal && members.length > 0 && (
-                <AvatarStack members={members} max={4} size={24} />
+                <AvatarStack members={members} max={4} size={32} />
               )}
             </View>
           </View>
@@ -603,9 +700,9 @@ export default function WalletDetailScreen() {
               <View style={{ marginBottom: 16 }}>
                 <Metric
                   label="Restante"
-                  value={fmtGs(restante)}
+                  value={fmtGsSigned(restante)}
                   labelColor="rgba(255,255,255,0.7)"
-                  valueColor={theme.colors.accent}
+                  valueColor={restante < 0 ? theme.colors.danger : theme.colors.accent}
                   highlight
                 />
               </View>
