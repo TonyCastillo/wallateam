@@ -31,26 +31,33 @@ git commit -m "chore(balance)[06.99]: cerrar Fase 6
 ```
 
 ### 3. Actualizar bitácora
-- `STATE.md`: Fase activa → 07-fase-multimoneda. Próximo módulo → diseñar prompt-pack 07.
+- `STATE.md`: Fase activa → 08-fase-extras. Próximo módulo → `prompts/08-fase-extras/00-overview.md` (luego 01-storage-bucket).
 - `CHANGELOG.md`: entry `[06.99]` consolidando lo de la fase.
-- `TASKS.md`: mover Fase 6 a Done, agregar item Fase 7 a Pendiente.
+- `TASKS.md`: mover Fase 6 a Done, agregar ítems de Fase 8 a Pendiente.
 - `DECISIONS.md`: ADR-015 (kind='settlement') si no se agregó en 06.04.
 
-### 4. Plantilla para Fase 7
+> **Nota:** Fase 7 (Multimoneda) quedó **diferida indefinidamente** (decisión 2026-05-20 — MVP es PYG-only para lanzamiento en Paraguay). Ver `prompts/07-fase-multimoneda/DEFERRED.md`. Saltamos directamente de Fase 6 a Fase 8.
+
+### 4. Plantilla para Fase 8
 ```
-Empezá Fase 7 (Multimoneda) del proyecto WallaTeam.
+Empezá Fase 8 (Extras) del proyecto WallaTeam.
 
 Lectura obligatoria:
 1. prompts/00-AGENT-HANDOFF.md
 2. prompts/00-MASTER.md
 3. bitacora/STATE.md, CHANGELOG.md, TASKS.md, DECISIONS.md
+4. prompts/08-fase-extras/00-overview.md
 
-Objetivo Fase 7: Soportar wallets en USD y ARS además de PYG.
-Conversión a moneda principal del usuario al mostrar totales agregados
-(BalanceCard, useTotalBalance). Tabla currencies ya existe en schema.sql.
+Objetivo Fase 8: dos features grandes:
+1. Foto del ticket — adjuntar imagen a un gasto vía cámara/galería con
+   upload a Supabase Storage. Columna expenses.photo_url ya existe.
+2. Charts mensuales — visualización de gastos por mes y por categoría
+   en el tab Resumen del Wallet Detail personal (hoy es placeholder).
+
+Fase 7 (Multimoneda) está deferred — no ejecutarla.
 
 Mocks ground truth:
-- Sin mock específico — diseñar componentes nuevos siguiendo design system.
+- Sin mock específico para foto/charts. Diseñar siguiendo design system.
 ```
 
 ## Validación

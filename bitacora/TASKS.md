@@ -16,12 +16,22 @@
 ### Fase 6 — Balance (en cierre)
 - [ ] [Fase 6] 99 — Cerrar fase (smoke test E2E 3 cuentas + commit)
 
-### Fase 1.5 (deferred)
+### Fase 8 — Extras (a ejecutar tras cierre de Fase 6)
+- [ ] [Fase 8] 01 — Supabase Storage bucket `expense-photos` + RLS + helper de upload
+- [ ] [Fase 8] 02 — PhotoPicker en `expense/new.tsx` + upload al guardar
+- [ ] [Fase 8] 03 — Thumbnail en `ExpenseRow` + `PhotoViewer` modal
+- [ ] [Fase 8] 04 — Hooks `useMonthlyTotals` / `useCategoryTotals`
+- [ ] [Fase 8] 05 — Componentes `MonthlyBarChart` + `CategoryDonut`
+- [ ] [Fase 8] 06 — Tab Resumen personal con charts
+- [ ] [Fase 8] 99 — Smoke test E2E + commit de cierre + marca MVP completo
+
+### Diferidas indefinidamente
+- [ ] [Fase 7] Multimoneda (USD, ARS, conversión) — ver `prompts/07-fase-multimoneda/DEFERRED.md`. MVP es PYG-only.
+- [ ] [Post-MVP] Push notifications (`expo-notifications` + Edge Function Supabase) — reevaluar tras validación en uso
+- [ ] [Post-MVP] Gastos recurrentes (suscripciones/alquileres) — requiere cron Supabase
 - [ ] [Fase 1.5] Google OAuth real (config Google Cloud + Supabase OAuth provider)
 - [ ] [Fase 1.5] Forgot password real (`supabase.auth.resetPasswordForEmail` + deep link)
 - [ ] [Fase 1.5] Re-activar Confirm email en Supabase antes de release a producción
-
-### Fases 5-8 (a planificar al cerrar la previa)
 
 ### SQL pendiente de aplicar en Supabase Dashboard
 - [ ] Correr `app/supabase/invites_rpc.sql` (RPCs `get_invite_preview` + `accept_wallet_invite`)
@@ -29,11 +39,7 @@
 - [ ] Correr `app/supabase/incomes_migration.sql` (alter table expenses add column kind) — polish 2026-05-05
 - [ ] Re-correr `app/supabase/expenses_rpc.sql` (parámetro `p_kind` en `create_expense_with_split`) — polish 2026-05-05
 - [ ] Correr `app/supabase/balance_migration.sql` (kind='settlement' en check) — Fase 6
-
-### Fases 5-8 (a planificar al cerrar la previa)
-- [ ] [Fase 6] Balance del grupo (cálculo deudas, saldar)
-- [ ] [Fase 7] Multimoneda (USD, ARS, conversión)
-- [ ] [Fase 8] Extras (foto ticket, push notifications, charts)
+- [ ] Correr `app/supabase/storage_setup.sql` (bucket expense-photos + RLS) — Fase 8.01 (cuando se ejecute)
 
 ## Done
 

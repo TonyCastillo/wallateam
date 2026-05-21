@@ -50,14 +50,14 @@ git pull
 
 | # | Fase | Estado |
 |---|---|---|
-| 01 | Auth (login, signup, sesión persistente) | Definido (prompts listos) |
-| 02 | Wallets personales (Home, Crear, Detalle) | A planificar al cerrar 01 |
-| 03 | Gastos | Pendiente |
-| 04 | Equipo (wallets type='team', invites, RLS) | Pendiente |
-| 05 | Splits (=, %, ₲) | Pendiente |
-| 06 | Balance (cálculo de deudas, saldar) | Pendiente |
-| 07 | Multimoneda (USD, ARS, conversión) | Pendiente |
-| 08 | Extras (foto ticket, push, charts) | Pendiente |
+| 01 | Auth (login, signup, sesión persistente) | ✅ Cerrada |
+| 02 | Wallets personales (Home, Crear, Detalle) | ✅ Cerrada |
+| 03 | Gastos | ✅ Cerrada |
+| 04 | Equipo (wallets type='team', invites, RLS) | ✅ Cerrada |
+| 05 | Splits (=, %, ₲) | ✅ Cerrada |
+| 06 | Balance (cálculo de deudas, saldar) | 🟡 En cierre (6/7, pendiente smoke E2E) |
+| 07 | Multimoneda (USD, ARS, conversión) | ⏸️ Diferida indefinidamente — MVP es PYG-only |
+| 08 | Extras (foto ticket + charts mensuales) | ⚪ Pendiente — prompt-pack listo |
 
 Detalle del alcance: [`prompts/00-MASTER.md`](prompts/00-MASTER.md) sección 9.
 

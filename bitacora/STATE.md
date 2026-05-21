@@ -41,11 +41,13 @@ Antes de probar en Expo Go o de generar el APK alfa, aplicar **todo** lo siguien
 | 04 — Equipo | ✅ Cerrada | 7 / 7 |
 | 05 — Splits | ✅ Cerrada | 7 / 7 |
 | 06 — Balance | 🟡 En curso | 6 / 7 |
-| 07 — Multimoneda | ⚪ Pendiente | — |
-| 08 — Extras | ⚪ Pendiente | — |
+| 07 — Multimoneda | ⏸️ Diferida indefinidamente | — (ver `prompts/07-fase-multimoneda/DEFERRED.md`) |
+| 08 — Extras | ⚪ Pendiente (prompt-pack listo) | 0 / 7 |
 
 ## Notas del momento
 
+- **Decisión 2026-05-20:** Fase 7 (Multimoneda) **diferida indefinidamente**. MVP se lanza PYG-only para Paraguay. Ver `prompts/07-fase-multimoneda/DEFERRED.md`. Al cerrar Fase 6 se salta directamente a Fase 8.
+- **Decisión 2026-05-20:** Fase 8 reducida a 2 tracks: Foto del ticket (3 módulos) + Charts mensuales (3 módulos). Push notifications y gastos recurrentes pasan a Post-MVP.
 - **Fase 3 (Gastos) completa**: CRUD expenses funcional, ExpenseRow, CategoryPicker, WalletPickerSheet, edición y eliminación con ConfirmDeleteSheet, métricas reactivas (gastado/restante/usedPct), over-budget en warning amarillo, useTotalBalance con datos reales en Home
 - **Polish 2026-05-05**: formato `fmtGs` sin abreviaciones M/k en toda la app (ADR-012). Wallets personales ahora soportan ingresos (kind='income') con flujo cuenta bancaria — saldo = initial + ingresos − gastos (ADR-013). FAB del Wallet Detail en personal abre TransactionTypeSheet (Gasto / Cargar saldo). WalletRow muestra balance actual real, no `initial_balance` fijo.
 - Project Supabase activo: `azfcmdihftxtiwrvcfsh.supabase.co`
